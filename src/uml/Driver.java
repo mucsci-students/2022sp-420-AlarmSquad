@@ -59,6 +59,15 @@ public class Driver {
                                 // Adds the Attribure to the desired class
                                 System.out.print("Enter attribute name: ");
                                 String attributeName = scan.next();
+                                
+                                /**
+                                 * I think Java is trying to use it's built in 
+                                 * 'Attribute' type here instead of the 'Attribute'
+                                 * type we made in this package. I asked in the MUCSCI
+                                 * server about this in #Java, so check there if anyone
+                                 * has answered how to solve this.
+                                 */
+                                                                
                                 Attribute attribute = new Attribute(attributeName);
                                 classes.get(i).addAttribute(attribute);
                                 return;
