@@ -2,7 +2,12 @@ package uml;
 
 import java.util.*;
 
+/**
+ * Get user input, then use switch statement to process commands.
+ * Issue: when user just presses enter as input.
+ */
 public class Driver {
+
     public static void main(String[] args){
 
         String prompt = "> ";
@@ -11,21 +16,24 @@ public class Driver {
 
         System.out.print(prompt);
         while(true){
-            System.out.println("before scan.nextln");
+            
             String input = scan.nextLine();
-            System.out.println("after scan.nextln");
 
-            switch (input){
-                case "add class":
-                    System.out.println("Enter class name: ");
-                    input = scan.next();
-                    //System.out.println("You added class " + input);
-                case "":
-                    System.out.print(prompt);
-                case "exit":
-                    return;
-                default:
-                    System.out.println("Please enter a valid command: ");
+
+            if (input.equals(null)){
+                System.out.print(prompt);
+            }
+            else{
+                switch (input){
+                    case "add class":
+                        System.out.println("Enter class name: ");
+                        input = scan.next();
+                        //System.out.println("You added class " + input);
+                    case "exit":
+                        return;
+                    default:
+                        System.out.println("Please enter a valid command: ");
+                }
             }
         }
         
