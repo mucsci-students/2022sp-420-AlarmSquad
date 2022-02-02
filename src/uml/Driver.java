@@ -2,8 +2,6 @@ package uml;
 
 import java.util.*;
 
-import javax.management.Attribute;
-
 /**
  * Gets user input, then uses switch statements to process commands.
  * 
@@ -16,7 +14,7 @@ public class Driver {
     // Creates new scanner
     private static Scanner scan = new Scanner(System.in);
     // The arraylist of classes in the diagram
-    private static ArrayList<Class> classes = new ArrayList<Class>();
+    private static ArrayList<Class> classList = new ArrayList<Class>();
 
     public static void main(String[] args) {
 
@@ -37,45 +35,27 @@ public class Driver {
                     case "exit":
                         return;
                     case "add class":
-                        // Get user defined name for class, then add to ArrayList classes
+                        // Get user defined name for class, then adds new class to ArrayList classes
                         System.out.print("Enter class name: ");
                         String className = scan.next();
                         System.out.println("You added class \"" + className + "\"");
                         Class newClass = new Class(className);
-                        classes.add(newClass);
+                        classList.add(newClass);
                         break;
                     case "delete class":
                         break;
                     case "rename class":
                         break;
                     case "add attribute":
-                        // Finds correct class to add attribute(Att)
-
-                        System.out.print("First enter class name: ");
-                        String classToAddAtt = scan.next();
-
-                        for (int i = 0; i < classes.size(); ++i) {
-                            if (classToAddAtt == classes.get(i).getName()) {
-                                // Adds the Attribure to the desired class
-                                System.out.print("Enter attribute name: ");
-                                String attributeName = scan.next();
-                                
-                                /**
-                                 * I think Java is trying to use it's built in 
-                                 * 'Attribute' type here instead of the 'Attribute'
-                                 * type we made in this package. I asked in the MUCSCI
-                                 * server about this in #Java, so check there if anyone
-                                 * has answered how to solve this.
-                                 */
-                                                                
-                                Attribute attribute = new Attribute(attributeName);
-                                classes.get(i).addAttribute(attribute);
-                                return;
-                            } else
-                                System.out
-                                        .println(classToAddAtt + " class was not found, please try again or add class");
+                        // call find class method
+                        Class classToAddAtt = findClass();
+                        if (classToAddAtt != null) {
+                            // Adds the Attribute to the desired class
+                            System.out.print("Enter attribute name: ");
+                            String attributeName = scan.next();
+                            Attribute attribute = new Attribute(attributeName);
+                            classToAddAtt.addAttribute(attribute);
                         }
-
                         break;
                     case "delete attribute":
                         break;
@@ -93,11 +73,16 @@ public class Driver {
                         break;
                     case "list classes":
                         // outer loop iterating through classes
-                        for (int i = 0; i < classes.size(); ++i) {
-                            System.out.println(classes.get(i).getName());
+                        for (int i = 0; i < classList.size(); ++i) {
+                            System.out.println(classList.get(i).getName());
                         }
                         break;
                     case "list class":
+                        // call find class method
+                        Class classToList = findClass();
+                        //display attributes
+                        System.out.println(classToList); 
+                        //display relationships
                         break;
                     case "list relationships":
                         break;
@@ -110,5 +95,46 @@ public class Driver {
                 }
             }
         }
+    }
+
+    /**
+     * Prompts the user for the name of a class, searches for it in the classList,
+     * returns the class
+     * otherwise, prompts them if it does not exist and returns null
+     * 
+     * @return the class with the matching name field, otherwise null
+     */
+    private static Class findClass() {
+        // prompts user for name and scans the name
+        System.out.print("Enter class name: ");
+        String classToFind = scan.next();
+        // iterates through the arraylist
+        for (int i = 0; i < classList.size(); ++i) {
+            // if the name matches, return class
+            if (classToFind.equals(classList.get(i).getName())) {
+                return classList.get(i);
+            }
+        }
+        // otherwise tell the user it does not exist and return null
+        System.out.println("\"" + classToFind + "\" was not found, please enter an existing class");
+        return null;
+    }
+
+    /**
+     * the user for the name of a class, searches for it in the classList,
+     * returns the class
+     * 
+     * @param classToFind
+     * @return
+     */
+    private static Class findClass(String classToFind) {
+        // iterates through the arraylist
+        for (int i = 0; i < classList.size(); ++i) {
+            // if the name matches, return class
+            if (classToFind.equals(classList.get(i).getName())) {
+                return classList.get(i);
+            }
+        }
+        return null;
     }
 }

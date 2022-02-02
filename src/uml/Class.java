@@ -2,6 +2,8 @@ package uml;
 
 import java.util.ArrayList;
 
+import org.w3c.dom.Attr;
+
 /**
  * A class for the UML class we will be working with in our diagram.
  * 
@@ -46,6 +48,14 @@ public class Class {
     }
 
     /**
+     * 
+     * @return
+     */
+    public ArrayList<Attribute> getAttributes() {
+        return this.attributes;
+    }
+
+    /**
      * Adds an attribute to the end of the attribute list
      * 
      * @param attribute the attribute to be added
@@ -79,5 +89,15 @@ public class Class {
      */
     public void deleteIncomingRelationship(Relationship relationship) {
         this.relationships.remove(relationship);
+    }
+
+    /**
+     * 
+     * 
+     * @param att
+     * @return
+     */
+    public Boolean attributeExists(Attribute att) {
+
     }
 }
