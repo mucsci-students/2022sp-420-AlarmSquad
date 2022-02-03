@@ -62,6 +62,16 @@ public class Driver {
                     case "rename attribute":
                         break;
                     case "add relationship":
+                        System.out.println("Enter source: ");
+                        String sourceName = scan.next();
+                        if (findClass(sourceName).equals(null))
+                            break;
+                        System.out.println("Enter destination: ");
+                        String destinationName = scan.next();
+                        if (findClass(destinationName).equals(null))
+                            break;
+                        Relationship newRelationship = new Relationship(findClass(sourceName),
+                                findClass(destinationName));
                         break;
                     case "delete relationship":
                         break;
@@ -78,11 +88,13 @@ public class Driver {
                         }
                         break;
                     case "list class":
-                        // call find class method
+                        // Get user to input desired class
                         Class classToList = findClass();
-                        //display attributes
-                        System.out.println(classToList); 
-                        //display relationships
+                        // print class name
+                        if (classToList != null) {
+                            System.out.println("Class name: " + classToList.getName());
+                            listClass(classToList);
+                        }
                         break;
                     case "list relationships":
                         break;
@@ -96,6 +108,15 @@ public class Driver {
             }
         }
     }
+
+    /*********************************************************************************/
+    /**
+     * 
+     * Programmer defined methods
+     *
+     *
+     * /
+     *********************************************************************************/
 
     /**
      * Prompts the user for the name of a class, searches for it in the classList,
@@ -121,11 +142,11 @@ public class Driver {
     }
 
     /**
-     * the user for the name of a class, searches for it in the classList,
-     * returns the class
+     * Searches for a given class name in the classList and returns the class,
+     * otherwise, returns null
      * 
-     * @param classToFind
-     * @return
+     * @param classToFind the given class name
+     * @return the class with the given class name
      */
     private static Class findClass(String classToFind) {
         // iterates through the arraylist
@@ -135,6 +156,22 @@ public class Driver {
                 return classList.get(i);
             }
         }
+        // otherwise tell the user it does not exist and return null
+        System.out.println("\"" + classToFind + "\" was not found, please enter an existing class");
         return null;
+    }
+
+    private static void listClass(Class classToList) {
+        // makes arraylist of this classes attributes
+        ArrayList<Attribute> list = classToList.getAttributes();
+        // print all the attributes
+        System.out.print("[ ");
+        if (list.size() >= 1) {
+            System.out.print(list.get(0).getName());
+        }
+        for (int i = 1; i < list.size(); ++i) {
+            System.out.print(", " + list.get(i).getName());
+        }
+        System.out.println(" ]");
     }
 }

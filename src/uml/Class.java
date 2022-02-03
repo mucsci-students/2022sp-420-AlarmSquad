@@ -2,8 +2,6 @@ package uml;
 
 import java.util.ArrayList;
 
-import org.w3c.dom.Attr;
-
 /**
  * A class for the UML class we will be working with in our diagram.
  * 
@@ -55,6 +53,7 @@ public class Class {
         return this.attributes;
     }
 
+
     /**
      * Adds an attribute to the end of the attribute list
      * 
@@ -97,7 +96,7 @@ public class Class {
      * @param att
      * @return
      */
-    public Boolean attributeExists(Attribute att) {
+    //public Boolean attributeExists(Attribute att) {
 
-    }
+    //}
 }

@@ -20,6 +20,7 @@ public class Relationship {
      * @param source      the source of the relationship
      * @param destination the destination of the relationship
      */
+    
     public Relationship(Class source, Class destination) {
         this.id = source.getName() + destination.getName();
         this.source = source;
