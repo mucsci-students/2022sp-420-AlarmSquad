@@ -12,7 +12,7 @@ public class Class {
     // The name of the class
     private String name;
     // The arraylist of attributes in the class
-    private ArrayList<Attribute> attributes;
+    private ArrayList<Attribute> attributeList;
 
     /**
      * Default constructor
@@ -21,7 +21,7 @@ public class Class {
      */
     public Class(String name) {
         this.name = name;
-        this.attributes = new ArrayList<Attribute>();
+        this.attributeList = new ArrayList<Attribute>();
     }
 
     /**
@@ -43,13 +43,13 @@ public class Class {
     }
 
     /**
+     * Gets the attribute list of the class
      * 
-     * @return
+     * @return the list of attributes
      */
     public ArrayList<Attribute> getAttributes() {
-        return this.attributes;
+        return this.attributeList;
     }
-
 
     /**
      * Adds an attribute to the end of the attribute list
@@ -57,7 +57,7 @@ public class Class {
      * @param attribute the attribute to be added
      */
     public void addAttribute(Attribute attribute) {
-        this.attributes.add(attribute);
+        this.attributeList.add(attribute);
     }
 
     /**
@@ -66,6 +66,24 @@ public class Class {
      * @param attribute the attribute to be deleted
      */
     public void deleteAttribute(Attribute attribute) {
-        this.attributes.remove(attribute);
+        this.attributeList.remove(attribute);
+    }
+
+    /**
+     * Lists the name of the class and its attributes in a nice way
+     * 
+     */
+    public void listClass() {
+        // prints the name of the class
+        System.out.println("Class name: " + this.name);
+        // prints all the attributes in a set
+        System.out.print("[ ");
+        if (attributeList.size() >= 1) {
+            System.out.print(attributeList.get(0).getName());
+        }
+        for (int i = 1; i < attributeList.size(); ++i) {
+            System.out.print(", " + attributeList.get(i).getName());
+        }
+        System.out.println(" ]");
     }
 }

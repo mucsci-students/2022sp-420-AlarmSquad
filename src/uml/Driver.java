@@ -16,7 +16,7 @@ public class Driver {
     // The arraylist of classes in the diagram
     private static ArrayList<Class> classList = new ArrayList<Class>();
     // The arraylist of relationships the class has
-    private static ArrayList<Relationship> relationships = new ArrayList<Relationship>();
+    private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
 
     public static void main(String[] args) {
 
@@ -49,15 +49,14 @@ public class Driver {
                         System.out.print("Enter class name to delete: ");
                         String classNameDel = scan.next();
 
-                        if(classNameDel != null) {
+                        if (classNameDel != null) {
                             System.out.print("Are you sure? (y/n): ");
                             String answer = scan.next();
                             // If yes, delete class with class name from input
-                            if(answer == "y") {
+                            if (answer == "y") {
                                 classList.remove(findClass(classNameDel));
                                 System.out.println("You deleted \"" + classNameDel + "\"");
-                            }
-                            else {
+                            } else {
                                 break;
                             }
                         }
@@ -81,8 +80,7 @@ public class Driver {
                         if (classToDelAtt != null) {
                             System.out.print("Enter attribute name to delete: ");
                             String attToDel = scan.next();
-                            
-                            classToDelAtt.deleteAttribute();
+                            // classToDelAtt.deleteAttribute();
                         }
                         break;
                     case "rename attribute":
@@ -91,21 +89,20 @@ public class Driver {
                         System.out.println("Enter source class name: ");
                         String sourceName = scan.next();
                         // If source class is valid and exists get destination class
-                        if (!findClass(sourceName).equals(null)){
+                        if (!findClass(sourceName).equals(null)) {
                             System.out.println("Enter destination: ");
                             String destinationName = scan.next();
-                            // If destination class is valid and exists add 
-                            // relationshipo to relationship array list
-                            if (!findClass(destinationName).equals(null)){
+                            // If destination class is valid and exists add
+                            // relationship to relationship array list
+                            if (!findClass(destinationName).equals(null)) {
                                 Relationship newRelationship = new Relationship(findClass(sourceName),
                                         findClass(destinationName));
-                                relationships.add(newRelationship);
+                                relationshipList.add(newRelationship);
                             }
                         }
                         break;
                     case "delete relationship":
                         findRelationship();
-
                         break;
                     case "rename relationship":
                         break;
@@ -116,7 +113,7 @@ public class Driver {
                     case "list classes":
                         // Loops through classList and calls listClass on all elements
                         for (int i = 0; i < classList.size(); ++i) {
-                            listClass(classList.get(i));
+                            classList.get(i).listClass();
                         }
                         break;
                     case "list class":
@@ -124,7 +121,7 @@ public class Driver {
                         Class classToList = findClass();
                         // print class name
                         if (classToList != null) {
-                            listClass(classToList);
+                            classToList.listClass();
                         }
                         break;
                     case "list relationships":
@@ -142,12 +139,9 @@ public class Driver {
 
     /*********************************************************************************/
     /**
-     * 
      * Programmer defined methods
-     *
-     *
      * /
-     *********************************************************************************/
+    /*********************************************************************************/
 
     /**
      * Prompts the user for the name of a class, searches for it in the classList,
@@ -195,35 +189,14 @@ public class Driver {
     private static Relationship findRelationship() {
         System.out.print("Enter Relationship ID: ");
         String relationToFind = scan.next();
-        for (int i = 0; i < relationships.size(); ++i) {
+        for (int i = 0; i < relationshipList.size(); ++i) {
             // if the name matches, return class
-            if (relationToFind.equals(relationships.get(i).getID())) {
-                return relationships.get(i);
-            } 
+            if (relationToFind.equals(relationshipList.get(i).getID())) {
+                return relationshipList.get(i);
+            }
         }
         System.out.println("\"" + relationToFind + "\" was not found, please enter an existing class");
         return null;
     }
 
-
-    /**
-     * Lists the name of a class and its attributes
-     * 
-     * @param classToList 
-     */
-    private static void listClass(Class classToList) {
-        // makes arraylist of this classes attributes
-        ArrayList<Attribute> list = classToList.getAttributes();
-        // prints the name of the class
-        System.out.println("Class name: " + classToList.getName());
-        // prints all the attributes in a set
-        System.out.print("[ ");
-        if (list.size() >= 1) {
-            System.out.print(list.get(0).getName());
-        }
-        for (int i = 1; i < list.size(); ++i) {
-            System.out.print(", " + list.get(i).getName());
-        }
-        System.out.println(" ]");
-    }
 }

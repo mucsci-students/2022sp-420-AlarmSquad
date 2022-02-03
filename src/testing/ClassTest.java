@@ -3,11 +3,15 @@ package testing;
 import uml.*;
 import org.junit.Test;
 
+/**
+ * JUnit tests for Class
+ * 
+ * @authors
+ */
 public class ClassTest {
-    // CLASS TESTS
 
     @Test
-    public boolean addSuccessful() {
-        
+    public boolean test01Constructor() {
+        return true;
     }
 }
