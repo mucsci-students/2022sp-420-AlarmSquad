@@ -15,6 +15,8 @@ public class Driver {
     private static Scanner scan = new Scanner(System.in);
     // The arraylist of classes in the diagram
     private static ArrayList<Class> classList = new ArrayList<Class>();
+    // The arraylist of relationships the class has
+    private static ArrayList<Relationship> relationships = new ArrayList<Relationship>();
 
     public static void main(String[] args) {
 
@@ -88,23 +90,22 @@ public class Driver {
                     case "add relationship":
                         System.out.println("Enter source class name: ");
                         String sourceName = scan.next();
-                        if (findClass(sourceName).equals(null)) {
-                            break;
+                        // If source class is valid and exists get destination class
+                        if (!findClass(sourceName).equals(null)){
+                            System.out.println("Enter destination: ");
+                            String destinationName = scan.next();
+                            // If destination class is valid and exists add 
+                            // relationshipo to relationship array list
+                            if (!findClass(destinationName).equals(null)){
+                                Relationship newRelationship = new Relationship(findClass(sourceName),
+                                        findClass(destinationName));
+                                relationships.add(newRelationship);
+                            }
                         }
-                        System.out.println("Enter destination class name: ");
-                        String destinationName = scan.next();
-                        if (findClass(destinationName).equals(null)) {
-                            break;
-                        }
-                        Relationship newRelationship = new Relationship(findClass(sourceName),
-                                findClass(destinationName));
                         break;
                     case "delete relationship":
-                        System.out.println("Enter relationship to delete");
-                        String relationToDel = scan.next();
-                        //if (findRelationship(relationToDel).equals(null)) {
-                           // break;
-                        //} else findClass(relationToDel);
+                        findRelationship();
+
                         break;
                     case "rename relationship":
                         break;
@@ -191,11 +192,18 @@ public class Driver {
         return null;
     }
 
-    //private static Relationship findRelationship() {
-        //System.out.print("Enter Relationship: ");
-       // String relationToFind = scan.next();
-        
-    //}
+    private static Relationship findRelationship() {
+        System.out.print("Enter Relationship ID: ");
+        String relationToFind = scan.next();
+        for (int i = 0; i < relationships.size(); ++i) {
+            // if the name matches, return class
+            if (relationToFind.equals(relationships.get(i).getID())) {
+                return relationships.get(i);
+            } 
+        }
+        System.out.println("\"" + relationToFind + "\" was not found, please enter an existing class");
+        return null;
+    }
 
 
     /**
