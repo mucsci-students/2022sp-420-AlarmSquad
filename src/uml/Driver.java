@@ -2,9 +2,6 @@ package uml;
 
 import java.util.*;
 
-import javax.lang.model.util.ElementScanner6;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
-
 /**
  * Gets user input, then uses switch statements to process commands.
  * 
@@ -50,26 +47,9 @@ public class Driver {
                     case "delete class":
                         // Get user input of class name to be deleted
                         System.out.print("Enter class name to delete: ");
-                        String classToDeleteName = scan.next();
-                        
-                        // Create new class object. If a class matches the user inputed name,
-                        // remove it from the ArrayList. Otherwise, inform user of failure.
-                        Class classToDelete = null;
-                        // Iterate through ArrayList of classes to see if class exists
-                        for (Class classObj:classList){
-                            if(classObj.getName().equals(classToDeleteName))
-                            classToDelete = classObj;
-                        }
-                        // Remove whatever class classToDelete was assigned as from
-                        // the ArrayList
-                        if(classToDelete != null){
-                            classList.remove(classToDelete);
-                        }
-                        // If no class was found in the ArrayList matching the name of the
-                        // users input, classToDelete will still be null
-                        else{
-                            System.out.println("Class \"" + classToDeleteName + "\" not found");
-                        }
+                        String classDeleteInput = scan.next();
+                        // Copy classList into new ArrayList with deleted class
+                        classList = deleteClass(classDeleteInput);
                         break;
                     case "rename class":
                         break;
@@ -151,7 +131,8 @@ public class Driver {
     /**
      * Programmer defined methods
      * /
-    /*********************************************************************************/
+     * /
+     *********************************************************************************/
 
     /**
      * Prompts the user for the name of a class, searches for it in the classList,
@@ -207,6 +188,28 @@ public class Driver {
         }
         System.out.println("\"" + relationToFind + "\" was not found, please enter an existing class");
         return null;
+    }
+
+    public static ArrayList<Class> deleteClass(String classToDeleteName) {
+        // Create new class object. If a class matches the user inputed name,
+        // remove it from the ArrayList. Otherwise, inform user of failure.
+        Class classToDelete = null;
+        // Iterate through ArrayList of classes to see if class exists
+        for (Class classObj : classList) {
+            if (classObj.getName().equals(classToDeleteName))
+                classToDelete = classObj;
+        }
+        // Remove whatever class classToDelete was assigned as from
+        // the ArrayList
+        if (classToDelete != null) {
+            classList.remove(classToDelete);
+        }
+        // If no class was found in the ArrayList matching the name of the
+        // users input, classToDelete will still be null
+        else {
+            System.out.println("Class \"" + classToDeleteName + "\" not found");
+        }
+        return classList;
     }
 
 }
