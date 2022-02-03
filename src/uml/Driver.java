@@ -43,12 +43,21 @@ public class Driver {
                         classList.add(newClass);
                         break;
                     case "delete class":
-                        System.out.print("Enter class name: ");
+                        // Get user input of class name to be deleted, prompt the user for yes or no
+                        System.out.print("Enter class name to delete: ");
                         String classNameDel = scan.next();
-                        if(classNameDel != null){
-                            System.out.print("Are you sure? (y/n)");
-                            classList.remove(findClass(classNameDel));
-                            System.out.println("You deleted \"" + classNameDel + "\"");
+
+                        if(classNameDel != null) {
+                            System.out.print("Are you sure? (y/n): ");
+                            String answer = scan.next();
+                            // If yes, delete class with class name from input
+                            if(answer == "y") {
+                                classList.remove(findClass(classNameDel));
+                                System.out.println("You deleted \"" + classNameDel + "\"");
+                            }
+                            else {
+                                break;
+                            }
                         }
                         break;
                     case "rename class":
@@ -65,19 +74,28 @@ public class Driver {
                         }
                         break;
                     case "delete attribute":
-
+                        // Call find class method
+                        Class classToDelAtt = findClass();
+                        if (classToDelAtt != null) {
+                            System.out.print("Enter attribute name to delete: ");
+                            String attToDel = scan.next();
+                            
+                            classToDelAtt.deleteAttribute();
+                        }
                         break;
                     case "rename attribute":
                         break;
                     case "add relationship":
-                        System.out.println("Enter source: ");
+                        System.out.println("Enter source class name: ");
                         String sourceName = scan.next();
-                        if (findClass(sourceName).equals(null))
+                        if (findClass(sourceName).equals(null)) {
                             break;
-                        System.out.println("Enter destination: ");
+                        }
+                        System.out.println("Enter destination class name: ");
                         String destinationName = scan.next();
-                        if (findClass(destinationName).equals(null))
+                        if (findClass(destinationName).equals(null)) {
                             break;
+                        }
                         Relationship newRelationship = new Relationship(findClass(sourceName),
                                 findClass(destinationName));
                         break;

@@ -1,8 +1,9 @@
-package uml;
+package testing;
 
+import uml.*;
 import org.junit.Test;
 
-public class Tests {
+public class ClassTest {
     // CLASS TESTS
 
     @Test
