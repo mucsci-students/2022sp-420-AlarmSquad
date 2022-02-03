@@ -1,0 +1,215 @@
+package uml;
+
+import java.util.*;
+
+/**
+ * Gets user input, then uses switch statements to process commands.
+ * 
+ * @authors
+ */
+public class Driver {
+
+    // Default prompt for user
+    private static String prompt = "> ";
+    // Creates new scanner
+    private static Scanner scan = new Scanner(System.in);
+    // The arraylist of classes in the diagram
+    private static ArrayList<Class> classList = new ArrayList<Class>();
+    // The arraylist of relationships the class has
+    private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
+
+    public static void main(String[] args) {
+
+        System.out.print(prompt);
+
+        // Enters the command loop
+        while (true) {
+
+            // Takes in the next line of user input
+            String input = scan.nextLine();
+
+            // If the user enters a blank line, prompt again
+            if (input.equals("")) {
+                System.out.print(prompt);
+            } else {
+                // If the user enters a command
+                switch (input) {
+                    case "exit":
+                        return;
+                    case "add class":
+                        // Get user defined name for class, then adds new class to ArrayList classes
+                        System.out.print("Enter class name: ");
+                        String className = scan.next();
+                        System.out.println("You added class \"" + className + "\"");
+                        Class newClass = new Class(className);
+                        classList.add(newClass);
+                        break;
+                    case "delete class":
+                        // Get user input of class name to be deleted
+                        System.out.print("Enter class name to delete: ");
+                        String classDeleteInput = scan.next();
+                        // Copy classList into new ArrayList with deleted class
+                        classList = deleteClass(classDeleteInput);
+                        break;
+                    case "rename class":
+                        break;
+                    case "add attribute":
+                        // Call find class method
+                        Class classToAddAtt = findClass();
+                        if (classToAddAtt != null) {
+                            // Adds the Attribute to the desired class
+                            System.out.print("Enter attribute name: ");
+                            String attributeName = scan.next();
+                            Attribute attribute = new Attribute(attributeName);
+                            classToAddAtt.addAttribute(attribute);
+                        }
+                        break;
+                    case "delete attribute":
+                        // Call find class method
+                        Class classToDelAtt = findClass();
+                        if (classToDelAtt != null) {
+                            System.out.print("Enter attribute name to delete: ");
+                            String attToDel = scan.next();
+                            // classToDelAtt.deleteAttribute();
+                        }
+                        break;
+                    case "rename attribute":
+                        break;
+                    case "add relationship":
+                        System.out.println("Enter source class name: ");
+                        String sourceName = scan.next();
+                        // If source class is valid and exists get destination class
+                        if (!findClass(sourceName).equals(null)) {
+                            System.out.println("Enter destination: ");
+                            String destinationName = scan.next();
+                            // If destination class is valid and exists add
+                            // relationship to relationship array list
+                            if (!findClass(destinationName).equals(null)) {
+                                Relationship newRelationship = new Relationship(findClass(sourceName),
+                                        findClass(destinationName));
+                                relationshipList.add(newRelationship);
+                            }
+                        }
+                        break;
+                    case "delete relationship":
+                        findRelationship();
+                        break;
+                    case "rename relationship":
+                        break;
+                    case "save":
+                        break;
+                    case "load":
+                        break;
+                    case "list classes":
+                        // Loops through classList and calls listClass on all elements
+                        for (int i = 0; i < classList.size(); ++i) {
+                            classList.get(i).listClass();
+                        }
+                        break;
+                    case "list class":
+                        // Get user to input desired class
+                        Class classToList = findClass();
+                        // print class name
+                        if (classToList != null) {
+                            classToList.listClass();
+                        }
+                        break;
+                    case "list relationships":
+                        break;
+                    case "help":
+                        break;
+                    // If the command is not valid
+                    default:
+                        System.out.println("Please enter a valid command");
+                        System.out.print(prompt);
+                }
+            }
+        }
+    }
+
+    /*********************************************************************************/
+    /**
+     * Programmer defined methods
+     * /
+     * /
+     *********************************************************************************/
+
+    /**
+     * Prompts the user for the name of a class, searches for it in the classList,
+     * returns the class
+     * otherwise, prompts them if it does not exist and returns null
+     * 
+     * @return the class with the matching name field, otherwise null
+     */
+    private static Class findClass() {
+        // prompts user for name and scans the name
+        System.out.print("Enter class name: ");
+        String classToFind = scan.next();
+        // iterates through the arraylist
+        for (int i = 0; i < classList.size(); ++i) {
+            // if the name matches, return class
+            if (classToFind.equals(classList.get(i).getName())) {
+                return classList.get(i);
+            }
+        }
+        // otherwise tell the user it does not exist and return null
+        System.out.println("\"" + classToFind + "\" was not found, please enter an existing class");
+        return null;
+    }
+
+    /**
+     * Searches for a given class name in the classList and returns the class,
+     * otherwise, returns null
+     * 
+     * @param classToFind the given class name
+     * @return the class with the given class name
+     */
+    private static Class findClass(String classToFind) {
+        // iterates through the arraylist
+        for (int i = 0; i < classList.size(); ++i) {
+            // if the name matches, return class
+            if (classToFind.equals(classList.get(i).getName())) {
+                return classList.get(i);
+            }
+        }
+        // otherwise tell the user it does not exist and return null
+        System.out.println("\"" + classToFind + "\" was not found, please enter an existing class");
+        return null;
+    }
+
+    private static Relationship findRelationship() {
+        System.out.print("Enter Relationship ID: ");
+        String relationToFind = scan.next();
+        for (int i = 0; i < relationshipList.size(); ++i) {
+            // if the name matches, return class
+            if (relationToFind.equals(relationshipList.get(i).getID())) {
+                return relationshipList.get(i);
+            }
+        }
+        System.out.println("\"" + relationToFind + "\" was not found, please enter an existing class");
+        return null;
+    }
+
+    public static ArrayList<Class> deleteClass(String classToDeleteName) {
+        // Create new class object. If a class matches the user inputed name,
+        // remove it from the ArrayList. Otherwise, inform user of failure.
+        Class classToDelete = null;
+        // Iterate through ArrayList of classes to see if class exists
+        for (Class classObj : classList) {
+            if (classObj.getName().equals(classToDeleteName))
+                classToDelete = classObj;
+        }
+        // Remove whatever class classToDelete was assigned as from
+        // the ArrayList
+        if (classToDelete != null) {
+            classList.remove(classToDelete);
+        }
+        // If no class was found in the ArrayList matching the name of the
+        // users input, classToDelete will still be null
+        else {
+            System.out.println("Class \"" + classToDeleteName + "\" not found");
+        }
+        return classList;
+    }
+
+}
