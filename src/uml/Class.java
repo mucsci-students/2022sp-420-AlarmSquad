@@ -86,4 +86,18 @@ public class Class {
         }
         System.out.println(" ]");
     }
+
+
+    public Attribute findAtt(String attToFind) {
+        // iterates through the arraylist
+        for (int i = 0; i < attributeList.size(); ++i) {
+            // if the name matches, return class
+            if (attToFind.equals(attributeList.get(i).getName())) {
+                return attributeList.get(i);
+            }
+        }
+        // otherwise tell the user it does not exist and return null
+        System.out.println("\"" + attToFind + "\" was not found, please enter an existing attribute");
+        return null;
+    }
 }

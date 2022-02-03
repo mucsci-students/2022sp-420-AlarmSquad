@@ -65,12 +65,18 @@ public class Driver {
                         }
                         break;
                     case "delete attribute":
-                        // Call find class method
+                        // Call find attribute method
                         Class classToDelAtt = findClass();
                         if (classToDelAtt != null) {
                             System.out.print("Enter attribute name to delete: ");
                             String attToDel = scan.next();
-                            // classToDelAtt.deleteAttribute();
+                            System.out.print("Are you sure you want to delete \"" + attToDel +"\"? (y/n) ");
+                            String answer = scan.next();
+                            if (answer.equals("y")) {
+                                Attribute deletedAtt = classToDelAtt.findAtt(attToDel);
+                                classToDelAtt.deleteAttribute(deletedAtt);
+                                System.out.print("Attribute \"" + attToDel + "\" has been deleted");
+                            }
                         }
                         break;
                     case "rename attribute":
