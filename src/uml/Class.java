@@ -13,8 +13,6 @@ public class Class {
     private String name;
     // The arraylist of attributes in the class
     private ArrayList<Attribute> attributes;
-    // The arraylist of relationships the class has
-    private ArrayList<Relationship> relationships;
 
     /**
      * Default constructor
@@ -24,7 +22,6 @@ public class Class {
     public Class(String name) {
         this.name = name;
         this.attributes = new ArrayList<Attribute>();
-        this.relationships = new ArrayList<Relationship>();
     }
 
     /**
@@ -71,32 +68,4 @@ public class Class {
     public void deleteAttribute(Attribute attribute) {
         this.attributes.remove(attribute);
     }
-
-    /**
-     * Adds a relationship to the end of the relationship list
-     * 
-     * @param relationship the relationship to be added
-     */
-    public void addIncomingRelationship(Relationship relationship) {
-        this.relationships.add(relationship);
-    }
-
-    /**
-     * Deletes the first occurance of the relationship from the relationship list
-     * 
-     * @param relationship the relationship to be deleted
-     */
-    public void deleteIncomingRelationship(Relationship relationship) {
-        this.relationships.remove(relationship);
-    }
-
-    /**
-     * 
-     * 
-     * @param att
-     * @return
-     */
-    //public Boolean attributeExists(Attribute att) {
-
-    //}
 }

@@ -43,11 +43,18 @@ public class Driver {
                         classList.add(newClass);
                         break;
                     case "delete class":
+                        System.out.print("Enter class name: ");
+                        String classNameDel = scan.next();
+                        if(classNameDel != null){
+                            System.out.print("Are you sure? (y/n)");
+                            classList.remove(findClass(classNameDel));
+                            System.out.println("You deleted \"" + classNameDel + "\"");
+                        }
                         break;
                     case "rename class":
                         break;
                     case "add attribute":
-                        // call find class method
+                        // Call find class method
                         Class classToAddAtt = findClass();
                         if (classToAddAtt != null) {
                             // Adds the Attribute to the desired class
@@ -58,6 +65,7 @@ public class Driver {
                         }
                         break;
                     case "delete attribute":
+
                         break;
                     case "rename attribute":
                         break;
@@ -74,6 +82,11 @@ public class Driver {
                                 findClass(destinationName));
                         break;
                     case "delete relationship":
+                        System.out.println("Enter relationship to delete");
+                        String relationToDel = scan.next();
+                        //if (findRelationship(relationToDel).equals(null)) {
+                           // break;
+                        //} else findClass(relationToDel);
                         break;
                     case "rename relationship":
                         break;
@@ -82,9 +95,9 @@ public class Driver {
                     case "load":
                         break;
                     case "list classes":
-                        // outer loop iterating through classes
+                        // Loops through classList and calls listClass on all elements
                         for (int i = 0; i < classList.size(); ++i) {
-                            System.out.println(classList.get(i).getName());
+                            listClass(classList.get(i));
                         }
                         break;
                     case "list class":
@@ -92,7 +105,6 @@ public class Driver {
                         Class classToList = findClass();
                         // print class name
                         if (classToList != null) {
-                            System.out.println("Class name: " + classToList.getName());
                             listClass(classToList);
                         }
                         break;
@@ -161,10 +173,24 @@ public class Driver {
         return null;
     }
 
+    //private static Relationship findRelationship() {
+        //System.out.print("Enter Relationship: ");
+       // String relationToFind = scan.next();
+        
+    //}
+
+
+    /**
+     * Lists the name of a class and its attributes
+     * 
+     * @param classToList 
+     */
     private static void listClass(Class classToList) {
         // makes arraylist of this classes attributes
         ArrayList<Attribute> list = classToList.getAttributes();
-        // print all the attributes
+        // prints the name of the class
+        System.out.println("Class name: " + classToList.getName());
+        // prints all the attributes in a set
         System.out.print("[ ");
         if (list.size() >= 1) {
             System.out.print(list.get(0).getName());

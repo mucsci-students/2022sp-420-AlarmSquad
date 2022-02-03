@@ -1,5 +1,6 @@
 package uml;
 
+import java.util.ArrayList;
 /**
  * A class for the relationships we will be working with in our UML classes.
  * 
@@ -13,6 +14,8 @@ public class Relationship {
     private Class source;
     // The destination of the relationship
     private Class destination;
+    // The arraylist of relationships the class has
+    private ArrayList<Relationship> relationships;
 
     /**
      * Default constructor

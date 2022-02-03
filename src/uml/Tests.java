@@ -1,8 +1,12 @@
 package uml;
 
+import org.junit.Test;
+
 public class Tests {
     // CLASS TESTS
-    /*public bool addSuccessful() {
+
+    @Test
+    public boolean addSuccessful() {
         
-    }*/
+    }
 }
