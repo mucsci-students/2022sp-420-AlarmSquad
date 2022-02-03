@@ -1,6 +1,9 @@
 package testing;
 
-import uml.*;
+import uml.Class;
+
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 /**
@@ -11,7 +14,11 @@ import org.junit.Test;
 public class ClassTest {
 
     @Test
-    public boolean test01Constructor() {
-        return true;
+    public void testClassConstruction() {
+        Class sharkClass = new Class("shark");
+        assertEquals(true, sharkClass.getName().equals("shark"));
+        assertEquals(true, sharkClass.getAttributes().isEmpty());
+        assertEquals(true, sharkClass.getIncomingRelationships().isEmpty());
+        assertEquals(true, sharkClass.getOutgoingRelationships().isEmpty());
     }
 }
