@@ -14,8 +14,7 @@ public class Relationship {
     private Class source;
     // The destination of the relationship
     private Class destination;
-    // The arraylist of relationships the class has
-    private ArrayList<Relationship> relationships;
+
 
     /**
      * Default constructor
