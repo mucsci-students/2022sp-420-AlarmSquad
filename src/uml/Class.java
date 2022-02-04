@@ -87,7 +87,11 @@ public class Class {
         System.out.println(" ]");
     }
 
-
+    /**
+     * Iterates through AttributeList, returns with .get()
+     * @param attToFind
+     * @return attribute if found, null if not found
+     */
     public Attribute findAtt(String attToFind) {
         // iterates through the arraylist
         for (int i = 0; i < attributeList.size(); ++i) {
