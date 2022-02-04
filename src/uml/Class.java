@@ -88,8 +88,9 @@ public class Class {
     }
 
     /**
-     * Finds the attribute in a class
-     * @param attToFind the attribute to find
+     * Iterates through AttributeList, returns with .get()
+     * @param attToFind
+     * @return attribute if found, null if not found
      */
     public Attribute findAtt(String attToFind) {
         // iterates through the arraylist
