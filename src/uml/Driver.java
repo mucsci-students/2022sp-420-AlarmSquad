@@ -87,7 +87,7 @@ public class Driver {
                         if (classToDelAtt != null) {
                             System.out.print("Enter attribute name to delete: ");
                             String attToDel = scan.next();
-                            System.out.print("Are you sure you want to delete \"" + attToDel +"\"? (y/n) ");
+                            System.out.print("Are you sure you want to delete \"" + attToDel + "\"? (y/n) ");
                             String answer = scan.next();
                             if (answer.equals("y")) {
                                 Attribute deletedAtt = classToDelAtt.findAtt(attToDel);
@@ -96,8 +96,35 @@ public class Driver {
                             }
                         }
                         break;
+
                     case "rename attribute":
+
+                        // Show user classes and attributes before asking for input
+                        listClasses();
+                        System.out.print("Enter class attribute is in: ");
+                        String classWithAttName = scan.next();
+
+                        // Ensure class exists
+                        Class classWithAtt = findClass(classWithAttName);
+                        if (classWithAtt != null) {
+                            // List attributes in class before asking for input
+                            findClass(classWithAttName).listClass();
+                            System.out.print("Enter attribute to be renamed: ");
+                            String oldAttName = scan.next();
+
+                            // Ensure attribute exists
+                            Attribute newAtt = classWithAtt.findAtt(oldAttName);
+                            if (newAtt != null) {
+                                // Rename attribute with user's new name
+                                System.out.print("Enter new name for " + oldAttName + ": ");
+                                String newAttName = scan.next();
+                                newAtt.setName(newAttName);
+                                System.out.println(oldAttName + " in class " + classWithAttName +
+                                        " renamed to " + newAtt.getName());
+                            }
+                        }
                         break;
+
                     case "add relationship":
                         System.out.println("Enter source class name: ");
                         String sourceName = scan.next();
@@ -124,10 +151,7 @@ public class Driver {
                     case "load":
                         break;
                     case "list classes":
-                        // Loops through classList and calls listClass on all elements
-                        for (int i = 0; i < classList.size(); ++i) {
-                            classList.get(i).listClass();
-                        }
+                        listClasses();
                         break;
                     case "list class":
                         // Get user to input desired class
@@ -198,6 +222,16 @@ public class Driver {
         // otherwise tell the user it does not exist and return null
         System.out.println("\"" + classToFind + "\" was not found, please enter an existing class");
         return null;
+    }
+
+    /**
+     * List all classes and their accompanying attributes
+     */
+    public static void listClasses() {
+        // Loops through classList and calls listClass on all elements
+        for (int i = 0; i < classList.size(); ++i) {
+            classList.get(i).listClass();
+        }
     }
 
     private static Relationship findRelationship() {
