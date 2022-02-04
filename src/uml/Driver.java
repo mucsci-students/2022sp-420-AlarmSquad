@@ -51,8 +51,25 @@ public class Driver {
                         // Copy classList into new ArrayList with deleted class
                         classList = deleteClass(classDeleteInput);
                         break;
+
                     case "rename class":
+
+                        // Get user input of class name to be renamed
+                        System.out.print("Enter class to rename: ");
+                        String oldClassName = scan.next();
+
+                        // If class exists, set class name to user inputed name
+                        Class oldClass = findClass(oldClassName);
+                        if (oldClass != null) {
+                            System.out.print("Enter new name for class " + oldClass.getName() + ": ");
+                            String newName = scan.next();
+                            oldClass.setName(newName);
+                            // Inform user of renamed class
+                            System.out.println("The class \"" + oldClassName +
+                                    "\" has been renamed to \"" + oldClass.getName() + "\"");
+                        }
                         break;
+
                     case "add attribute":
                         // Call find class method
                         Class classToAddAtt = findClass();
@@ -211,5 +228,4 @@ public class Driver {
         }
         return classList;
     }
-
 }
