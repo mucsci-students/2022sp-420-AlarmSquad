@@ -53,13 +53,13 @@ public class Driver {
                         break;
 
                     case "rename class":
-
                         // Get user input of class name to be renamed
                         System.out.print("Enter class to rename: ");
                         String oldClassName = scan.next();
 
                         // If class exists, set class name to user inputed name
                         Class oldClass = findClass(oldClassName);
+
                         if (oldClass != null) {
                             System.out.print("Enter new name for class " + oldClass.getName() + ": ");
                             String newName = scan.next();
@@ -79,52 +79,41 @@ public class Driver {
                             String attributeName = scan.next();
                             Attribute attribute = new Attribute(attributeName);
                             classToAddAtt.addAttribute(attribute);
+                            System.out.print("You added attribute \"" + attributeName + "\" to class \"" + classToAddAtt.getName() + "\"\n"); 
                         }
                         break;
                     case "delete attribute":
-                        // Call find attribute method
+                        // Call find class method to find the class the attribute is
                         Class classToDelAtt = findClass();
+                        Boolean attBool = false;
+                        // Prompt user to delete an attribute
                         if (classToDelAtt != null) {
-                            System.out.print("Enter attribute name to delete: ");
-                            String attToDel = scan.next();
-                            System.out.print("Are you sure you want to delete \"" + attToDel + "\"? (y/n) ");
-                            String answer = scan.next();
-                            if (answer.equals("y")) {
+                            // while bool is false continue loop until the user does not want to delete an attribute
+                            // or until an attribute is deleted 
+                            // (this may be changed so the user can type exit to exit the program as well)
+                            while(attBool.equals(false)){
+                                System.out.print("Enter attribute name to delete: ");
+                                String attToDel = scan.next();
                                 Attribute deletedAtt = classToDelAtt.findAtt(attToDel);
-                                classToDelAtt.deleteAttribute(deletedAtt);
-                                System.out.print("Attribute \"" + attToDel + "\" has been deleted");
+                                if(deletedAtt != null){
+                                    System.out.print("Are you sure you want to delete \"" + attToDel +"\"? (y/n) ");
+                                    String answer = scan.next();
+                                    // If the user wants to delete an attribute, proceed to do so
+                                    if (answer.equals("y")) {
+                                        classToDelAtt.deleteAttribute(deletedAtt);
+                                        System.out.print("Attribute \"" + attToDel + "\" has been deleted \n");
+                                        attBool = true;
+                                    }
+                                    // if user types n, break out of loop and bring back prompt for new command
+                                    else{
+                                        break;
+                                    }
+                                }
                             }
                         }
                         break;
-
                     case "rename attribute":
-
-                        // Show user classes and attributes before asking for input
-                        listClasses();
-                        System.out.print("Enter the class that contains the attribute: ");
-                        String classWithAttName = scan.next();
-
-                        // Ensure class exists
-                        Class classWithAtt = findClass(classWithAttName);
-                        if (classWithAtt != null) {
-                            // List attributes in class before asking for input
-                            findClass(classWithAttName).listClass();
-                            System.out.print("Enter attribute to be renamed: ");
-                            String oldAttName = scan.next();
-
-                            // Ensure attribute exists
-                            Attribute newAtt = classWithAtt.findAtt(oldAttName);
-                            if (newAtt != null) {
-                                // Rename attribute with user's new name
-                                System.out.print("Enter new name for " + oldAttName + ": ");
-                                String newAttName = scan.next();
-                                newAtt.setName(newAttName);
-                                System.out.println(oldAttName + " in class " + classWithAttName +
-                                        " renamed to " + newAtt.getName());
-                            }
-                        }
                         break;
-
                     case "add relationship":
                         System.out.println("Enter source class name: ");
                         String sourceName = scan.next();
@@ -151,7 +140,11 @@ public class Driver {
                     case "load":
                         break;
                     case "list classes":
-                        listClasses();
+                        // Loops through classList and calls listClass on all elements
+                        for (int i = 0; i < classList.size(); ++i) {
+                            classList.get(i).listClass();
+                        }
+                        System.out.print("> ");
                         break;
                     case "list class":
                         // Get user to input desired class
@@ -176,7 +169,7 @@ public class Driver {
 
     /*********************************************************************************/
     /**
-     * Programmer defined methods
+     * Programmer defined Helper Methods
      * /
      * /
      *********************************************************************************/
@@ -225,18 +218,13 @@ public class Driver {
     }
 
     /**
-     * List all classes and their accompanying attributes
+     * 
+     * @return
      */
-    public static void listClasses() {
-        // Loops through classList and calls listClass on all elements
-        for (int i = 0; i < classList.size(); ++i) {
-            classList.get(i).listClass();
-        }
-    }
-
     private static Relationship findRelationship() {
         System.out.print("Enter Relationship ID: ");
         String relationToFind = scan.next();
+
         for (int i = 0; i < relationshipList.size(); ++i) {
             // if the name matches, return class
             if (relationToFind.equals(relationshipList.get(i).getID())) {
@@ -247,24 +235,44 @@ public class Driver {
         return null;
     }
 
-    public static ArrayList<Class> deleteClass(String classToDeleteName) {
+    /**
+     * 
+     * @param classToDeleteName
+     * @return
+    */ 
+    private static ArrayList<Class> deleteClass(String classToDeleteName) {
         // Create new class object. If a class matches the user inputed name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
         Class classToDelete = null;
-        // Iterate through ArrayList of classes to see if class exists
-        for (Class classObj : classList) {
-            if (classObj.getName().equals(classToDeleteName))
-                classToDelete = classObj;
-        }
-        // Remove whatever class classToDelete was assigned as from
-        // the ArrayList
-        if (classToDelete != null) {
-            classList.remove(classToDelete);
-        }
-        // If no class was found in the ArrayList matching the name of the
-        // users input, classToDelete will still be null
-        else {
-            System.out.println("Class \"" + classToDeleteName + "\" not found");
+
+        // While loop to make sure the user can make a mistake when typing in
+        // a class name to delete, and continue to delete a class afterwards
+        while(classToDelete == null){
+            // Iterate through ArrayList of classes to see if class exists
+            for (Class classObj : classList) {
+                if (classObj.getName().equals(classToDeleteName)) {
+                    classToDelete = classObj;
+                }
+            }
+            // Remove whatever class classToDelete was assigned as from
+            // the ArrayList
+            if (classToDelete != null) {
+                classList.remove(classToDelete);
+            }
+            // If no class was found in the ArrayList matching the name of the
+            // users input, classToDelete will still be null
+            else {
+                System.out.println("Class \"" + classToDeleteName + "\" not found");
+                System.out.print("Do you want to delete a class? (y/n): ");
+                String theAnswer =  scan.next();
+                // If the user does not want to delete a class, return class list
+                if(theAnswer.equals("n")){
+                    return classList;
+                }
+                // Otherwise, prompt user to enter a class to delete again
+                System.out.print("Enter class name to delete: ");
+                classToDeleteName = scan.next();
+            }
         }
         return classList;
     }
