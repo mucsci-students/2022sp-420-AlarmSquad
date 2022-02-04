@@ -101,7 +101,7 @@ public class Driver {
 
                         // Show user classes and attributes before asking for input
                         listClasses();
-                        System.out.print("Enter class attribute is in: ");
+                        System.out.print("Enter the class that contains the attribute: ");
                         String classWithAttName = scan.next();
 
                         // Ensure class exists
