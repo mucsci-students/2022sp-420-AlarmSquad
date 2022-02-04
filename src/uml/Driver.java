@@ -94,6 +94,14 @@ public class Driver {
                             while(attBool.equals(false)){
                                 System.out.print("Enter attribute name to delete: ");
                                 String attToDel = scan.next();
+                        // Prompt user to delete an attribute
+                        if (classToDelAtt != null) {
+                            System.out.print("Enter attribute name to delete: ");
+                            String attToDel = scan.next();
+                            System.out.print("Are you sure you want to delete \"" + attToDel + "\"? (y/n) ");
+                            String answer = scan.next();
+                            // If the user wants to delete an attribute, proceed to do so
+                            if (answer.equals("y")) {
                                 Attribute deletedAtt = classToDelAtt.findAtt(attToDel);
                                 if(deletedAtt != null){
                                     System.out.print("Are you sure you want to delete \"" + attToDel +"\"? (y/n) ");
@@ -145,6 +153,7 @@ public class Driver {
                             classList.get(i).listClass();
                         }
                         System.out.print("> ");
+
                         break;
                     case "list class":
                         // Get user to input desired class
@@ -218,8 +227,8 @@ public class Driver {
     }
 
     /**
-     * 
-     * @return
+     *
+     * List all classes and their accompanying attributes
      */
     private static Relationship findRelationship() {
         System.out.print("Enter Relationship ID: ");
