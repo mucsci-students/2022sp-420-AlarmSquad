@@ -98,7 +98,7 @@ public class Driver {
                         }
                         break;
                     case "delete relationship":
-                        findRelationship();
+                        relationshipList.remove(findRelationship());
                         break;
                     case "rename relationship":
                         break;
@@ -121,6 +121,12 @@ public class Driver {
                         }
                         break;
                     case "list relationships":
+                        if (relationshipList.size() >= 1) {
+                            System.out.print(relationshipList.get(0).getID());
+                        }
+                        for (int i = 1; i < relationshipList.size(); ++i) {
+                            System.out.print(", " + relationshipList.get(i).getID());
+                        }
                         break;
                     case "help":
                         break;
