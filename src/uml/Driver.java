@@ -113,6 +113,30 @@ public class Driver {
                          }
                         break;
                     case "rename attribute":
+                         // Show user classes and attributes before asking for input
+                        listClasses();
+                        System.out.print("Enter the class that contains the attribute: ");
+                        String classWithAttName = scan.next();
+
+                        // Ensure class exists
+                        Class classWithAtt = findClass(classWithAttName);
+                        if (classWithAtt != null) {
+                            // List attributes in class before asking for input
+                            findClass(classWithAttName).listClass();
+                            System.out.print("Enter attribute to be renamed: ");
+                            String oldAttName = scan.next();
+
+                            // Ensure attribute exists
+                            Attribute newAtt = classWithAtt.findAtt(oldAttName);
+                            if (newAtt != null) {
+                                // Rename attribute with user's new name
+                                System.out.print("Enter new name for " + oldAttName + ": ");
+                                String newAttName = scan.next();
+                                newAtt.setName(newAttName);
+                                System.out.println(oldAttName + " in class " + classWithAttName +
+                                        " renamed to " + newAtt.getName());
+                            }
+                        }
                         break;
                     case "add relationship":
                         System.out.println("Enter source class name: ");
