@@ -246,6 +246,17 @@ public class Driver {
      *
      * List all classes and their accompanying attributes
      */
+    public static void listClasses() {
+        // Loops through classList and calls listClass on all elements
+        for (int i = 0; i < classList.size(); ++i) {
+            classList.get(i).listClass();
+        }
+    }
+
+    /**
+     *
+     * List all classes and their accompanying attributes
+     */
     private static Relationship findRelationship() {
         System.out.print("Enter Relationship ID: ");
         String relationToFind = scan.next();
