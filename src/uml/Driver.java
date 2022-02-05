@@ -181,8 +181,13 @@ public class Driver {
                         break;
                     case "list relationships":
                         break;
+
                     case "help":
+
+                        displayHelp();
+                        System.out.print(prompt);
                         break;
+
                     // If the command is not valid
                     default:
                         System.out.println("Please enter a valid command");
@@ -275,7 +280,7 @@ public class Driver {
      * 
      * @param classToDeleteName
      * @return
-    */ 
+     */
     private static ArrayList<Class> deleteClass(String classToDeleteName) {
         // Create new class object. If a class matches the user inputed name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
@@ -283,7 +288,7 @@ public class Driver {
 
         // While loop to make sure the user can make a mistake when typing in
         // a class name to delete, and continue to delete a class afterwards
-        while(classToDelete == null){
+        while (classToDelete == null) {
             // Iterate through ArrayList of classes to see if class exists
             for (Class classObj : classList) {
                 if (classObj.getName().equals(classToDeleteName)) {
@@ -300,9 +305,9 @@ public class Driver {
             else {
                 System.out.println("Class \"" + classToDeleteName + "\" not found");
                 System.out.print("Do you want to delete a class? (y/n): ");
-                String theAnswer =  scan.next();
+                String theAnswer = scan.next();
                 // If the user does not want to delete a class, return class list
-                if(theAnswer.equals("n")){
+                if (theAnswer.equals("n")) {
                     return classList;
                 }
                 // Otherwise, prompt user to enter a class to delete again
@@ -312,4 +317,27 @@ public class Driver {
         }
         return classList;
     }
+
+    /**
+     * Display list of commands and their accompanying descriptions
+     */
+    public static void displayHelp() {
+        String helpMessage = "\n   Commands\t\t   Description\n--------------\t\t-----------------\n";
+        helpMessage += "add class\t\tAdd a new class\n";
+        helpMessage += "delete class\t\tDelete an existing class\n";
+        helpMessage += "rename class\t\tRename an existing class\n";
+        helpMessage += "add attribute\t\tAdd a new attribute to an existing class\n";
+        helpMessage += "delete attribute\tDelete an attribute from an existing class\n";
+        helpMessage += "rename attribute\tRename and attribute from an existing class\n";
+        helpMessage += "add relationship\tAdd a new relationship\n";
+        helpMessage += "delete relationship\tDelete an existing relationship\n";
+        helpMessage += "rename relationship\tRename an existing relationship\n";
+        helpMessage += "save\t\t\tSave the current UML diagram\n";
+        helpMessage += "load\t\t\tLoad a previously saved UML diagram\n";
+        helpMessage += "help\t\t\tDisplay list of commands\n";
+        helpMessage += "exit\t\t\tExit the application\n";
+
+        System.out.println(helpMessage);
+    }
 }
+
