@@ -142,12 +142,12 @@ public class Driver {
                         System.out.println("Enter source class name: ");
                         String sourceName = scan.next();
                         // If source class is valid and exists get destination class
-                        if (!findClass(sourceName).equals(null)) {
+                        if (findClass(sourceName) != (null)) {
                             System.out.println("Enter destination: ");
                             String destinationName = scan.next();
                             // If destination class is valid and exists add
                             // relationship to relationship array list
-                            if (!findClass(destinationName).equals(null)) {
+                            if (findClass(destinationName) != (null)) {
                                 Relationship newRelationship = new Relationship(findClass(sourceName),
                                         findClass(destinationName));
                                 relationshipList.add(newRelationship);
