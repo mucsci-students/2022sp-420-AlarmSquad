@@ -83,42 +83,34 @@ public class Driver {
                         }
                         break;
                     case "delete attribute":
-                        // Call find class method to find the class the attribute is
-                        Class classToDelAtt = findClass();
-                        Boolean attBool = false;
-                        // Prompt user to delete an attribute
-                        if (classToDelAtt != null) {
-                            // while bool is false continue loop until the user does not want to delete an attribute
-                            // or until an attribute is deleted 
-                            // (this may be changed so the user can type exit to exit the program as well)
-                            while(attBool.equals(false)){
-                                System.out.print("Enter attribute name to delete: ");
-                                String attToDel = scan.next();
-                        // Prompt user to delete an attribute
-                        if (classToDelAtt != null) {
-                            System.out.print("Enter attribute name to delete: ");
-                            String attToDel = scan.next();
-                            System.out.print("Are you sure you want to delete \"" + attToDel + "\"? (y/n) ");
-                            String answer = scan.next();
-                            // If the user wants to delete an attribute, proceed to do so
-                            if (answer.equals("y")) {
-                                Attribute deletedAtt = classToDelAtt.findAtt(attToDel);
-                                if(deletedAtt != null){
-                                    System.out.print("Are you sure you want to delete \"" + attToDel +"\"? (y/n) ");
-                                    String answer = scan.next();
-                                    // If the user wants to delete an attribute, proceed to do so
-                                    if (answer.equals("y")) {
-                                        classToDelAtt.deleteAttribute(deletedAtt);
-                                        System.out.print("Attribute \"" + attToDel + "\" has been deleted \n");
-                                        attBool = true;
-                                    }
-                                    // if user types n, break out of loop and bring back prompt for new command
-                                    else{
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                         // Call find class method to find the class the attribute is
+                         Class classToDelAtt = findClass();
+                         Boolean attBool = false;
+                         // Prompt user to delete an attribute
+                         if (classToDelAtt != null) {
+                             // while bool is false continue loop until the user does not want to delete an attribute
+                             // or until an attribute is deleted 
+                             // (this may be changed so the user can type exit to exit the program as well)
+                             while(attBool.equals(false)){
+                                 System.out.print("Enter attribute name to delete: ");
+                                 String attToDel = scan.next();
+                                 Attribute deletedAtt = classToDelAtt.findAtt(attToDel);
+                                 if(deletedAtt != null){
+                                     System.out.print("Are you sure you want to delete \"" + attToDel +"\"? (y/n) ");
+                                     String answer = scan.next();
+                                     // If the user wants to delete an attribute, proceed to do so
+                                     if (answer.equals("y")) {
+                                         classToDelAtt.deleteAttribute(deletedAtt);
+                                         System.out.print("Attribute \"" + attToDel + "\" has been deleted \n");
+                                         attBool = true;
+                                     }
+                                     // if user types n, break out of loop and bring back prompt for new command
+                                     else{
+                                         break;
+                                     }
+                                 }
+                             }
+                         }
                         break;
                     case "rename attribute":
                         break;
