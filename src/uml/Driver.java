@@ -36,6 +36,7 @@ public class Driver {
                 switch (input) {
                     case "exit":
                         return;
+
                     case "add class":
                         // Get user defined name for class, then adds new class to ArrayList classes
                         System.out.print("Enter class name: ");
@@ -44,6 +45,7 @@ public class Driver {
                         Class newClass = new Class(className);
                         classList.add(newClass);
                         break;
+
                     case "delete class":
                         // Get user input of class name to be deleted
                         System.out.print("Enter class name to delete: ");
@@ -164,12 +166,18 @@ public class Driver {
                     case "load":
                         break;
                     case "list classes":
-                        // Loops through classList and calls listClass on all elements
-                        for (int i = 0; i < classList.size(); ++i) {
-                            classList.get(i).listClass();
+                        // if there are classes to list, list them
+                        if (classList.size() != 0) {
+                            // Loops through classList and calls listClass on all elements
+                            for (int i = 0; i < classList.size(); ++i) {
+                                classList.get(i).listClass();
+                            }
                         }
-                        System.out.print("> ");
-
+                        // if there are no classes to list, prompt user that there are no classes
+                        else{
+                            System.out.print("There are currently no classes to list.\n");
+                        }
+                        System.out.print(prompt);
                         break;
                     case "list class":
                         // Get user to input desired class
@@ -189,7 +197,6 @@ public class Driver {
                         break;
 
                     case "help":
-
                         displayHelp();
                         System.out.print(prompt);
                         break;
@@ -304,7 +311,17 @@ public class Driver {
             // Remove whatever class classToDelete was assigned as from
             // the ArrayList
             if (classToDelete != null) {
-                classList.remove(classToDelete);
+                System.out.print("Are you sure? (y/n): ");
+                String theNextAnswer = scan.next();
+                if(theNextAnswer.equals("y")){
+                    classList.remove(classToDelete);
+                    System.out.print("Class \"" + classToDelete.getName() + "\" has been deleted\n");
+                    break;
+                }
+                else if(theNextAnswer.equals("n")){
+                    System.out.print("Class \"" + classToDelete.getName() + "\" has NOT been deleted\n");
+                    break;
+                }
             }
             // If no class was found in the ArrayList matching the name of the
             // users input, classToDelete will still be null
