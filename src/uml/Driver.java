@@ -34,6 +34,7 @@ public class Driver {
             } else {
                 // If the user enters a command
                 switch (input) {
+                    
                     case "exit":
                         return;
 
@@ -84,6 +85,7 @@ public class Driver {
                             System.out.print("You added attribute \"" + attributeName + "\" to class \"" + classToAddAtt.getName() + "\"\n"); 
                         }
                         break;
+                        
                     case "delete attribute":
                          // Call find class method to find the class the attribute is
                          Class classToDelAtt = findClass();
@@ -106,14 +108,11 @@ public class Driver {
                                          System.out.print("Attribute \"" + attToDel + "\" has been deleted \n");
                                          attBool = true;
                                      }
-                                     // if user types n, break out of loop and bring back prompt for new command
-                                     else{
-                                         break;
-                                     }
                                  }
                              }
                          }
                         break;
+                        
                     case "rename attribute":
                          // Show user classes and attributes before asking for input
                         listClasses();
@@ -140,6 +139,7 @@ public class Driver {
                             }
                         }
                         break;
+                        
                     case "add relationship":
                         System.out.println("Enter source class name: ");
                         String sourceName = scan.next();
@@ -156,15 +156,20 @@ public class Driver {
                             }
                         }
                         break;
+                        
                     case "delete relationship":
                         relationshipList.remove(findRelationship());
                         break;
+                        
                     case "rename relationship":
                         break;
+                        
                     case "save":
                         break;
+                        
                     case "load":
                         break;
+                        
                     case "list classes":
                         // if there are classes to list, list them
                         if (classList.size() != 0) {
@@ -179,6 +184,7 @@ public class Driver {
                         }
                         System.out.print(prompt);
                         break;
+                        
                     case "list class":
                         // Get user to input desired class
                         Class classToList = findClass();
@@ -187,6 +193,7 @@ public class Driver {
                             classToList.listClass();
                         }
                         break;
+                        
                     case "list relationships":
                         if (relationshipList.size() >= 1) {
                             System.out.print(relationshipList.get(0).getID());
@@ -201,7 +208,7 @@ public class Driver {
                         System.out.print(prompt);
                         break;
 
-                    // If the command is not valid
+                    // If the user's command is not valid
                     default:
                         System.out.println("Please enter a valid command");
                         System.out.print(prompt);
