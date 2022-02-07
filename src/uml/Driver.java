@@ -41,6 +41,13 @@ public class Driver {
                         // Get user defined name for Class, then adds new Class to the classList
                         System.out.print("Enter class name: ");
                         String className = scan.next();
+
+                        if(classList.stream().anyMatch(o -> o.getName().equals(className)))
+                        {
+                            System.out.printf("Class %s already exists/n", className);
+                            break;  
+                        }
+
                         System.out.println("You added class \"" + className + "\"");
                         Class newClass = new Class(className);
                         classList.add(newClass);
@@ -160,8 +167,6 @@ public class Driver {
                         break;
                     case "delete relationship":
                         relationshipList.remove(findRelationship());
-                        break;
-                    case "rename relationship":
                         break;
                     case "save":
                         JSON.save();
