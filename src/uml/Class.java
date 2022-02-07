@@ -14,6 +14,7 @@ public class Class {
     // The arraylist of attributes in the class
     private ArrayList<Attribute> attributeList;
 
+
     /**
      * Default constructor
      * 
