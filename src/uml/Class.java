@@ -3,14 +3,14 @@ package uml;
 import java.util.ArrayList;
 
 /**
- * A class for the UML class we will be working with in our diagram.
+ * A class for the UML Class object we will be working with in our diagram
  * 
  * @authors
  */
 public class Class {
 
     // The name of the class
-    private String name;
+    private String className;
     // The arraylist of attributes in the class
     private ArrayList<Attribute> attributeList;
 
@@ -20,18 +20,18 @@ public class Class {
      * 
      * @param name the name of the class
      */
-    public Class(String name) {
-        this.name = name;
+    public Class(String className) {
+        this.className = className;
         this.attributeList = new ArrayList<Attribute>();
     }
 
     /**
      * Sets the name of the class
      * 
-     * @param name the new name for the class
+     * @param className the new name for the class
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     /**
@@ -39,8 +39,8 @@ public class Class {
      * 
      * @return the name of the class
      */
-    public String getName() {
-        return this.name;
+    public String getClassName() {
+        return this.className;
     }
 
     /**
@@ -48,7 +48,7 @@ public class Class {
      * 
      * @return the list of attributes
      */
-    public ArrayList<Attribute> getAttributes() {
+    public ArrayList<Attribute> getAttributeList() {
         return this.attributeList;
     }
 
@@ -76,28 +76,29 @@ public class Class {
      */
     public void listClass() {
         // prints the name of the class
-        System.out.println("Class name: " + this.name);
+        System.out.println("Class name: " + this.className);
         // prints all the attributes in a set
         System.out.print("[ ");
         if (attributeList.size() >= 1) {
-            System.out.print(attributeList.get(0).getName());
+            System.out.print(attributeList.get(0).getAttName());
         }
         for (int i = 1; i < attributeList.size(); ++i) {
-            System.out.print(", " + attributeList.get(i).getName());
+            System.out.print(", " + attributeList.get(i).getAttName());
         }
         System.out.println(" ]");
     }
 
     /**
      * Iterates through AttributeList, returns with .get()
+     * 
      * @param attToFind
      * @return attribute if found, null if not found
      */
-    public Attribute findAtt(String attToFind) {
+    public Attribute findAttribute(String attToFind) {
         // iterates through the arraylist
         for (int i = 0; i < attributeList.size(); ++i) {
             // if the name matches, return class
-            if (attToFind.equals(attributeList.get(i).getName())) {
+            if (attToFind.equals(attributeList.get(i).getAttName())) {
                 return attributeList.get(i);
             }
         }

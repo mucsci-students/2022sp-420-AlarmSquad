@@ -1,31 +1,31 @@
 package uml;
 
 /**
- * A class for the attributes we will be working with in our UML classes.
+ * A class for the attribute object within a UML Class object
  * 
  * @authors
  */
 public class Attribute {
 
     // The name of the attribute
-    private String name;
+    private String attName;
 
     /**
      * Default constructor
      * 
-     * @param name the name of the attribute
+     * @param attName the name of the attribute
      */
-    public Attribute(String name) {
-        this.name = name;
+    public Attribute(String attName) {
+        this.attName = attName;
     }
 
     /**
      * Sets the name of the attribute
      * 
-     * @param name the new name of the attribute
+     * @param attName the new name of the attribute
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setAttName(String attName) {
+        this.attName = attName;
     }
 
     /**
@@ -33,7 +33,7 @@ public class Attribute {
      * 
      * @return the name of the attribute
      */
-    public String getName() {
-        return this.name;
+    public String getAttName() {
+        return this.attName;
     }
 }
