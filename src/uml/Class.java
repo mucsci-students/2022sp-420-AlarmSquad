@@ -13,7 +13,7 @@ public class Class {
     private String name;
     // The arraylist of attributes in the class
     private ArrayList<Attribute> attributeList;
-    private ArrayList<Relationship> incomingRelationshipList, outgoingRelationshipList;
+
 
     /**
      * Default constructor
@@ -23,8 +23,6 @@ public class Class {
     public Class(String name) {
         this.name = name;
         this.attributeList = new ArrayList<Attribute>();
-        this.incomingRelationshipList = new ArrayList<Relationship>();
-        this.outgoingRelationshipList = new ArrayList<Relationship>();
     }
 
     /**
@@ -70,24 +68,6 @@ public class Class {
      */
     public void deleteAttribute(Attribute attribute) {
         this.attributeList.remove(attribute);
-    }
-
-    /**
-     * Gets the attribute list of the class
-     * 
-     * @return the list of attributes
-     */
-    public ArrayList<Relationship> getIncomingRelationships() {
-        return this.incomingRelationshipList;
-    }
-
-    /**
-     * Gets the attribute list of the class
-     * 
-     * @return the list of attributes
-     */
-    public ArrayList<Relationship> getOutgoingRelationships() {
-        return this.outgoingRelationshipList;
     }
 
     /**
