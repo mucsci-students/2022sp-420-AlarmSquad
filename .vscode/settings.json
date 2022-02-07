@@ -2,5 +2,8 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "src/testing/junit-platform-console-standalone-1.8.2.jar"
+    ],
+    "java.project.sourcePaths": [
+        "src"
     ]
 }
