@@ -14,6 +14,7 @@ public class Relationship {
     // The destination of the relationship
     private Class destination;
 
+
     /**
      * Default constructor
      * 
@@ -80,4 +81,6 @@ public class Relationship {
     public Class getDestination() {
         return this.destination;
     }
+
+    
 }
