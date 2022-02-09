@@ -45,6 +45,11 @@ public class Driver {
                     case "exit":
                         return;
 
+                    case "clear":
+                        clearScreen();
+                        System.out.print(prompt);
+                        break;
+
                     case "add class":
                         // Get user defined name for Class, then adds new Class to the classList
                         System.out.print("Enter class name: ");
