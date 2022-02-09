@@ -103,7 +103,7 @@ public class Class {
             }
         }
         // otherwise tell the user it does not exist and return null
-        System.out.println("\"" + attToFind + "\" was not found, please enter an existing attribute");
+        System.out.println("Attribute \"" + attToFind + "\" not found in class " + getClassName());
         return null;
     }
 }
