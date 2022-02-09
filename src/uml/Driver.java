@@ -34,6 +34,7 @@ public class Driver {
             } else {
                 // If the user enters a command
                 switch (input) {
+                    
                     case "exit":
                         return;
 
@@ -91,7 +92,9 @@ public class Driver {
                                     + classToAddAtt.getClassName() + "\"\n");
                         }
                         break;
+                        
                     case "delete attribute":
+
                         // Call find class method to find the class the attribute is
                         Class classToDelAtt = findClass();
                         Boolean attBool = false;
@@ -122,7 +125,9 @@ public class Driver {
                                 }
                             }
                         }
+                    
                         break;
+                        
                     case "rename attribute":
                         // Show user classes and attributes before asking for input
                         listClasses();
@@ -149,6 +154,7 @@ public class Driver {
                             }
                         }
                         break;
+                        
                     case "add relationship":
                         System.out.print("Enter source class name: ");
                         String sourceName = scan.next();
@@ -165,7 +171,9 @@ public class Driver {
                             }
                         }
                         break;
+                        
                     case "delete relationship":
+
                         // Find the relationship
                         Relationship r = findRelationship();
                         System.out.print("Are you sure you want to delete the relationship (y/n): ");
@@ -180,16 +188,19 @@ public class Driver {
                             System.out.println("Relationship has NOT been deleted");
                         }
                         break;
+                        
                     case "save":
                         JSON.save();
                         System.out.println("Diagram has been saved to \"placeholder.json\"");
                         System.out.print(prompt);
                         break;
+                        
                     case "load":
                         JSON.load();
                         System.out.println("Diagram has been loaded from \"placeholder.json\"");
                         System.out.print(prompt);
                         break;
+                        
                     case "list classes":
                         // if there are classes to list, list them
                         if (classList.size() != 0) {
@@ -204,6 +215,7 @@ public class Driver {
                         }
                         System.out.print(prompt);
                         break;
+                        
                     case "list class":
                         // Get user to input desired class
                         Class classToList = findClass();
@@ -212,6 +224,7 @@ public class Driver {
                             classToList.listClass();
                         }
                         break;
+                        
                     case "list relationships":
                         // List relationships spaced out by new lines and arrows
                         // designating which class is the source and destination
@@ -235,7 +248,7 @@ public class Driver {
                         System.out.print(prompt);
                         break;
 
-                    // If the command is not valid
+                    // If the user's command is not valid
                     default:
                         System.out.println("Please enter a valid command");
                         System.out.print(prompt);
