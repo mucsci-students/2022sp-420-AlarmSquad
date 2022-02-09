@@ -1,6 +1,7 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "src/testing/junit-platform-console-standalone-1.8.2.jar"
+        "c:\\Users\\lwsan\\Desktop\\VSCode Workspace\\Dependencies\\json-simple-1.1.1.jar",
+        "c:\\Users\\lwsan\\Desktop\\VSCode Workspace\\Dependencies\\junit-platform-console-standalone-1.8.2.jar"
     ]
 }

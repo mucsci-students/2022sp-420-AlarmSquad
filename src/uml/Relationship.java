@@ -1,14 +1,13 @@
 package uml;
 
-import java.util.ArrayList;
 /**
- * A class for the relationships we will be working with in our UML classes.
+ * A class for the relationship object between two UML Class objects
  * 
  * @authors
  */
 public class Relationship {
 
-    // The identification of the relationship
+    // The id of the relationship
     private String id;
     // The source of the relationship
     private Class source;
@@ -22,9 +21,9 @@ public class Relationship {
      * @param source      the source of the relationship
      * @param destination the destination of the relationship
      */
-    
+
     public Relationship(Class source, Class destination) {
-        this.id = source.getName() + destination.getName();
+        this.id = source.getClassName() + destination.getClassName();
         this.source = source;
         this.destination = destination;
     }
@@ -82,4 +81,6 @@ public class Relationship {
     public Class getDestination() {
         return this.destination;
     }
+
+    
 }
