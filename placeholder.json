@@ -1,1 +1,29 @@
-
+{
+    "relationshipList": [
+        {
+            "destination": "student",
+            "source": "teacher"
+        },
+        {
+            "destination": "teacher",
+            "source": "student"
+        }
+    ],
+    "classList": [
+        {
+            "className": "student",
+            "attList": [
+                "name",
+                "id"
+            ]
+        },
+        {
+            "className": "teacher",
+            "attList": [
+                "name",
+                "salary",
+                "dept"
+            ]
+        }
+    ]
+}

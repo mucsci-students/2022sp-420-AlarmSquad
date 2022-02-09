@@ -34,7 +34,7 @@ public class Driver {
             } else {
                 // If the user enters a command
                 switch (input) {
-                    
+
                     case "exit":
                         return;
 
@@ -48,7 +48,7 @@ public class Driver {
                             break;
                         }
 
-                        System.out.println("You added class \"" + className + "\"");
+                        System.out.println("Added class \"" + className + "\"");
                         Class newClass = new Class(className);
                         classList.add(newClass);
                         break;
@@ -88,11 +88,11 @@ public class Driver {
                             String attributeName = scan.next();
                             Attribute attribute = new Attribute(attributeName);
                             classToAddAtt.addAttribute(attribute);
-                            System.out.print("You added attribute \"" + attributeName + "\" to class \""
+                            System.out.print("Added attribute \"" + attributeName + "\" to class \""
                                     + classToAddAtt.getClassName() + "\"\n");
                         }
                         break;
-                        
+
                     case "delete attribute":
 
                         // Call find class method to find the class the attribute is
@@ -125,9 +125,9 @@ public class Driver {
                                 }
                             }
                         }
-                    
+
                         break;
-                        
+
                     case "rename attribute":
                         // Show user classes and attributes before asking for input
                         listClasses();
@@ -154,7 +154,7 @@ public class Driver {
                             }
                         }
                         break;
-                        
+
                     case "add relationship":
                         System.out.print("Enter source class name: ");
                         String sourceName = scan.next();
@@ -171,7 +171,7 @@ public class Driver {
                             }
                         }
                         break;
-                        
+
                     case "delete relationship":
 
                         // Find the relationship
@@ -188,26 +188,32 @@ public class Driver {
                             System.out.println("Relationship has NOT been deleted");
                         }
                         break;
-                        
+
                     case "save":
                         JSON.save();
                         System.out.println("Diagram has been saved to \"placeholder.json\"");
                         System.out.print(prompt);
                         break;
-                        
+
                     case "load":
                         JSON.load();
                         System.out.println("Diagram has been loaded from \"placeholder.json\"");
                         System.out.print(prompt);
                         break;
-                        
+
                     case "list classes":
                         // if there are classes to list, list them
                         if (classList.size() != 0) {
                             // Loops through classList and calls listClass on all elements
-                            for (int i = 0; i < classList.size(); ++i) {
+                            System.out.println("\n--------------------");
+                            if (classList.size() >= 1) {
+                                classList.get(0).listClass();
+                            }
+                            for (int i = 1; i < classList.size(); ++i) {
+                                System.out.println();
                                 classList.get(i).listClass();
                             }
+                            System.out.println("--------------------\n");
                         }
                         // if there are no classes to list, prompt user that there are no classes
                         else {
@@ -215,16 +221,18 @@ public class Driver {
                         }
                         System.out.print(prompt);
                         break;
-                        
+
                     case "list class":
                         // Get user to input desired class
                         Class classToList = findClass();
                         // print class name
+                        System.out.println("\n--------------------");
                         if (classToList != null) {
                             classToList.listClass();
                         }
+                        System.out.println("--------------------\n");
                         break;
-                        
+
                     case "list relationships":
                         // List relationships spaced out by new lines and arrows
                         // designating which class is the source and destination
@@ -281,7 +289,7 @@ public class Driver {
             }
         }
         // otherwise tell the user it does not exist and return null
-        System.out.println("\"" + classToFind + "\" was not found, please enter an existing class");
+        System.out.println("Class \"" + classToFind + "\" was not found");
         return null;
     }
 
@@ -301,7 +309,7 @@ public class Driver {
             }
         }
         // otherwise tell the user it does not exist and return null
-        System.out.println("\"" + classToFind + "\" was not found, please enter an existing class");
+        System.out.println("Class \"" + classToFind + "\" was not found");
         return null;
     }
 
@@ -348,7 +356,7 @@ public class Driver {
         }
         // If user's source or destintion input did not match any relationship's
         // source and destination fields, output error
-        System.out.print("Relationship was not found, please enter an existing relationship");
+        //System.out.print("Relationship was not found, please enter an existing relationship");
         return null;
     }
 
@@ -392,8 +400,8 @@ public class Driver {
             // If no class was found in the ArrayList matching the name of the
             // users input, classToDelete will still be null
             else {
-                System.out.println("Class \"" + classToDeleteName + "\" not found");
-                System.out.print("Do you want to delete a class? (y/n): ");
+                System.out.println("Class \"" + classToDeleteName + "\" was not found");
+                System.out.print("Do you still want to delete a class? (y/n): ");
                 String theAnswer = scan.next();
                 // If the user does not want to delete a class, return class list
                 if (theAnswer.toLowerCase().equals("n")) {
