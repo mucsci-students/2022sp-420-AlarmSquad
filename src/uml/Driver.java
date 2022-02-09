@@ -42,7 +42,7 @@ public class Driver {
                         System.out.print("Enter class name: ");
                         String className = scan.next();
 
-                        if(classList.stream().anyMatch(o -> o.getName().equals(className)))
+                        if(classList.stream().anyMatch(o -> o.getClassName().equals(className)))
                         {
                             System.out.printf("Class %s already exists/n", className);
                             break;  
@@ -367,6 +367,22 @@ public class Driver {
      */
     public static ArrayList<Relationship> getRelationshipList() {
         return relationshipList;
+    }
+
+    /**
+     * 
+     * 
+     */
+    public static void clearClassList() {
+        classList.clear();
+    }
+
+    /**
+     * 
+     * 
+     */
+    public static void clearRelationshipList() {
+        relationshipList.clear();
     }
 
     /**
