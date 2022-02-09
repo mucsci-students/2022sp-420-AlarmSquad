@@ -42,10 +42,9 @@ public class Driver {
                         System.out.print("Enter class name: ");
                         String className = scan.next();
 
-                        if(classList.stream().anyMatch(o -> o.getClassName().equals(className)))
-                        {
+                        if (classList.stream().anyMatch(o -> o.getClassName().equals(className))) {
                             System.out.printf("Class %s already exists/n", className);
-                            break;  
+                            break;
                         }
 
                         System.out.println("You added class \"" + className + "\"");
@@ -150,11 +149,11 @@ public class Driver {
                         }
                         break;
                     case "add relationship":
-                        System.out.println("Enter source class name: ");
+                        System.out.print("Enter source class name: ");
                         String sourceName = scan.next();
                         // If source class is valid and exists get destination class
                         if (findClass(sourceName) != (null)) {
-                            System.out.println("Enter destination: ");
+                            System.out.print("Enter destination: ");
                             String destinationName = scan.next();
                             // If destination class is valid and exists add
                             // relationship to relationship array list
@@ -172,6 +171,7 @@ public class Driver {
                         JSON.save();
                         break;
                     case "load":
+                        JSON.load();
                         break;
                     case "list classes":
                         // if there are classes to list, list them
@@ -253,7 +253,7 @@ public class Driver {
      * @param classToFind the given class name
      * @return the class with the given class name
      */
-    private static Class findClass(String classToFind) {
+    public static Class findClass(String classToFind) {
         // iterates through the arraylist
         for (int i = 0; i < classList.size(); ++i) {
             // if the name matches, return class
@@ -370,7 +370,7 @@ public class Driver {
     }
 
     /**
-     * 
+     * Clears the classList
      * 
      */
     public static void clearClassList() {
@@ -378,11 +378,29 @@ public class Driver {
     }
 
     /**
-     * 
+     * Clears the relationshipList
      * 
      */
     public static void clearRelationshipList() {
         relationshipList.clear();
+    }
+
+    /**
+     * Adds the given Class object to the classList
+     * 
+     * @param newClass the class to be added
+     */
+    public static void addToClassList(Class newClass) {
+        classList.add(newClass);
+    }
+
+    /**
+     * Adds the given Relationship object to the relationshipList
+     * 
+     * @param newRelationship the relationship to be added
+     */
+    public static void addToRelationshipList(Relationship newRelationship) {
+        relationshipList.add(newRelationship);
     }
 
     /**

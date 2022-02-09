@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -68,28 +67,62 @@ public class JSON {
         }
     }
 
-    public void load() {
+    @SuppressWarnings("unchecked")
+    public static void load() {
 
-        relationshipList.clear();
-        classList.clear();
-
-        JSONParser parser = new JSONParser();
+        // wipe both lists
+        Driver.clearClassList();
+        Driver.clearRelationshipList();
 
         try {
-            Object obj = parser.parse(new FileReader("placeholder.json"));
-            JSONObject readFile = (JSONObject) obj;
+            // makes the JSONParser
+            Object obj = new JSONParser().parse(new FileReader("placeholder.json"));
+            // casting obj to JSONObject
+            JSONObject jo = (JSONObject) obj;
 
-            JSONArray readRelationships = (JSONArray) readFile.get("relationshipList");
-            Iterator<Relationship> iter = readRelationships.iterator();
-            while (iter.hasNext()) {
+            // JSONArray for getting the saved classList
+            JSONArray classArray = (JSONArray) jo.get("classList");
+            // iterator for iterating classList
+            Iterator<JSONObject> classIter = classArray.iterator();
+            // iterator for iterating attList
+            Iterator<JSONObject> attIter = classArray.iterator();
 
+            // loops through the classes and attributes of the classes
+            while (classIter.hasNext()) {
+                // finds the class' name at the key "className"
+                String className = (String) classIter.next().get("className");
+                // finds the list of attributes at the key "attList"
+                ArrayList<String> attList = (ArrayList<String>) attIter.next().get("attList");
+                // make the new class
+                Class newClass = new Class(className);
+                // loop through the attList
+                for (String attName : attList) {
+                    // make a new Attribute and add it to the class
+                    Attribute newAtt = new Attribute(attName);
+                    newClass.addAttribute(newAtt);
+                }
+                // add the filled class to the classList
+                Driver.addToClassList(newClass);
+            }
+
+            // JSONArray for getting the saved relationshipList
+            JSONArray relArray = (JSONArray) jo.get("relationshipList");
+            // iterator for iterating for source
+            Iterator<JSONObject> srcIter = relArray.iterator();
+            // iterator for iterating for destination
+            Iterator<JSONObject> destIter = relArray.iterator();
+
+            while (srcIter.hasNext()) {
+                String sourceName = (String) srcIter.next().get("source");
+                String destinationName = (String) destIter.next().get("destination");
+                Relationship newRelationship = new Relationship(Driver.findClass(sourceName),
+                        Driver.findClass(destinationName));
+                Driver.addToRelationshipList(newRelationship);
             }
 
         } catch (FileNotFoundException exception) {
             exception.printStackTrace();
         } catch (IOException exception) {
-            exception.printStackTrace();
-        } catch (ParseException exception) {
             exception.printStackTrace();
         } catch (Exception exception) {
             exception.printStackTrace();
