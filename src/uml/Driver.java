@@ -176,15 +176,19 @@ public class Driver {
                             System.out.println("Relationship has been deleted");
                         }
                         // If not, prompt user and move on
-                        else if(rAnswer.toLowerCase().equals("n")) {
+                        else if (rAnswer.toLowerCase().equals("n")) {
                             System.out.println("Relationship has NOT been deleted");
                         }
                         break;
                     case "save":
                         JSON.save();
+                        System.out.println("Diagram has been saved to \"placeholder.json\"");
+                        System.out.print(prompt);
                         break;
                     case "load":
                         JSON.load();
+                        System.out.println("Diagram has been loaded from \"placeholder.json\"");
+                        System.out.print(prompt);
                         break;
                     case "list classes":
                         // if there are classes to list, list them
@@ -216,7 +220,7 @@ public class Driver {
                             System.out.print(" -> ");
                             System.out.print(relationshipList.get(0).getDestination().getClassName());
                         }
-                        
+
                         for (int i = 1; i < relationshipList.size(); ++i) {
                             System.out.print("\n" + relationshipList.get(i).getSource().getClassName());
                             System.out.print(" -> ");
@@ -321,8 +325,8 @@ public class Driver {
                 // If dest name was found, proceed to find relationship
                 for (int i = 0; i < relationshipList.size(); ++i) {
                     // If the name matches, return class
-                    if (relationshipList.get(i).getSource().getClassName().equals(sourceToFind) && 
-                        relationshipList.get(i).getDestination().getClassName().equals(destToFind)) {
+                    if (relationshipList.get(i).getSource().getClassName().equals(sourceToFind) &&
+                            relationshipList.get(i).getDestination().getClassName().equals(destToFind)) {
 
                         return relationshipList.get(i);
                     }
@@ -361,7 +365,7 @@ public class Driver {
             if (classToDelete != null) {
                 System.out.print("Are you sure? (y/n): ");
                 String theNextAnswer = scan.next();
-                
+
                 // User confirms if they wish to delete. If no, break out of loop
                 if (theNextAnswer.toLowerCase().equals("y")) {
                     classList.remove(classToDelete);
