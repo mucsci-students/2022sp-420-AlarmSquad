@@ -125,8 +125,7 @@ public class Driver {
                                 String attToDel = scan.next();
                                 Attribute deletedAtt = classToDelAtt.findAttribute(attToDel);
                                 if (deletedAtt != null) {
-                                    System.out.print(
-                                            "Are you sure you want to delete attribute \"" + attToDel + "\"? (y/n): ");
+                                    System.out.print("Delete attribute \"" + attToDel + "\"? (y/n): ");
                                     String answer = scan.next();
                                     // If the user wants to delete an attribute, proceed to do so
                                     if (answer.toLowerCase().equals("y")) {
