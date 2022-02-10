@@ -1,15 +1,9 @@
 package uml;
 
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import java.io.*;
+import java.util.*;
+import org.json.simple.*;
+import org.json.simple.parser.*;
 
 public class JSON {
 
@@ -20,8 +14,23 @@ public class JSON {
     // the JSON object to be saved
     private static JSONObject saveFile = new JSONObject();
 
+    class fileNameFilter implements FilenameFilter {
+
+        String fileName;
+
+        public fileNameFilter(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public boolean accept(File dir, String name) {
+            return name.startsWith(fileName);
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    public static void save() {
+    public static void save(String fileName) {
+        // appends .json to the end of the fileName
+        fileName += ".json";
         // a JSON array that contains a list of all the classes
         JSONArray saveClasses = new JSONArray();
         // a JSON array that contains a list of all the relationships
@@ -59,7 +68,8 @@ public class JSON {
         saveFile.put("relationshipList", saveRelationships);
 
         // save the file
-        try (FileWriter file = new FileWriter("placeholder.json")) {
+        try (FileWriter file = new FileWriter(fileName)) {
+            File fileToBeSaved = new File(folder, fileName);
             file.write(saveFile.toString());
             file.flush();
         } catch (IOException exception) {
@@ -68,15 +78,33 @@ public class JSON {
     }
 
     @SuppressWarnings("unchecked")
-    public static void load() {
+    public static void load(String fileName) {
 
         // wipe both lists
         Driver.clearClassList();
         Driver.clearRelationshipList();
 
+        // append ".json" to the end of the fileName
+        fileName += ".json";
+
         try {
+            File folder = new File("2022sp-420-AlarmSquad/src/savefiles");
+
+            // checks to make sure the file exists, if it doesn't it throws an error and
+            // exits method
+            fileNameFilter filter = new fileNameFilter(fileName);
+            String[] fileList = folder.list(filter);
+            for (int i = 0; i < fileList.length; ++i) {
+                if (fileList[i] == fileName) {
+                    break;
+                } else if (i == fileList.length - 1) {
+                    System.out.println("File does not exist");
+                    return;
+                }
+            }
+
             // makes the JSONParser
-            Object obj = new JSONParser().parse(new FileReader("placeholder.json"));
+            Object obj = new JSONParser().parse(new FileReader(fileName + ".json"));
             // casting obj to JSONObject
             JSONObject jo = (JSONObject) obj;
 
