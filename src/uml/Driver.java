@@ -542,9 +542,9 @@ public class Driver {
         helpMessage += "rename attribute\tRename and attribute from an existing class\n";
         helpMessage += "add relationship\tAdd a new relationship\n";
         helpMessage += "delete relationship\tDelete an existing relationship\n";
-        helpMessage += "rename relationship\tRename an existing relationship\n";
         helpMessage += "save\t\t\tSave the current UML diagram\n";
         helpMessage += "load\t\t\tLoad a previously saved UML diagram\n";
+        helpMessage += "clear\t\t\tClear the command history\n";
         helpMessage += "help\t\t\tDisplay list of commands\n";
         helpMessage += "exit\t\t\tExit the application\n";
 
