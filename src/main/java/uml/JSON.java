@@ -93,8 +93,8 @@ public class JSON {
             Boolean hasFoundFile = false;
             // loops through the list of file names
             for (int i = 0; i < fileList.length; ++i) {
-                // if the list only has one element and it is the correct name
-                if (fileList.length == 1 && fileList[i].equals(fileName + ".json")) {
+                // if the list only has one file (and placeholder.txt) and it is the correct name
+                if (fileList.length == 2 && fileList[i].equals(fileName + ".json")) {
                     hasFoundFile = true;
                     // otherwise keep looping
                 } else {
@@ -185,7 +185,7 @@ public class JSON {
     public static boolean ifDirIsEmpty() {
         File dir = new File(FILE_DIR);
         String[] fileList = dir.list();
-        if (fileList.length == 0) {
+        if (fileList.length == 1) {
             return true;
         } else {
             return false;
