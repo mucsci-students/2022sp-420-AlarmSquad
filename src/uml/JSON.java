@@ -7,6 +7,8 @@ import org.json.simple.parser.*;
 
 public class JSON {
 
+    // directory of the save files
+    private final static String FILE_DIR = "savefiles";
     // a copy of the classList from Driver
     private static ArrayList<Class> classList = Driver.getClassList();
     // a copy of the relationshipList from Driver
@@ -14,23 +16,15 @@ public class JSON {
     // the JSON object to be saved
     private static JSONObject saveFile = new JSONObject();
 
-    class fileNameFilter implements FilenameFilter {
-
-        String fileName;
-
-        public fileNameFilter(String fileName) {
-            this.fileName = fileName;
-        }
-
-        public boolean accept(File dir, String name) {
-            return name.startsWith(fileName);
-        }
-    }
-
+    /**
+     * Saves the current UML diagram to a file with a given name
+     * Overrides a file if it has the same name
+     * 
+     * @param fileName the name of the file to be saved to
+     */
     @SuppressWarnings("unchecked")
     public static void save(String fileName) {
-        // appends .json to the end of the fileName
-        fileName += ".json";
+
         // a JSON array that contains a list of all the classes
         JSONArray saveClasses = new JSONArray();
         // a JSON array that contains a list of all the relationships
@@ -53,6 +47,7 @@ public class JSON {
             // put the JSONArray into the JSON object
             saveClasses.add(classToBeSaved);
         }
+        // add the classList to the JSONObject
         saveFile.put("classList", saveClasses);
 
         // iterate through the relationship list
@@ -65,11 +60,13 @@ public class JSON {
             // put the JSON object in the JSONArray
             saveRelationships.add(relToBeSaved);
         }
+        // add the relationshipList to the JSONObject
         saveFile.put("relationshipList", saveRelationships);
 
+        // a file with the correct directory and file name
+        File fileToBeSaved = new File(FILE_DIR, fileName + ".json");
         // save the file
-        try (FileWriter file = new FileWriter(fileName)) {
-            File fileToBeSaved = new File(folder, fileName);
+        try (FileWriter file = new FileWriter(fileToBeSaved)) {
             file.write(saveFile.toString());
             file.flush();
         } catch (IOException exception) {
@@ -77,34 +74,48 @@ public class JSON {
         }
     }
 
+    /**
+     * Loads the current UML diagram from a file with a given name
+     * DOES NOT CHECK IF THE DIRECTORY IS EMPTY
+     * 
+     * @param fileName the name of the file to be loaded from
+     */
     @SuppressWarnings("unchecked")
     public static void load(String fileName) {
 
-        // wipe both lists
-        Driver.clearClassList();
-        Driver.clearRelationshipList();
-
-        // append ".json" to the end of the fileName
-        fileName += ".json";
-
         try {
-            File folder = new File("2022sp-420-AlarmSquad/src/savefiles");
-
-            // checks to make sure the file exists, if it doesn't it throws an error and
-            // exits method
-            fileNameFilter filter = new fileNameFilter(fileName);
-            String[] fileList = folder.list(filter);
+            // a file which acts as the save file directory
+            File dir = new File(FILE_DIR);
+            // a list of the names of the files in the directory
+            String[] fileList = dir.list();
+            Boolean hasFoundFile = false;
+            // loops through the list of file names
             for (int i = 0; i < fileList.length; ++i) {
-                if (fileList[i] == fileName) {
-                    break;
-                } else if (i == fileList.length - 1) {
-                    System.out.println("File does not exist");
-                    return;
+                // if the list only has one element and it is the correct name
+                if (fileList.length == 1 && fileList[i].equals(fileName + ".json")) {
+                    hasFoundFile = true;
+                    // otherwise keep looping
+                } else {
+                    // if the end of the list has been reached and the file has not been found
+                    if (i == (fileList.length - 1) && hasFoundFile == false) {
+                        // tell the user the file does not exist and exit
+                        System.out.println("File does not exist");
+                        return;
+                        // if the file has been found
+                    } else if (fileList[i].equals(fileName + ".json")) {
+                        hasFoundFile = true;
+                    }
                 }
             }
 
+            // wipe both lists
+            Driver.clearClassList();
+            Driver.clearRelationshipList();
+
+            // gets the file in the correct directory
+            File fileToBeLoaded = new File(FILE_DIR + "/" + fileName + ".json");
             // makes the JSONParser
-            Object obj = new JSONParser().parse(new FileReader(fileName + ".json"));
+            Object obj = new JSONParser().parse(new FileReader(fileToBeLoaded));
             // casting obj to JSONObject
             JSONObject jo = (JSONObject) obj;
 
@@ -140,13 +151,20 @@ public class JSON {
             // iterator for iterating for destination
             Iterator<JSONObject> destIter = relArray.iterator();
 
+            // iterate through the relationships
             while (srcIter.hasNext()) {
+                // get the source name of the relationship
                 String sourceName = (String) srcIter.next().get("source");
+                // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
+                // make a new relationship with the correct parameters
                 Relationship newRelationship = new Relationship(Driver.findClass(sourceName),
                         Driver.findClass(destinationName));
+                // add the relationship to the relationship list
                 Driver.addToRelationshipList(newRelationship);
             }
+
+            System.out.println("Diagram has been loaded from \"" + fileName + ".json\"");
 
         } catch (FileNotFoundException exception) {
             exception.printStackTrace();
@@ -157,4 +175,18 @@ public class JSON {
         }
     }
 
+    /**
+     * Checks to see if the save file directory is empty
+     * 
+     * @return true if empty, false otherwise
+     */
+    public static boolean ifDirIsEmpty() {
+        File dir = new File(FILE_DIR);
+        String[] fileList = dir.list();
+        if (fileList.length == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
