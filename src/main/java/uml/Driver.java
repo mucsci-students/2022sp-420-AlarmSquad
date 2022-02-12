@@ -20,7 +20,6 @@ public class Driver {
     private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
 
     public static void main(String[] args) {
-
         clearScreen();
 
         String intro = "Welcome to ALARM Squad's UML editor!";
