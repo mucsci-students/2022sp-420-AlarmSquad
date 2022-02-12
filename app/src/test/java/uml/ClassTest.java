@@ -1,6 +1,5 @@
-package testing;
+package uml;
 
-import uml.Class;
 
 import static org.junit.Assert.*;
 
@@ -13,15 +12,15 @@ import org.junit.Test;
  */
 public class ClassTest {
 
-    // @Test
-    // public void testClassConstruction() {
+    @Test
+    public void testClassConstruction() {
     //     ClassManager classFiles = new ClassManager();
     //     classFiles.addClass("Students");
     //     assertEquals(true, classFiles[0].getName().equals("Students"));
     //     assertEquals(true, classFiles[0].getAttributes().isEmpty());
     //     assertEquals(true, classFiles[0].getIncomingRelationships().isEmpty());
     //     assertEquals(true, classFiles[0].getOutgoingRelationships().isEmpty());
-    // }
+       }
 
     // @Test
     // public void testAddClass() {

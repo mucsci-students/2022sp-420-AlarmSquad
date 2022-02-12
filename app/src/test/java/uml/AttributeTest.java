@@ -1,6 +1,5 @@
-package testing;
+package uml;
 
-import uml.*;
 import org.junit.Test;
 
 /**
@@ -10,8 +9,8 @@ import org.junit.Test;
  */
 public class AttributeTest {
 
-    // @Test
-    // public boolean test01Constructor() {
-    //     return true;
-    // }
+    @Test
+    public boolean test01Constructor() {
+        return true;
+    }
 }

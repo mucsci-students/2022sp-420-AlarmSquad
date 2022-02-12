@@ -1,0 +1,1 @@
+{"relationshipList":[{"destination":"mary","source":"stu"},{"destination":"phil","source":"mary"},{"destination":"stu","source":"phil"}],"classList":[{"className":"stu","attList":["id"]},{"className":"mary","attList":[]},{"className":"phil","attList":[]}]}
