@@ -19,7 +19,6 @@ public class ClassTest {
         assertEquals(true, studentClass.getAttributeList().isEmpty());
     }
 
-    // @Test
     // public void testAddClass() {
     //     ClassManager classFiles = new ClassManager();
     //     classFiles.addClass("Students");
