@@ -70,7 +70,7 @@ public class JSON {
 
         // save the file
         try (FileWriter file = new FileWriter(fileName)) {
-            File fileToBeSaved = new File(fileName);
+            //File fileToBeSaved = new File(fileName);
             file.write(saveFile.toString());
             file.flush();
         } catch (IOException exception) {

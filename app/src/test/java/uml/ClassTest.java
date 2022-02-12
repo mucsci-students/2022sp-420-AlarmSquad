@@ -1,9 +1,9 @@
 package uml;
 
 
-import static org.junit.Assert.*;
+// import static org.junit.Assert.*;
 
-import org.junit.Test;
+// import org.junit.Test;
 
 /**
  * JUnit tests for Class
@@ -12,15 +12,15 @@ import org.junit.Test;
  */
 public class ClassTest {
 
-    @Test
-    public void testClassConstruction() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     assertEquals(true, classFiles[0].getName().equals("Students"));
-    //     assertEquals(true, classFiles[0].getAttributes().isEmpty());
-    //     assertEquals(true, classFiles[0].getIncomingRelationships().isEmpty());
-    //     assertEquals(true, classFiles[0].getOutgoingRelationships().isEmpty());
-       }
+    // @Test
+    // public void testClassConstruction() {
+    // //     ClassManager classFiles = new ClassManager();
+    // //     classFiles.addClass("Students");
+    // //     assertEquals(true, classFiles[0].getName().equals("Students"));
+    // //     assertEquals(true, classFiles[0].getAttributes().isEmpty());
+    // //     assertEquals(true, classFiles[0].getIncomingRelationships().isEmpty());
+    // //     assertEquals(true, classFiles[0].getOutgoingRelationships().isEmpty());
+    //    }
 
     // @Test
     // public void testAddClass() {
