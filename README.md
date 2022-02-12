@@ -1,19 +1,43 @@
 # 2022sp-420-AlarmSquad
 
-## Dependencies:
-- [Junit](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/json-simple/json-simple-1.1.1.jar)
+## Need:
+- [Latest version of git](https://git-scm.com/downloads)
+- [Latest version of Java](https://www.oracle.com/java/technologies/downloads/)
 
 ## Setup
 
-- Open Terminal
-- Clone [repo](https://github.com/mucsci-students/2022sp-420-AlarmSquad.git)
-- Use command "cd" to enter "2022sp-420-AlarmSquad" folder
+1. Open terminal
 
-## How to Run
+2. Clone the repository
 
-- Clone repository
-- 'cd 2022-420-AlarmSquad/app'
-- 'gradlew build'
-- 'java -jar ./build/libs/app.jar'
+```
+git clone https://github.com/mucsci-students/2022sp-420-AlarmSquad
+```
+
+2. Navigate to the app directory inside the project folder
+
+```
+cd 2022sp-420-AlarmSquad\app
+```
+
+3. Invoke `gradlew` for your OS.
+
+```
+# Linux and macOS
+./gradlew build
+
+# Windows
+gradlew build
+```
+
+4. To run the application, invoke the generated jar file
+
+```
+# Linux and macOS
+java -jar ./build/libs/app.jar
+
+# Windows
+java -jar ./build/libs/app.jar
+```
 
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  
