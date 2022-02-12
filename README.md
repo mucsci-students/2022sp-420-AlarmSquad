@@ -11,7 +11,8 @@
 
 ## How to Run
 
-- In your IDE, at the top, click run
-- Or run through terminal with this command ""
+- Clone repository
+- './gradlew.bat build' for Windows, 'gradlew build' or for Mac/Linux
+- 'java -jar ./build/libs/app.jar'
 
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  
