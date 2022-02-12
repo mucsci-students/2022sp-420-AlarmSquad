@@ -211,11 +211,6 @@ public class Driver {
                             // relationship to relationship array list
                             if (findClass(destinationName) != (null)) {
                                 if (findRelationship(sourceName, destinationName) != null) {
-                                // if (relationshipList.stream()
-                                //         .anyMatch(srcObj -> srcObj.getSource().getClassName().equals(sourceName) &&
-                                //                 relationshipList.stream().anyMatch(destObj -> destObj.getDestination()
-                                //                         .getClassName().equals(destinationName)))) {
-
                                     System.out.println("Relationship already exists between " +
                                             sourceName + " and " + destinationName);
                                     break;
