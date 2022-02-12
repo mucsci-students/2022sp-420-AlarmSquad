@@ -1,7 +1,6 @@
 package uml;
 
 import java.io.*;
-import java.nio.*;
 import java.util.*;
 
 /**
@@ -258,12 +257,16 @@ public class Driver {
                         System.out.println("Diagram has been saved to \"" + saveFileName + ".json\"");
                         break;
                     case "load":
-                        System.out.println("Load file name: ");
-                        String loadFileName = scan.next();
-                        JSON.load(loadFileName);
-                        System.out.println("Diagram has been loaded from \"" + loadFileName + ".json\"");
-                        break;
-
+                        if (JSON.ifDirIsEmpty()) {
+                            System.out.println("No save files found");
+                            System.out.print(prompt);
+                            break;
+                        } else {
+                            System.out.print("Load file name: ");
+                            String loadFileName = scan.next();
+                            JSON.load(loadFileName);
+                            break;
+                        }
                     case "list classes":
                     case "l classes":
                         // if there are classes to list, list them
@@ -605,20 +608,21 @@ public class Driver {
     }
 
     /**
-     * Pass in name of class being deleted. If any relationship with 
+     * Pass in name of class being deleted. If any relationship with
+     * 
      * @param className
      * @return updated relationship list
      */
     public static ArrayList<Relationship> updateRelationshipList(String className) {
-        
-        for ( Relationship rel : relationshipList) {
+
+        for (Relationship rel : relationshipList) {
             if (rel.getSource().getClassName() == className ||
-                rel.getDestination().getClassName() == className) {
-                    relationshipList.remove(rel);
-                }
-                
+                    rel.getDestination().getClassName() == className) {
+                relationshipList.remove(rel);
+            }
+
         }
-        
+
         return relationshipList;
     }
 }

@@ -1,7 +1,6 @@
-package testing;
+package uml;
 
-import uml.*;
-import org.junit.Test;
+// import org.junit.Test;
 
 /**
  * JUnit tests for Attribute
