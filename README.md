@@ -14,17 +14,17 @@
 git clone https://github.com/mucsci-students/2022sp-420-AlarmSquad
 ```
 
-2. Navigate to the app directory inside the project folder
+3. Navigate to the app directory inside the project folder
 
 ```
 # Linux and macOS
-cd 2022sp-420-AlarmSquad/app
+cd 2022sp-420-AlarmSquad
 
 # Windows
-cd 2022sp-420-AlarmSquad\app
+cd 2022sp-420-AlarmSquad
 ```
 
-3. Invoke `gradlew` for your OS.
+4. Invoke `gradlew` for your OS.
 
 ```
 # Linux and macOS
@@ -34,10 +34,10 @@ cd 2022sp-420-AlarmSquad\app
 gradlew build
 ```
 
-4. To run the application, invoke the generated jar file
+5. To run the application, invoke the generated jar file
 
 ```
-java -jar ./build/libs/app.jar
+java -jar ./build/libs/2022sp-420-AlarmSquad.jar
 ```
 
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  
