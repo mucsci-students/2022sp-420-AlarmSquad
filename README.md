@@ -12,7 +12,8 @@
 ## How to Run
 
 - Clone repository
-- './gradlew.bat build' for Windows, 'gradlew build' or for Mac/Linux
+- 'cd 2022-420-AlarmSquad/app'
+- 'gradlew build'
 - 'java -jar ./build/libs/app.jar'
 
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  
