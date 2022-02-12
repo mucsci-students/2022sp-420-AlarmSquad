@@ -5,6 +5,19 @@ import java.util.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
+class fileNameFilter implements FilenameFilter {
+
+    String fileName;
+
+    public fileNameFilter(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public boolean accept(File dir, String name) {
+        return name.startsWith(fileName);
+    }
+}
+
 public class JSON {
 
     // a copy of the classList from Driver
@@ -14,18 +27,6 @@ public class JSON {
     // the JSON object to be saved
     private static JSONObject saveFile = new JSONObject();
 
-    class fileNameFilter implements FilenameFilter {
-
-        String fileName;
-
-        public fileNameFilter(String fileName) {
-            this.fileName = fileName;
-        }
-
-        public boolean accept(File dir, String name) {
-            return name.startsWith(fileName);
-        }
-    }
 
     @SuppressWarnings("unchecked")
     public static void save(String fileName) {
@@ -69,7 +70,7 @@ public class JSON {
 
         // save the file
         try (FileWriter file = new FileWriter(fileName)) {
-            File fileToBeSaved = new File(folder, fileName);
+            File fileToBeSaved = new File(fileName);
             file.write(saveFile.toString());
             file.flush();
         } catch (IOException exception) {
@@ -92,8 +93,8 @@ public class JSON {
 
             // checks to make sure the file exists, if it doesn't it throws an error and
             // exits method
-            fileNameFilter filter = new fileNameFilter(fileName);
-            String[] fileList = folder.list(filter);
+            //fileNameFilter filter = new fileNameFilter(fileName);
+            String[] fileList = folder.list();
             for (int i = 0; i < fileList.length; ++i) {
                 if (fileList[i] == fileName) {
                     break;
