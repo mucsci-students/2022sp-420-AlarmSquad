@@ -423,7 +423,7 @@ public class Driver {
      * 
      * @return the relationship if it was found, otherwise returns null
      */
-    private static Relationship findRelationship() {
+    public static Relationship findRelationship() {
         System.out.print("Enter relationship source name: ");
         String sourceToFind = scan.next().trim();
         Class src = findClass(sourceToFind);
