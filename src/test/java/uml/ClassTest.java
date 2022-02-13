@@ -1,9 +1,10 @@
 package uml;
 
-
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import uml.managers.ClassManager;
 
 /**
  * JUnit tests for Class
@@ -11,100 +12,79 @@ import org.junit.Test;
  * @authors Ryan Ganzke
  */
 public class ClassTest {
+    private static ClassManager classManager = new ClassManager();
 
     @Test
     public void testClassConstruction() {
-        Class studentClass = new Class("Students");
-        assertEquals(true, studentClass.getClassName().equals("Students"));
+        Class studentClass = new Class("Student");
+        assertEquals(true, studentClass.getClassName().equals("Student"));
         assertEquals(true, studentClass.getAttributeList().isEmpty());
     }
 
-    // public void testAddClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     assertEquals(false, classFiles.listClass("Rooms"));
-    // }
+    @Test
+    public void testAddClass() {
+        classManager.addClass("Student");
+        classManager.addClass("Teacher");
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
+    }
 
-    // @Test
-    // public void testAddDuplicatClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals("Class Students already exists", classFiles.addClass("Students"));
-    //     classFiles.addClass("Rooms");
-    //     assertEquals("Class Rooms already exists", classFiles.addClass("Students"));
-    // }
+    @Test
+    public void testAddInvalid() {
+        classManager.addClass("Student");
+        assertEquals("\"5Teacher\" is not a valid identifier\n", classManager.addClass("5Teacher"));
+        assertEquals("\"@Child\" is not a valid identifier\n", classManager.addClass("@Child"));
+    }
 
-    // @Test
-    // public void testDeleteClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     classFiles.deleteClass("Students");
-    //     assertEquals(false, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    // }
 
-    // @Test
-    // public void testDeleteMultipleClasses() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     classFiles.addClass("Rooms");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     classFiles.deleteClass("Students", "Rooms");
-    //     assertEquals(false, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    //     assertEquals(false, classFiles.listClass("Rooms"));
-    // }
+    @Test
+    public void testAddDuplicateClass() {
+        classManager.addClass("Student");
+        classManager.addClass("Teacher");
+        assertEquals("Class \"Student\" already exists\n", classManager.addClass("Student"));
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
+        assertEquals(1, classManager.numOfClasses("Student"));
+    }
 
-    // @Test
-    // public void testDeleteNonexistantClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals("Rooms class does not exist", classFiles.deleteClass("Rooms"));
-    //     classFiles.deleteClass("Teachers");
-    //     assertEquals(false, classFiles.listClass("Teachers"));
-    // }
+    @Test
+    public void testDeleteClass() {
+        classManager.addClass("Student");
+        classManager.addClass("Teacher");
+        classManager.deleteClass("Student");
+        assertEquals(false, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
+    }
 
-    // @Test
-    // public void testRenameClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     classFiles.renameClass("Students", "Rooms");
-    //     assertEquals(false, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Rooms"));
-    // }
+    @Test
+    public void testDeleteNonExistantClass() {
+        classManager.addClass("Student");
+        assertEquals("Class \"Professor\" was not found\n", classManager.deleteClass("Professor"));
+    }
 
-    // @Test
-    // public void testRenameDuplicateClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     assertEquals("A class named Teachers already exists", classFiles.renameClass("Students", "Teachers"));
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    // }
+    @Test
+    public void testRenameClass() {
+        classManager.addClass("Student");
+        classManager.addClass("Teacher");
+        classManager.renameClass("Teacher", "Professor");
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
+        assertEquals(false, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Professor")));
+    }
 
-    // @Test
-    // public void testClassMaster() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     classFiles.addClass("Rooms");
-    //     classFiles.addClass("Courses");
-    //     classFiles.addClass("Tests");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    //     assertEquals(false, classFiles.listClass("Exams"));
-    //     classFiles.renameClass("Tests", "Exams");
-    //     classFiles.renameClass("Teachers", "Professors");
-    // }
+    @Test
+    public void testRenameInvalid() {
+        classManager.addClass("Student");
+        classManager.addClass("Teacher");
+        assertEquals("\"5Teacher\" is not a valid identifier\n", classManager.renameClass("Teacher", "5Teacher"));
+        assertEquals("\"(Teacher)\" is not a valid identifier\n", classManager.renameClass("Teacher", "(Teacher)"));
+    }
+
+    @Test
+    public void testRenameDuplicateClass() {
+        classManager.addClass("Student");
+        classManager.addClass("Teacher");
+        assertEquals("Class \"Student\" already exists\n", classManager.renameClass("Teacher", "Student"));
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
+        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
+    }
 }
