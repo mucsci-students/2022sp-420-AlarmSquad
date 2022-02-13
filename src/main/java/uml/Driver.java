@@ -60,6 +60,7 @@ public class Driver {
                         String className = scan.next().trim();
 
                         if (!ifValidInput(className)) {
+                            System.out.println("\"" + className + "\" is not a valid identifier\n");
                             break;
                         }
 
@@ -99,6 +100,11 @@ public class Driver {
                             System.out.print("Enter new name for class " + oldClass.getClassName() + ": ");
                             String newName = scan.next().trim();
                             if (!ifValidInput(newName)) {
+                                System.out.println("\"" + newName + "\" is not a valid identifier\n");
+                                break;
+                            }
+                            if(findClass(newName) != null) {
+                                System.out.println("Class \"" + newName + "\" already exists\n");
                                 break;
                             }
                             oldClass.setClassName(newName);
@@ -117,6 +123,7 @@ public class Driver {
                             System.out.print("Enter attribute name: ");
                             String attributeName = scan.next().trim();
                             if (!ifValidInput(attributeName)) {
+                                System.out.println("\"" + attributeName + "\" is not a valid identifier\n");
                                 break;
                             }
                             if (classToAddAtt.getAttributeList().stream()
@@ -193,6 +200,12 @@ public class Driver {
                                 System.out.print("Enter new name for " + oldAttName + ": ");
                                 String newAttName = scan.next().trim();
                                 if (!ifValidInput(newAttName)) {
+                                    System.out.println("\"" + newAttName + "\" is not a valid identifier\n");
+                                    break;
+                                }
+                                if(classWithAtt.findAttribute(newAttName) != null) {
+                                    System.out.println("Attribute \"" + newAttName +
+                                        "\" already exists in class \"" + classWithAttName + "\"\n");
                                     break;
                                 }
                                 newAtt.setAttName(newAttName);
@@ -460,7 +473,7 @@ public class Driver {
      * @param classToDeleteName the name of the class to delete
      * @return the classList
      */
-    private static ArrayList<Class> deleteClass(String classToDeleteName) {
+    public static ArrayList<Class> deleteClass(String classToDeleteName) {
         // Create new class object. If a class matches the user inputed name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
         Class classToDelete = null;
