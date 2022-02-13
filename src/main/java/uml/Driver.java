@@ -20,6 +20,10 @@ public class Driver {
     private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
 
     public static void main(String[] args) {
+        runCLI();
+    }
+
+    public static void runCLI() {
         clearScreen();
 
         String intro = "Welcome to ALARM Squad's UML editor!";
@@ -419,7 +423,7 @@ public class Driver {
      * 
      * @return the relationship if it was found, otherwise returns null
      */
-    private static Relationship findRelationship() {
+    public static Relationship findRelationship() {
         System.out.print("Enter relationship source name: ");
         String sourceToFind = scan.next().trim();
         Class src = findClass(sourceToFind);
