@@ -26,101 +26,120 @@ public class ClassTest {
     public void testAddClass() {
         String data = "a class\nStudent\nexit";
         InputStream stdin = System.in;
+
         try {
             System.setIn(new ByteArrayInputStream(data.getBytes()));
             Scanner scan = new Scanner(System.in);
+            
+            Driver.runCLI();
 
-            Driver mainDriver = new Driver();
-            mainDriver.main(new String[0]);
+            assertEquals("Student", Driver.findClass("Student").getClassName());
+            assertEquals(null, Driver.findClass("Teacher"));
 
-            assertEquals("Student", mainDriver.findClass("Student").getClassName());
-            assertEquals(null, mainDriver.findClass("Teacher"));
             scan.close();
         } finally {
             System.setIn(stdin);
         }
     }
 
-    // @Test
-    // public void testAddDuplicatClass() {
-    //     ArrayList<Class> classList = new ArrayList<Class>();
-    //     Class studentClass = new Class("Student");
-    //     Class teacherClass = new Class("Teacher");
-    //     classList.add(studentClass);
-    //     classList.add(teacherClass);
-    //     assertEquals("", classList.add(studentClass));
-    //     classFiles.addClass("Rooms");
-    //     assertEquals("Class Rooms already exists", classFiles.addClass("Students"));
-    // }
+    @Test
+    public void testAddDuplicateClass() {
+        String data = "a class\nStudent\na class\nTeacher\na class\nStudent\nexit";
+        InputStream stdin = System.in;
 
-    // @Test
-    // public void testDeleteClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     classFiles.deleteClass("Students");
-    //     assertEquals(false, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    // }
+        try {
+            System.setIn(new ByteArrayInputStream(data.getBytes()));
+            Scanner scan = new Scanner(System.in);
 
-    // @Test
-    // public void testDeleteMultipleClasses() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     classFiles.addClass("Rooms");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     classFiles.deleteClass("Students", "Rooms");
-    //     assertEquals(false, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    //     assertEquals(false, classFiles.listClass("Rooms"));
-    // }
+            Driver.runCLI();
 
-    // @Test
-    // public void testDeleteNonexistantClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals("Rooms class does not exist", classFiles.deleteClass("Rooms"));
-    //     classFiles.deleteClass("Teachers");
-    //     assertEquals(false, classFiles.listClass("Teachers"));
-    // }
+            assertEquals("Student", Driver.findClass("Student").getClassName());
+            assertEquals("Teacher", Driver.findClass("Teacher").getClassName());
 
-    // @Test
-    // public void testRenameClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     classFiles.renameClass("Students", "Rooms");
-    //     assertEquals(false, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Rooms"));
-    // }
+            scan.close();
+        } finally {
+            System.setIn(stdin);
+        }
+    }
 
-    // @Test
-    // public void testRenameDuplicateClass() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     assertEquals("A class named Teachers already exists", classFiles.renameClass("Students", "Teachers"));
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    // }
+    @Test
+    public void testDeleteClass() {
+        String data = "a class\nStudent\na class\nTeacher\nd class\nStudent\ny\nexit";
+        InputStream stdin = System.in;
 
-    // @Test
-    // public void testClassMaster() {
-    //     ClassManager classFiles = new ClassManager();
-    //     classFiles.addClass("Students");
-    //     classFiles.addClass("Teachers");
-    //     classFiles.addClass("Rooms");
-    //     classFiles.addClass("Courses");
-    //     classFiles.addClass("Tests");
-    //     assertEquals(true, classFiles.listClass("Students"));
-    //     assertEquals(true, classFiles.listClass("Teachers"));
-    //     assertEquals(false, classFiles.listClass("Exams"));
-    //     classFiles.renameClass("Tests", "Exams");
-    //     classFiles.renameClass("Teachers", "Professors");
-    // }
+        try {
+            System.setIn(new ByteArrayInputStream(data.getBytes()));
+            Scanner scan = new Scanner(System.in);
+
+            Driver.runCLI();
+
+            assertEquals("Teacher", Driver.findClass("Teacher").getClassName());
+            assertEquals(null, Driver.findClass("Student"));
+
+            scan.close();
+        } finally {
+            System.setIn(stdin);
+        }
+    }
+
+    @Test
+    public void testDeleteNonExistantClass() {
+        String data = "a class\nStudent\na class\nTeacher\nd class\nRoom\nexit";
+        InputStream stdin = System.in;
+
+        try {
+            System.setIn(new ByteArrayInputStream(data.getBytes()));
+            Scanner scan = new Scanner(System.in);
+
+            Driver.runCLI();
+
+            assertEquals("Student", Driver.findClass("Student").getClassName());
+            assertEquals("Teacher", Driver.findClass("Teacher").getClassName());
+
+            scan.close();
+        } finally {
+            System.setIn(stdin);
+        }
+    }
+
+    @Test
+    public void testRenameClass() {
+        String data = "a class\nStudent\na class\nTeacher\nr class\nTeacher\nProfessor\nexit";
+        InputStream stdin = System.in;
+
+        try {
+            System.setIn(new ByteArrayInputStream(data.getBytes()));
+            Scanner scan = new Scanner(System.in);
+
+            Driver.runCLI();
+
+            assertEquals("Student", Driver.findClass("Student").getClassName());
+            assertEquals(null, Driver.findClass("Teacher"));
+            assertEquals("Professor", Driver.findClass("Professor").getClassName());
+
+            scan.close();
+        } finally {
+            System.setIn(stdin);
+        }
+    }
+
+    @Test
+    public void testRenameDuplicateClass() {
+        String data = "a class\nStudent\na class\nTeacher\nr class\nTeacher\nStudent\nexit";
+        InputStream stdin = System.in;
+
+        try {
+            System.setIn(new ByteArrayInputStream(data.getBytes()));
+            Scanner scan = new Scanner(System.in);
+
+            Driver.runCLI();
+
+            assertEquals("Student", Driver.findClass("Student").getClassName());
+            assertEquals("Teacher", Driver.findClass("Teacher").getClassName());
+
+            scan.close();
+        } finally {
+            System.setIn(stdin);
+        }
+    }
 }
