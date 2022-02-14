@@ -18,26 +18,26 @@ git clone https://github.com/mucsci-students/2022sp-420-AlarmSquad
 
 ```
 # Linux and macOS
-cd 2022sp-420-AlarmSquad
+cd 2022sp-420-AlarmSquad\maven\initial
 
 # Windows
-cd 2022sp-420-AlarmSquad
+cd 2022sp-420-AlarmSquad\maven\initial
 ```
 
-4. Invoke `gradlew` for your OS.
+4. Invoke `mvnw` for your OS.
 
 ```
 # Linux and macOS
-./gradlew build
+./mvnw package
 
 # Windows
-gradlew build
+.\mvnw package
 ```
 
 5. To run the application, invoke the generated jar file
 
 ```
-java -jar ./build/libs/2022sp-420-AlarmSquad.jar
+java -jar target\2022sp-420-AlarmSquad-1.0.jar
 ```
 
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  
