@@ -40,4 +40,14 @@ cd 2022sp-420-AlarmSquad\maven\initial
 java -jar target\2022sp-420-AlarmSquad-1.0.jar
 ```
 
+6. If you would like to run the tests, invoke the following command
+
+```
+# Linux and macOS
+./mvnw test
+
+# Windows
+.\mvnw test
+```
+
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  

@@ -2,7 +2,6 @@ package uml.managers;
 
 import java.util.ArrayList;
 
-import uml.Driver;
 import uml.Class;
 import uml.Relationship;
 
