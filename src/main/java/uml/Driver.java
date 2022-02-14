@@ -60,6 +60,7 @@ public class Driver {
                         String className = scan.next().trim();
 
                         if (!ifValidInput(className)) {
+                            System.out.println("\"" + className + "\" is not a valid identifier\n");
                             break;
                         }
 
@@ -99,6 +100,11 @@ public class Driver {
                             System.out.print("Enter new name for class " + oldClass.getClassName() + ": ");
                             String newName = scan.next().trim();
                             if (!ifValidInput(newName)) {
+                                System.out.println("\"" + newName + "\" is not a valid identifier\n");
+                                break;
+                            }
+                            if(findClass(newName) != null) {
+                                System.out.println("Class \"" + newName + "\" already exists\n");
                                 break;
                             }
                             oldClass.setClassName(newName);
@@ -117,6 +123,7 @@ public class Driver {
                             System.out.print("Enter attribute name: ");
                             String attributeName = scan.next().trim();
                             if (!ifValidInput(attributeName)) {
+                                System.out.println("\"" + attributeName + "\" is not a valid identifier\n");
                                 break;
                             }
                             if (classToAddAtt.getAttributeList().stream()
@@ -193,6 +200,12 @@ public class Driver {
                                 System.out.print("Enter new name for " + oldAttName + ": ");
                                 String newAttName = scan.next().trim();
                                 if (!ifValidInput(newAttName)) {
+                                    System.out.println("\"" + newAttName + "\" is not a valid identifier\n");
+                                    break;
+                                }
+                                if(classWithAtt.findAttribute(newAttName) != null) {
+                                    System.out.println("Attribute \"" + newAttName +
+                                        "\" already exists in class \"" + classWithAttName + "\"\n");
                                     break;
                                 }
                                 newAtt.setAttName(newAttName);
@@ -213,11 +226,7 @@ public class Driver {
                             // If destination class is valid and exists add
                             // relationship to relationship array list
                             if (findClass(destinationName) != (null)) {
-                                if (relationshipList.stream()
-                                        .anyMatch(srcObj -> srcObj.getSource().getClassName().equals(sourceName) &&
-                                                relationshipList.stream().anyMatch(destObj -> destObj.getDestination()
-                                                        .getClassName().equals(destinationName)))) {
-
+                                if (findRelationship(sourceName, destinationName) != null) {
                                     System.out.println("Relationship already exists between " +
                                             sourceName + " and " + destinationName);
                                     break;
@@ -454,13 +463,44 @@ public class Driver {
     }
 
     /**
+     * 
+     * Takes in the source and destination name, returns it if it's in the
+     * relationshipList. Otherwise, returns
+     * null
+     * 
+     * @param srcName
+     * @param destName
+     * @return
+     */
+    private static Relationship findRelationship(String srcName, String destName) {
+        Class src = findClass(srcName);
+        if (src != null) {
+            // If source name was found, proceed to find dest name
+            Class dest = findClass(destName);
+            if (dest != null) {
+                // If dest name was found, proceed to find relationship
+                for (int i = 0; i < relationshipList.size(); ++i) {
+                    // If the name matches, return class
+                    if (relationshipList.get(i).getSource().getClassName().equals(srcName) &&
+                            relationshipList.get(i).getDestination().getClassName().equals(destName)) {
+                        return relationshipList.get(i);
+                    }
+                }
+            }
+        }
+        // If user's source or destintion input did not match any relationship's
+        // source and destination fields, output error
+        return null;
+    }
+
+    /**
      * Deletes the class with the matching name field if it exists, and returns the
      * classList.
      * 
      * @param classToDeleteName the name of the class to delete
      * @return the classList
      */
-    private static ArrayList<Class> deleteClass(String classToDeleteName) {
+    public static ArrayList<Class> deleteClass(String classToDeleteName) {
         // Create new class object. If a class matches the user inputed name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
         Class classToDelete = null;
@@ -482,6 +522,7 @@ public class Driver {
 
                 // User confirms if they wish to delete. If no, break out of loop
                 if (theNextAnswer.toLowerCase().equals("y")) {
+                    relationshipList = updateRelationshipList(classToDeleteName);
                     classList.remove(classToDelete);
                     System.out.print("Class \"" + classToDelete.getClassName() + "\" has been deleted\n");
                     break;
@@ -494,16 +535,6 @@ public class Driver {
             // users input, classToDelete will still be null
             else {
                 System.out.println("Class \"" + classToDeleteName + "\" was not found");
-
-                // System.out.print("Do you still want to delete a class? (y/n): ");
-                // String theAnswer = scan.next();
-                // // If the user does not want to delete a class, return class list
-                // if (theAnswer.toLowerCase().equals("n")) {
-                // return classList;
-                // }
-                // // Otherwise, prompt user to enter a class to delete again
-                // System.out.print("Enter class name to delete: ");
-                // classToDeleteName = scan.next();
             }
         }
         return classList;
@@ -616,16 +647,14 @@ public class Driver {
      * @param className
      * @return updated relationship list
      */
-    public static ArrayList<Relationship> updateRelationshipList(String className) {
-
-        for (Relationship rel : relationshipList) {
-            if (rel.getSource().getClassName() == className ||
-                    rel.getDestination().getClassName() == className) {
-                relationshipList.remove(rel);
+    private static ArrayList<Relationship> updateRelationshipList(String className) {
+        for (Iterator<Relationship> iter = relationshipList.iterator(); iter.hasNext();) {
+            Relationship rel = iter.next();
+            if (rel.getSource().getClassName().equals(className) ||
+                    rel.getDestination().getClassName().equals(className)) {
+                iter.remove();
             }
-
         }
-
         return relationshipList;
     }
 }

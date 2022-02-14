@@ -2,11 +2,9 @@ package uml;
 
 import static org.junit.Assert.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Scanner;
-
 import org.junit.Test;
+
+import uml.managers.ClassManager;
 
 /**
  * JUnit tests for Attribute
@@ -14,122 +12,61 @@ import org.junit.Test;
  * @authors Ryan Ganzke
  */
 public class AttributeTest {
+    private static ClassManager classManager = new ClassManager();
 
     @Test
     public void testAddAttr() {
-        String data = "a class\nStudent\na att\nStudent\nName\nexit";
-        InputStream stdin = System.in;
-
-        try {
-            System.setIn(new ByteArrayInputStream(data.getBytes()));
-            Scanner scan = new Scanner(System.in);
-            
-            Driver.runCLI();
-
-            assertEquals("Name", Driver.findClass("Student").findAttribute("Name").getAttName());
-
-            scan.close();
-        } finally {
-            System.setIn(stdin);
-        }
+        classManager.addClass("Student");
+        classManager.addAttribute("Student", "ID");
+        assertEquals(true, classManager.findClass("Student").getAttributeList().stream().anyMatch(o -> o.getAttName().equals("ID")));
     }
 
     @Test
-    public void testAddDuplicateAttr() {
-        String data = "a class\nStudent\na att\nStudent\nName\na att\nStudent\nName\nexit";
-        InputStream stdin = System.in;
-
-        try {
-            System.setIn(new ByteArrayInputStream(data.getBytes()));
-            Scanner scan = new Scanner(System.in);
-            
-            Driver.runCLI();
-
-            assertEquals("Name", Driver.findClass("Student").findAttribute("Name").getAttName());
-
-            scan.close();
-        } finally {
-            System.setIn(stdin);
-        }
+    public void testAddInvalidAtt() {
+        classManager.addClass("Student");
+        assertEquals("\"3Name\" is not a valid identifier\n", classManager.addClass("3Name"));
+        assertEquals("\"&Name\" is not a valid identifier\n", classManager.addClass("&Name"));
     }
 
     @Test
     public void testDeleteAttr() {
-        String data = "a class\nStudent\na att\nStudent\nName\na att\nStudent\nID\nd att\nStudent\nName\ny\nexit";
-        InputStream stdin = System.in;
+        classManager.addClass("Student");
+        classManager.addAttribute("Student", "FirstName");
+        classManager.deleteAttribute("Student", "FirstName");
+        assertEquals(false, classManager.findClass("Student").getAttributeList().stream().anyMatch(o -> o.getAttName().equals("FirstName")));
+    }
 
-        try {
-            System.setIn(new ByteArrayInputStream(data.getBytes()));
-            Scanner scan = new Scanner(System.in);
-            
-            Driver.runCLI();
-
-            assertEquals(null, Driver.findClass("Student").findAttribute("Name"));
-            assertEquals("ID", Driver.findClass("Student").findAttribute("ID").getAttName());
-
-            scan.close();
-        } finally {
-            System.setIn(stdin);
-        }
+    @Test
+    public void testAddDuplicateAttr() {
+        classManager.addClass("Student");
+        classManager.addAttribute("Student", "FirstName");
+        assertEquals("Attribute \"FirstName\" already exists in class \"Student\"\n", classManager.addAttribute("Student", "FirstName"));
     }
 
     @Test
     public void testRenameAttr() {
-        String data = "a class\nStudent\na att\nStudent\nFirstName\nr att\nStudent\nFirstName\nLastName\nexit";
-        InputStream stdin = System.in;
-
-        try {
-            System.setIn(new ByteArrayInputStream(data.getBytes()));
-            Scanner scan = new Scanner(System.in);
-            
-            Driver.runCLI();
-
-            assertEquals(null, Driver.findClass("Student").findAttribute("FirstName"));
-            assertEquals("LastName", Driver.findClass("Student").findAttribute("LastName").getAttName());
-
-            scan.close();
-        } finally {
-            System.setIn(stdin);
-        }
+        classManager.addClass("Student");
+        classManager.addAttribute("Student", "FirstName");
+        classManager.addAttribute("Student", "MidName");
+        classManager.renameAttribute("Student", "MidName", "LastName");
+        assertEquals(true, classManager.findClass("Student").getAttributeList().stream().anyMatch(o -> o.getAttName().equals("FirstName")));
+        assertEquals(false, classManager.findClass("Student").getAttributeList().stream().anyMatch(o -> o.getAttName().equals("MidName")));
+        assertEquals(true, classManager.findClass("Student").getAttributeList().stream().anyMatch(o -> o.getAttName().equals("LastName")));
     }
 
     @Test
-    public void testRenameNonExistantAttr() {
-        String data = "a class\nStudent\na att\nStudent\nFirstName\nr att\nStudent\nLastName\nexit";
-        InputStream stdin = System.in;
-
-        try {
-            System.setIn(new ByteArrayInputStream(data.getBytes()));
-            Scanner scan = new Scanner(System.in);
-            
-            Driver.runCLI();
-
-            assertEquals("FirstName", Driver.findClass("Student").findAttribute("FirstName").getAttName());
-            assertEquals(null, Driver.findClass("Student").findAttribute("LastName"));
-
-            scan.close();
-        } finally {
-            System.setIn(stdin);
-        }
+    public void testRenameInvalidAtt() {
+        classManager.addClass("Student");
+        classManager.addAttribute("Student", "Grade");
+        assertEquals("\"7thGrade\" is not a valid identifier\n", classManager.addClass("7thGrade"));
+        assertEquals("\"?thGrade\" is not a valid identifier\n", classManager.addClass("?thGrade"));
     }
 
     @Test
     public void testRenameDuplicateAttr() {
-        String data = "a class\nStudent\na att\nStudent\nFirstName\na att\nStudent\nMidName\nr att\nStudent\nFirstName\nMidName\nexit";
-        InputStream stdin = System.in;
-
-        try {
-            System.setIn(new ByteArrayInputStream(data.getBytes()));
-            Scanner scan = new Scanner(System.in);
-            
-            Driver.runCLI();
-
-            assertEquals("FirstName", Driver.findClass("Student").findAttribute("FirstName").getAttName());
-            assertEquals("MidName", Driver.findClass("Student").findAttribute("MidName").getAttName());
-
-            scan.close();
-        } finally {
-            System.setIn(stdin);
-        }
+        classManager.addClass("Student");
+        classManager.addAttribute("Student", "FirstName");
+        classManager.addAttribute("Student", "MidName");
+        assertEquals("Attribute \"FirstName\" already exists in class \"Student\"\n", classManager.renameAttribute("Student", "MidName", "FirstName"));
     }
 }
