@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * A class for the UML Class object we will be working with in our diagram
- * 
+ *
  * @authors
  */
 public class Class {
@@ -12,13 +12,13 @@ public class Class {
     // The name of the class
     private String className;
     // The arraylist of attributes in the class
-    private ArrayList<Attribute> attributeList;
+    private final ArrayList<Attribute> attributeList;
 
 
     /**
      * Default constructor
-     * 
-     * @param name the name of the class
+     *
+     * @param className the name of the class
      */
     public Class(String className) {
         this.className = className;
@@ -26,17 +26,8 @@ public class Class {
     }
 
     /**
-     * Sets the name of the class
-     * 
-     * @param className the new name for the class
-     */
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    /**
      * Gets the name of the class
-     * 
+     *
      * @return the name of the class
      */
     public String getClassName() {
@@ -44,8 +35,17 @@ public class Class {
     }
 
     /**
+     * Sets the name of the class
+     *
+     * @param className the new name for the class
+     */
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    /**
      * Gets the attribute list of the class
-     * 
+     *
      * @return the list of attributes
      */
     public ArrayList<Attribute> getAttributeList() {
@@ -54,7 +54,7 @@ public class Class {
 
     /**
      * Adds an attribute to the end of the attribute list
-     * 
+     *
      * @param attribute the attribute to be added
      */
     public void addAttribute(Attribute attribute) {
@@ -62,8 +62,8 @@ public class Class {
     }
 
     /**
-     * Deletes the first occurance of the attribute from the attribute list
-     * 
+     * Deletes the first occurrence of the attribute from the attribute list
+     *
      * @param attribute the attribute to be deleted
      */
     public void deleteAttribute(Attribute attribute) {
@@ -72,7 +72,6 @@ public class Class {
 
     /**
      * Lists the name of the class and its attributes in a nice way
-     * 
      */
     public void listClass() {
         // prints the name of the class
@@ -90,19 +89,19 @@ public class Class {
 
     /**
      * Iterates through AttributeList, returns with .get()
-     * 
+     *
      * @param attToFind
      * @return attribute if found, null if not found
      */
     public Attribute findAttribute(String attToFind) {
         // iterates through the arraylist
-        for (int i = 0; i < attributeList.size(); ++i) {
+        for (Attribute attribute : attributeList) {
             // if the name matches, return class
-            if (attToFind.equals(attributeList.get(i).getAttName())) {
-                return attributeList.get(i);
+            if (attToFind.equals(attribute.getAttName())) {
+                return attribute;
             }
         }
-        // otherwise tell the user it does not exist and return null
+        // otherwise, tell the user it does not exist and return null
         System.out.println("Attribute \"" + attToFind + "\" not found in class " + getClassName());
         return null;
     }

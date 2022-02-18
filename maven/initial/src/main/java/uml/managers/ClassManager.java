@@ -1,14 +1,14 @@
 package uml.managers;
 
-import uml.Class;
 import uml.Attribute;
+import uml.Class;
 import uml.Driver;
 
 import java.util.ArrayList;
 
 public class ClassManager {
-    
-    private ArrayList<Class> classList;
+
+    private final ArrayList<Class> classList;
 
     public ClassManager() {
         classList = new ArrayList<Class>();
@@ -19,7 +19,7 @@ public class ClassManager {
     }
 
     public String addClass(String className) {
-        if (!Driver.ifValidInput(className)) {
+        if (Driver.ifNotValidInput(className)) {
             return "\"" + className + "\" is not a valid identifier\n";
         }
 
@@ -42,21 +42,21 @@ public class ClassManager {
     }
 
     public String renameClass(String oldClassName, String newName) {
-        if (!Driver.ifValidInput(newName)) {
+        if (Driver.ifNotValidInput(newName)) {
             return "\"" + newName + "\" is not a valid identifier\n";
         }
-        if(findClass(newName) != null) {
+        if (findClass(newName) != null) {
             return "Class \"" + newName + "\" already exists\n";
         }
         Class oldClass = findClass(oldClassName);
         oldClass.setClassName(newName);
         // Inform user of renamed Class
         return "The class \"" + oldClassName +
-            "\" has been renamed to \"" + oldClass.getClassName() + "\"\n";
+                "\" has been renamed to \"" + oldClass.getClassName() + "\"\n";
     }
 
     public String addAttribute(String classToAddAttName, String attributeName) {
-        if (!Driver.ifValidInput(attributeName)) {
+        if (Driver.ifNotValidInput(attributeName)) {
             return "\"" + attributeName + "\" is not a valid identifier\n";
         }
         Class classToAddAtt = findClass(classToAddAttName);
@@ -79,12 +79,12 @@ public class ClassManager {
     }
 
     public String renameAttribute(String classWithAttName, String oldAttName, String newAttName) {
-        if (!Driver.ifValidInput(newAttName)) {
+        if (Driver.ifNotValidInput(newAttName)) {
             return "\"" + oldAttName + "\" is not a valid identifier\n";
         }
         Class classWithAtt = findClass(classWithAttName);
         Attribute newAtt = classWithAtt.findAttribute(oldAttName);
-        if(classWithAtt.findAttribute(newAttName) != null) {
+        if (classWithAtt.findAttribute(newAttName) != null) {
             return "Attribute \"" + newAttName +
                     "\" already exists in class \"" + classWithAttName + "\"\n";
         }
@@ -95,9 +95,8 @@ public class ClassManager {
 
     public int numOfClasses(String searchName) {
         int count = 0;
-        for(Class classObj : classList)
-        {
-            if(classObj.getClassName().equals(searchName)) {
+        for (Class classObj : classList) {
+            if (classObj.getClassName().equals(searchName)) {
                 ++count;
             }
         }
@@ -106,13 +105,13 @@ public class ClassManager {
 
     public Class findClass(String classToFind) {
         // iterates through the arraylist
-        for (int i = 0; i < classList.size(); ++i) {
+        for (Class aClass : classList) {
             // if the name matches, return class
-            if (classToFind.equals(classList.get(i).getClassName())) {
-                return classList.get(i);
+            if (classToFind.equals(aClass.getClassName())) {
+                return aClass;
             }
         }
-        // otherwise tell the user it does not exist and return null
+        // otherwise, tell the user it does not exist and return null
         System.out.println("Class \"" + classToFind + "\" was not found");
         return null;
     }

@@ -1,19 +1,18 @@
 package uml;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Gets user input, then uses switch statements to process commands
- * 
+ *
  * @authors
  */
 public class Driver {
 
-    // Default prompt for user
-    private static String prompt = "> ";
     // Creates a new scanner
-    private static Scanner scan = new Scanner(System.in);
+    private static final Scanner scan = new Scanner(System.in);
     // The arraylist of Classes in the diagram
     private static ArrayList<Class> classList = new ArrayList<Class>();
     // The arraylist of relationships the Class has
@@ -30,6 +29,8 @@ public class Driver {
         intro += "\n\nType 'help' to list all commands and their accompanying descriptions.\n";
         System.out.println(intro);
 
+        // Default prompt for user
+        String prompt = "> ";
         System.out.print(prompt);
 
         // Enters the command loop
@@ -59,7 +60,7 @@ public class Driver {
                         System.out.print("Enter class name: ");
                         String className = scan.next().trim();
 
-                        if (!ifValidInput(className)) {
+                        if (ifNotValidInput(className)) {
                             System.out.println("\"" + className + "\" is not a valid identifier\n");
                             break;
                         }
@@ -93,13 +94,13 @@ public class Driver {
                         System.out.print("Enter class to rename: ");
                         String oldClassName = scan.next().trim();
 
-                        // If Class exists, set Class name to user inputed name
+                        // If Class exists, set Class name to user inputted name
                         Class oldClass = findClass(oldClassName);
 
                         if (oldClass != null) {
                             System.out.print("Enter new name for class " + oldClass.getClassName() + ": ");
                             String newName = scan.next().trim();
-                            if (!ifValidInput(newName)) {
+                            if (ifNotValidInput(newName)) {
                                 System.out.println("\"" + newName + "\" is not a valid identifier\n");
                                 break;
                             }
@@ -122,7 +123,7 @@ public class Driver {
                             // Adds the Attribute to the desired class
                             System.out.print("Enter attribute name: ");
                             String attributeName = scan.next().trim();
-                            if (!ifValidInput(attributeName)) {
+                            if (ifNotValidInput(attributeName)) {
                                 System.out.println("\"" + attributeName + "\" is not a valid identifier\n");
                                 break;
                             }
@@ -159,7 +160,7 @@ public class Driver {
                                     System.out.print("Delete attribute \"" + attToDel + "\"? (y/n): ");
                                     String answer = scan.next().trim();
                                     // If the user wants to delete an attribute, proceed to do so
-                                    if (answer.toLowerCase().equals("y")) {
+                                    if (answer.equalsIgnoreCase("y")) {
                                         classToDelAtt.deleteAttribute(deletedAtt);
                                         System.out.print("Attribute \"" + attToDel + "\" has been deleted \n");
                                         attBool = true;
@@ -199,7 +200,7 @@ public class Driver {
                                 // Rename attribute with user's new name
                                 System.out.print("Enter new name for " + oldAttName + ": ");
                                 String newAttName = scan.next().trim();
-                                if (!ifValidInput(newAttName)) {
+                                if (ifNotValidInput(newAttName)) {
                                     System.out.println("\"" + newAttName + "\" is not a valid identifier\n");
                                     break;
                                 }
@@ -251,12 +252,12 @@ public class Driver {
                                     + "\"? (y/n): ");
                             String rAnswer = scan.next().trim();
                             // If the user wants to delete the relationship, proceed to do so
-                            if (rAnswer.toLowerCase().equals("y")) {
+                            if (rAnswer.equalsIgnoreCase("y")) {
                                 relationshipList.remove(r);
                                 System.out.println("Relationship has been deleted");
                             }
                             // If not, prompt user and move on
-                            else if (rAnswer.toLowerCase().equals("n")) {
+                            else if (rAnswer.equalsIgnoreCase("n")) {
                                 System.out.println("Relationship has NOT been deleted");
                             }
                         }
@@ -272,13 +273,12 @@ public class Driver {
                         if (JSON.ifDirIsEmpty()) {
                             System.out.println("No save files found");
                             System.out.print(prompt);
-                            break;
                         } else {
                             System.out.print("Load file name: ");
                             String loadFileName = scan.next();
                             JSON.load(loadFileName);
-                            break;
                         }
+                        break;
                     case "list classes":
                     case "l classes":
                         // if there are classes to list, list them
@@ -356,9 +356,9 @@ public class Driver {
     }
 
     /********************************************************************
-     * 
+     *
      * Programmer defined Helper Methods
-     * 
+     *
      ********************************************************************/
 
     private static void clearScreen() {
@@ -375,7 +375,7 @@ public class Driver {
     /**
      * Prompts the user for the name of a class, returns it if it's in the
      * classList. Otherwise, prompts them that it does not exist and returns null
-     * 
+     *
      * @return the Class with the matching name field, otherwise null
      */
     private static Class findClass() {
@@ -383,13 +383,13 @@ public class Driver {
         System.out.print("Enter class name: ");
         String classToFind = scan.next().trim();
         // iterates through the arraylist
-        for (int i = 0; i < classList.size(); ++i) {
+        for (Class aClass : classList) {
             // if the name matches, return class
-            if (classToFind.equals(classList.get(i).getClassName())) {
-                return classList.get(i);
+            if (classToFind.equals(aClass.getClassName())) {
+                return aClass;
             }
         }
-        // otherwise tell the user it does not exist and return null
+        // otherwise, tell the user it does not exist and return null
         System.out.println("Class \"" + classToFind + "\" was not found");
         return null;
     }
@@ -397,31 +397,30 @@ public class Driver {
     /**
      * Searches for a given class name in the classList and returns the class,
      * otherwise, returns null
-     * 
+     *
      * @param classToFind the given class name
      * @return the class with the given class name
      */
     public static Class findClass(String classToFind) {
         // iterates through the arraylist
-        for (int i = 0; i < classList.size(); ++i) {
+        for (Class aClass : classList) {
             // if the name matches, return class
-            if (classToFind.equals(classList.get(i).getClassName())) {
-                return classList.get(i);
+            if (classToFind.equals(aClass.getClassName())) {
+                return aClass;
             }
         }
-        // otherwise tell the user it does not exist and return null
+        // otherwise, tell the user it does not exist and return null
         System.out.println("Class \"" + classToFind + "\" was not found");
         return null;
     }
 
     /**
      * List all classes and their accompanying attributes
-     * 
      */
     public static void listClasses() {
         // Loops through classList and calls listClass on all elements
-        for (int i = 0; i < classList.size(); ++i) {
-            classList.get(i).listClass();
+        for (Class aClass : classList) {
+            aClass.listClass();
         }
     }
 
@@ -429,7 +428,7 @@ public class Driver {
      * Prompts the user for the name of a relationship, returns it if it's in the
      * relationshipList. Otherwise, prompts them that it does not exist and returns
      * null
-     * 
+     *
      * @return the relationship if it was found, otherwise returns null
      */
     public static Relationship findRelationship() {
@@ -445,29 +444,28 @@ public class Driver {
 
             if (dest != null) {
                 // If dest name was found, proceed to find relationship
-                for (int i = 0; i < relationshipList.size(); ++i) {
+                for (Relationship relationship : relationshipList) {
                     // If the name matches, return class
-                    if (relationshipList.get(i).getSource().getClassName().equals(sourceToFind) &&
-                            relationshipList.get(i).getDestination().getClassName().equals(destToFind)) {
+                    if (relationship.getSource().getClassName().equals(sourceToFind) &&
+                            relationship.getDestination().getClassName().equals(destToFind)) {
 
-                        return relationshipList.get(i);
+                        return relationship;
                     }
                 }
                 // If relationship is not found, for loop will end and will proceed to here
                 System.out.println("Relationship not found between " + sourceToFind + " and " + destToFind);
             }
         }
-        // If user's source or destintion input did not match any relationship's
+        // If user's source or destination input did not match any relationship's
         // source and destination fields, output error
         return null;
     }
 
     /**
-     * 
      * Takes in the source and destination name, returns it if it's in the
      * relationshipList. Otherwise, returns
      * null
-     * 
+     *
      * @param srcName
      * @param destName
      * @return
@@ -479,16 +477,16 @@ public class Driver {
             Class dest = findClass(destName);
             if (dest != null) {
                 // If dest name was found, proceed to find relationship
-                for (int i = 0; i < relationshipList.size(); ++i) {
+                for (Relationship relationship : relationshipList) {
                     // If the name matches, return class
-                    if (relationshipList.get(i).getSource().getClassName().equals(srcName) &&
-                            relationshipList.get(i).getDestination().getClassName().equals(destName)) {
-                        return relationshipList.get(i);
+                    if (relationship.getSource().getClassName().equals(srcName) &&
+                            relationship.getDestination().getClassName().equals(destName)) {
+                        return relationship;
                     }
                 }
             }
         }
-        // If user's source or destintion input did not match any relationship's
+        // If user's source or destination input did not match any relationship's
         // source and destination fields, output error
         return null;
     }
@@ -496,12 +494,12 @@ public class Driver {
     /**
      * Deletes the class with the matching name field if it exists, and returns the
      * classList.
-     * 
+     *
      * @param classToDeleteName the name of the class to delete
      * @return the classList
      */
     public static ArrayList<Class> deleteClass(String classToDeleteName) {
-        // Create new class object. If a class matches the user inputed name,
+        // Create new class object. If a class matches the user inputted name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
         Class classToDelete = null;
 
@@ -521,12 +519,12 @@ public class Driver {
                 String theNextAnswer = scan.next().trim();
 
                 // User confirms if they wish to delete. If no, break out of loop
-                if (theNextAnswer.toLowerCase().equals("y")) {
+                if (theNextAnswer.equalsIgnoreCase("y")) {
                     relationshipList = updateRelationshipList(classToDeleteName);
                     classList.remove(classToDelete);
                     System.out.print("Class \"" + classToDelete.getClassName() + "\" has been deleted\n");
                     break;
-                } else if (theNextAnswer.toLowerCase().equals("n")) {
+                } else if (theNextAnswer.equalsIgnoreCase("n")) {
                     System.out.print("Class \"" + classToDelete.getClassName() + "\" has NOT been deleted\n");
                     break;
                 }
@@ -538,58 +536,6 @@ public class Driver {
             }
         }
         return classList;
-    }
-
-    /**
-     * Gets the classList
-     * 
-     * @return the list of classes in the diagram
-     */
-    public static ArrayList<Class> getClassList() {
-        return classList;
-    }
-
-    /**
-     * Gets the relationshipList
-     * 
-     * @return the list of relationships in the diagram
-     */
-    public static ArrayList<Relationship> getRelationshipList() {
-        return relationshipList;
-    }
-
-    /**
-     * Clears the classList
-     * 
-     */
-    public static void clearClassList() {
-        classList.clear();
-    }
-
-    /**
-     * Clears the relationshipList
-     * 
-     */
-    public static void clearRelationshipList() {
-        relationshipList.clear();
-    }
-
-    /**
-     * Adds the given Class object to the classList
-     * 
-     * @param newClass the class to be added
-     */
-    public static void addToClassList(Class newClass) {
-        classList.add(newClass);
-    }
-
-    /**
-     * Adds the given Relationship object to the relationshipList
-     * 
-     * @param newRelationship the relationship to be added
-     */
-    public static void addToRelationshipList(Relationship newRelationship) {
-        relationshipList.add(newRelationship);
     }
 
     public static boolean isValidIdentifier(String input) {
@@ -610,17 +556,16 @@ public class Driver {
         return false;
     }
 
-    public static boolean ifValidInput(String input) {
+    public static boolean ifNotValidInput(String input) {
         if (!isValidIdentifier(input)) {
             System.out.printf("Input %s is not a valid identifier\n", input);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
      * Display list of commands and their accompanying descriptions
-     * 
      */
     public static void displayHelp() {
         String helpMessage = "\n   Commands\t\t   Description\n--------------\t\t-----------------\n";
@@ -643,18 +588,13 @@ public class Driver {
 
     /**
      * Pass in name of class being deleted. If any relationship with
-     * 
+     *
      * @param className
      * @return updated relationship list
      */
     private static ArrayList<Relationship> updateRelationshipList(String className) {
-        for (Iterator<Relationship> iter = relationshipList.iterator(); iter.hasNext();) {
-            Relationship rel = iter.next();
-            if (rel.getSource().getClassName().equals(className) ||
-                    rel.getDestination().getClassName().equals(className)) {
-                iter.remove();
-            }
-        }
+        relationshipList.removeIf(rel -> rel.getSource().getClassName().equals(className) ||
+                rel.getDestination().getClassName().equals(className));
         return relationshipList;
     }
 }

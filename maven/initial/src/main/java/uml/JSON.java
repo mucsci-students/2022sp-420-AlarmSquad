@@ -1,25 +1,32 @@
 package uml;
 
-import java.io.*;
-import java.util.*;
-import org.json.simple.*;
-import org.json.simple.parser.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Objects;
 
 public class JSON {
 
     // directory of the save files
     private final static String FILE_DIR = "savefiles";
     // a copy of the classList from Driver
-    private static ArrayList<Class> classList = Driver.getClassList();
+    private static final ArrayList<Class> classList = UMLModel.getClassList();
     // a copy of the relationshipList from Driver
-    private static ArrayList<Relationship> relationshipList = Driver.getRelationshipList();
+    private static final ArrayList<Relationship> relationshipList = UMLModel.getRelationshipList();
     // the JSON object to be saved
-    private static JSONObject saveFile = new JSONObject();
+    private static final JSONObject saveFile = new JSONObject();
 
     /**
      * Saves the current UML diagram to a file with a given name
      * Overrides a file if it has the same name
-     * 
+     *
      * @param fileName the name of the file to be saved to
      */
     @SuppressWarnings("unchecked")
@@ -63,8 +70,7 @@ public class JSON {
         // add the relationshipList to the JSONObject
         saveFile.put("relationshipList", saveRelationships);
 
-        
-        
+
         // a file with the correct directory and file name
         File fileToBeSaved = new File(FILE_DIR, fileName + ".json");
         // save the file
@@ -79,7 +85,7 @@ public class JSON {
     /**
      * Loads the current UML diagram from a file with a given name
      * DOES NOT CHECK IF THE DIRECTORY IS EMPTY
-     * 
+     *
      * @param fileName the name of the file to be loaded from
      */
     @SuppressWarnings("unchecked")
@@ -90,16 +96,16 @@ public class JSON {
             File dir = new File(FILE_DIR);
             // a list of the names of the files in the directory
             String[] fileList = dir.list();
-            Boolean hasFoundFile = false;
+            boolean hasFoundFile = false;
             // loops through the list of file names
-            for (int i = 0; i < fileList.length; ++i) {
+            for (int i = 0; i < Objects.requireNonNull(fileList).length; ++i) {
                 // if the list only has one file (and placeholder.txt) and it is the correct name
                 if (fileList.length == 2 && fileList[i].equals(fileName + ".json")) {
                     hasFoundFile = true;
-                    // otherwise keep looping
+                    // otherwise, keep looping
                 } else {
                     // if the end of the list has been reached and the file has not been found
-                    if (i == (fileList.length - 1) && hasFoundFile == false) {
+                    if (i == (fileList.length - 1) && !hasFoundFile) {
                         // tell the user the file does not exist and exit
                         System.out.println("File does not exist");
                         return;
@@ -111,8 +117,8 @@ public class JSON {
             }
 
             // wipe both lists
-            Driver.clearClassList();
-            Driver.clearRelationshipList();
+            UMLModel.clearClassList();
+            UMLModel.clearRelationshipList();
 
             // gets the file in the correct directory
             File fileToBeLoaded = new File(FILE_DIR + "/" + fileName + ".json");
@@ -143,7 +149,7 @@ public class JSON {
                     newClass.addAttribute(newAtt);
                 }
                 // add the filled class to the classList
-                Driver.addToClassList(newClass);
+                UMLModel.addClass(newClass);
             }
 
             // JSONArray for getting the saved relationshipList
@@ -160,18 +166,14 @@ public class JSON {
                 // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
                 // make a new relationship with the correct parameters
-                Relationship newRelationship = new Relationship(Driver.findClass(sourceName),
-                        Driver.findClass(destinationName));
+                Relationship newRelationship = new Relationship(Objects.requireNonNull(Driver.findClass(sourceName)),
+                        Objects.requireNonNull(Driver.findClass(destinationName)));
                 // add the relationship to the relationship list
-                Driver.addToRelationshipList(newRelationship);
+                UMLModel.addRel(newRelationship);
             }
 
             System.out.println("Diagram has been loaded from \"" + fileName + ".json\"");
 
-        } catch (FileNotFoundException exception) {
-            exception.printStackTrace();
-        } catch (IOException exception) {
-            exception.printStackTrace();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -179,13 +181,13 @@ public class JSON {
 
     /**
      * Checks to see if the save file directory is empty
-     * 
+     *
      * @return true if empty, false otherwise
      */
     public static boolean ifDirIsEmpty() {
         File dir = new File(FILE_DIR);
         String[] fileList = dir.list();
-        if (fileList.length == 1) {
+        if (Objects.requireNonNull(fileList).length == 1) {
             return true;
         } else {
             return false;
