@@ -1,5 +1,4 @@
 package uml;
-
 import java.util.ArrayList;
 
 /**
@@ -12,7 +11,8 @@ public class Class {
     // The name of the class
     private String className;
     // The arraylist of attributes in the class
-    private ArrayList<Attribute> attributeList;
+    private ArrayList<Field> fieldList;
+    private ArrayList<Method> methodList;
 
 
     /**
@@ -22,7 +22,8 @@ public class Class {
      */
     public Class(String className) {
         this.className = className;
-        this.attributeList = new ArrayList<Attribute>();
+        this.fieldList = new ArrayList<Field>();
+        this.methodList = new ArrayList<Method>();
     }
 
     /**
@@ -44,30 +45,57 @@ public class Class {
     }
 
     /**
-     * Gets the attribute list of the class
+     * Gets the field list of the class
      * 
-     * @return the list of attributes
+     * @return the list of fields
      */
-    public ArrayList<Attribute> getAttributeList() {
-        return this.attributeList;
+    public ArrayList<Field> getFieldList() {
+        return this.fieldList;
     }
 
     /**
-     * Adds an attribute to the end of the attribute list
+     * Adds a field to the end of the field list
      * 
-     * @param attribute the attribute to be added
+     * @param field the attribute to be added
      */
-    public void addAttribute(Attribute attribute) {
-        this.attributeList.add(attribute);
+    public void addField(Field field) {
+        this.fieldList.add(field);
     }
 
     /**
-     * Deletes the first occurance of the attribute from the attribute list
+     * Deletes the first occurance of the field from the field list
      * 
-     * @param attribute the attribute to be deleted
+     * @param field the field to be deleted
      */
-    public void deleteAttribute(Attribute attribute) {
-        this.attributeList.remove(attribute);
+    public void deleteField(Field field) {
+        this.fieldList.remove(field);
+    }
+
+    /**
+     * Gets the method list of the class
+     * 
+     * @return the list of methods
+     */
+    public ArrayList<Method> getMethodList() {
+        return this.methodList;
+    }
+
+    /**
+     * Adds a Method to the end of the Method list
+     * 
+     * @param method the attribute to be added
+     */
+    public void addMethod(Method method) {
+        this.methodList.add(method);
+    }
+
+    /**
+     * Deletes the first occurance of the Method from the Method list
+     * 
+     * @param method the Method to be deleted
+     */
+    public void deleteMethod(Method method) {
+        this.methodList.remove(method);
     }
 
     /**
@@ -77,33 +105,63 @@ public class Class {
     public void listClass() {
         // prints the name of the class
         System.out.println("Class name: " + this.className);
-        // prints all the attributes in a set
+        // prints all the field in a set
+        System.out.print("Fields");
         System.out.print("[ ");
-        if (attributeList.size() >= 1) {
-            System.out.print(attributeList.get(0).getAttName());
+        if (fieldList.size() >= 1) {
+            System.out.print(fieldList.get(0).getAttName());
         }
-        for (int i = 1; i < attributeList.size(); ++i) {
-            System.out.print(", " + attributeList.get(i).getAttName());
+        for (int i = 1; i < fieldList.size(); ++i) {
+            System.out.print(", " + fieldList.get(i).getAttName());
+        }
+        System.out.println(" ]");
+        // prints all the methods in a set
+        System.out.print("Methods");
+        System.out.print("[ ");
+        if (methodList.size() >= 1) {
+            System.out.print(methodList.get(0).getAttName());
+        }
+        for (int i = 1; i < methodList.size(); ++i) {
+            System.out.print(", " + methodList.get(i).getAttName());
         }
         System.out.println(" ]");
     }
 
     /**
-     * Iterates through AttributeList, returns with .get()
+     * Iterates through fieldList, returns with .get()
      * 
-     * @param attToFind
-     * @return attribute if found, null if not found
+     * @param fieldToFind
+     * @return field if found, null if not found
      */
-    public Attribute findAttribute(String attToFind) {
+    public Field findField(String fieldToFind) {
         // iterates through the arraylist
-        for (int i = 0; i < attributeList.size(); ++i) {
+        for (int i = 0; i < fieldList.size(); ++i) {
             // if the name matches, return class
-            if (attToFind.equals(attributeList.get(i).getAttName())) {
-                return attributeList.get(i);
+            if (fieldToFind.equals(fieldList.get(i).getAttName())) {
+                return fieldList.get(i);
             }
         }
         // otherwise tell the user it does not exist and return null
-        System.out.println("Attribute \"" + attToFind + "\" not found in class " + getClassName());
+        System.out.println("Field \"" + fieldToFind + "\" not found in class " + getClassName());
+        return null;
+    }
+
+     /**
+     * Iterates through methodList, returns with .get()
+     * 
+     * @param methodToFind
+     * @return method if found, null if not found
+     */
+    public Method findMethod(String methodToFind) {
+        // iterates through the arraylist
+        for (int i = 0; i < methodList.size(); ++i) {
+            // if the name matches, return class
+            if (methodToFind.equals(methodList.get(i).getAttName())) {
+                return methodList.get(i);
+            }
+        }
+        // otherwise tell the user it does not exist and return null
+        System.out.println("Method \"" + methodToFind + "\" not found in class " + getClassName());
         return null;
     }
 }

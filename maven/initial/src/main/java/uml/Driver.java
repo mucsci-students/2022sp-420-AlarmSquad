@@ -115,59 +115,93 @@ public class Driver {
                         break;
 
                     case "add att":
-                    case "a att":
+                    case "a att -f":
                         // Call find class method
-                        Class classToAddAtt = findClass();
-                        if (classToAddAtt != null) {
+                        Class classToAddField = findClass();
+                        if (classToAddField != null) {
                             // Adds the Attribute to the desired class
-                            System.out.print("Enter attribute name: ");
-                            String attributeName = scan.next().trim();
-                            if (!ifValidInput(attributeName)) {
-                                System.out.println("\"" + attributeName + "\" is not a valid identifier\n");
+                            System.out.print("Enter field name: ");
+                            String fieldName = scan.next().trim();
+                            if (!ifValidInput(fieldName)) {
+                                System.out.println("\"" + fieldName + "\" is not a valid identifier\n");
                                 break;
                             }
-                            if (classToAddAtt.getAttributeList().stream()
-                                    .anyMatch(attObj -> attObj.getAttName().equals(attributeName))) {
-                                System.out.println("Attribute " + attributeName +
-                                        " already exists in class " + classToAddAtt.getClassName());
+                            if (classToAddField.getFieldList().stream()
+                                    .anyMatch(attObj -> attObj.getAttName().equals(fieldName))) {
+                                System.out.println("Field " + fieldName +
+                                        " already exists in class " + classToAddField.getClassName());
                                 break;
                             }
-                            Attribute attribute = new Attribute(attributeName);
-                            classToAddAtt.addAttribute(attribute);
-                            System.out.print("Added attribute \"" + attributeName + "\" to class \""
-                                    + classToAddAtt.getClassName() + "\"\n");
+                            System.out.print("Enter field type: ");
+                            String fieldType = scan.next().trim();
+                            if (!isTypeValid(fieldType)) {
+                                System.out.println("\"" + fieldType + "\" is not a valid field type\n");
+                                break;
+                            }
+                            Field field = new Field(fieldName, fieldType);
+                            classToAddField.addField(field);
+                            System.out.print("Added field \"" + fieldName + "\" to class \""
+                                    + classToAddField.getClassName() + "\"\n");
+                        }
+                        break;
+                    case "a att -m":
+                        // Call find class method
+                        Class classToAddMethod = findClass();
+                        if (classToAddMethod != null) {
+                            // Adds the Attribute to the desired class
+                            System.out.print("Enter method name: ");
+                            String methodName = scan.next().trim();
+                            if (!ifValidInput(methodName)) {
+                                System.out.println("\"" + methodName + "\" is not a valid identifier\n");
+                                break;
+                            }
+                            if (classToAddMethod.getMethodList().stream()
+                                    .anyMatch(attObj -> attObj.getAttName().equals(methodName))) {
+                                System.out.println("Method " + methodName +
+                                        " already exists in class " + classToAddMethod.getClassName());
+                                break;
+                            }
+                            System.out.print("Enter method return type: ");
+                            String returnType = scan.next().trim();
+                            if (!isTypeValid(returnType) && !returnType.equals("void")) {
+                                System.out.println("\"" + returnType + "\" is not a valid return type\n");
+                                break;
+                            }
+                            Method method = new Method(methodName, returnType);
+                            classToAddMethod.addMethod(method);
+                            System.out.print("Added method \"" + methodName + "\" to class \""
+                                    + classToAddMethod.getClassName() + "\"\n");
                         }
                         break;
 
-                    case "delete att":
-                    case "d att":
-
-                        // Call find class method to find the class the attribute is
-                        Class classToDelAtt = findClass();
-                        Boolean attBool = false;
+                    case "delete att -f":
+                    case "d att -f":
+                        // Call find class method to find the class the field is in
+                        Class classToDelField = findClass();
+                        Boolean fieldBool = false;
                         // Prompt user to delete an attribute
-                        if (classToDelAtt != null) {
+                        if (classToDelField != null) {
                             // while bool is false continue loop until the user does not want to delete an
                             // attribute
                             // or until an attribute is deleted
                             // (this may be changed so the user can type exit to exit the program as well)
-                            while (attBool.equals(false)) {
-                                System.out.print("Enter attribute name to delete: ");
-                                String attToDel = scan.next().trim();
-                                Attribute deletedAtt = classToDelAtt.findAttribute(attToDel);
-                                if (deletedAtt != null) {
-                                    System.out.print("Delete attribute \"" + attToDel + "\"? (y/n): ");
+                            while (!fieldBool) {
+                                System.out.print("Enter field name to delete: ");
+                                String fieldToDel = scan.next().trim();
+                                Field deletedField = classToDelField.findField(fieldToDel);
+                                if (deletedField != null) {
+                                    System.out.print("Delete field \"" + fieldToDel + "\"? (y/n): ");
                                     String answer = scan.next().trim();
                                     // If the user wants to delete an attribute, proceed to do so
                                     if (answer.toLowerCase().equals("y")) {
-                                        classToDelAtt.deleteAttribute(deletedAtt);
-                                        System.out.print("Attribute \"" + attToDel + "\" has been deleted \n");
-                                        attBool = true;
+                                        classToDelField.deleteField(deletedField);
+                                        System.out.print("Field \"" + fieldToDel + "\" has been deleted \n");
+                                        fieldBool = true;
                                     }
                                     // if user types n, break out of loop, then break out of case
                                     // and bring back prompt for new command
                                     else {
-                                        System.out.println("Attribute " + attToDel + " has NOT been deleted");
+                                        System.out.println("Attribute " + fieldToDel + " has NOT been deleted");
                                         break;
                                     }
                                 } else {
@@ -177,44 +211,114 @@ public class Driver {
                         }
 
                         break;
-
-                    case "rename att":
-                    case "r att":
+                    case "d att -m":
+                        // Call find class method to find the class the method is in
+                        Class classToDelMethod = findClass();
+                        Boolean methodBool = false;
+                        // Prompt user to delete a method
+                        if (classToDelMethod != null) {
+                            // while bool is false continue loop until the user does not want to delete an
+                            // method
+                            // or until an method is deleted
+                            // (this may be changed so the user can type exit to exit the program as well)
+                            while (!methodBool) {
+                                System.out.print("Enter method name to delete: ");
+                                String methodToDel = scan.next().trim();
+                                Method deletedMethod = classToDelMethod.findMethod(methodToDel);
+                                if (deletedMethod != null) {
+                                    System.out.print("Delete method \"" + methodToDel + "\"? (y/n): ");
+                                    String answer = scan.next().trim();
+                                    // If the user wants to delete a method, proceed to do so
+                                    if (answer.toLowerCase().equals("y")) {
+                                        classToDelMethod.deleteMethod(deletedMethod);
+                                        System.out.print("Field \"" + methodToDel + "\" has been deleted \n");
+                                        fieldBool = true;
+                                    }
+                                    // if user types n, break out of loop, then break out of case
+                                    // and bring back prompt for new command
+                                    else {
+                                        System.out.println("Attribute " + methodToDel + " has NOT been deleted");
+                                        break;
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    case "rename att -f":
+                    case "r att -f":
                         // Show user classes and attributes before asking for input
                         listClasses();
-                        System.out.print("Enter class that contains attribute: ");
-                        String classWithAttName = scan.next().trim();
+                        System.out.print("Enter class that contains field: ");
+                        String classWithFieldName = scan.next().trim();
 
                         // Ensure class exists
-                        Class classWithAtt = findClass(classWithAttName);
-                        if (classWithAtt != null) {
+                        Class classWithField = findClass(classWithFieldName);
+                        if (classWithField != null) {
                             // List attributes in class before asking for input
-                            findClass(classWithAttName).listClass();
-                            System.out.print("Enter attribute to be renamed: ");
-                            String oldAttName = scan.next().trim();
+                            findClass(classWithFieldName).listClass();
+                            System.out.print("Enter field to be renamed: ");
+                            String oldFieldName = scan.next().trim();
 
                             // Ensure attribute exists
-                            Attribute newAtt = classWithAtt.findAttribute(oldAttName);
-                            if (newAtt != null) {
+                            Attribute newField = classWithField.findField(oldFieldName);
+                            if (newField != null) {
                                 // Rename attribute with user's new name
-                                System.out.print("Enter new name for " + oldAttName + ": ");
-                                String newAttName = scan.next().trim();
-                                if (!ifValidInput(newAttName)) {
-                                    System.out.println("\"" + newAttName + "\" is not a valid identifier\n");
+                                System.out.print("Enter new name for " + oldFieldName + ": ");
+                                String newFieldName = scan.next().trim();
+                                if (!ifValidInput(newFieldName)) {
+                                    System.out.println("\"" + newFieldName + "\" is not a valid identifier\n");
                                     break;
                                 }
-                                if (classWithAtt.findAttribute(newAttName) != null) {
-                                    System.out.println("Attribute \"" + newAttName +
-                                            "\" already exists in class \"" + classWithAttName + "\"\n");
+                                if (classWithField.findField(newFieldName) != null) {
+                                    System.out.println("Field \"" + newFieldName +
+                                            "\" already exists in class \"" + classWithFieldName + "\"\n");
                                     break;
                                 }
-                                newAtt.setAttName(newAttName);
-                                System.out.println(oldAttName + " in class " + classWithAttName +
-                                        " renamed to " + newAtt.getAttName());
+                                newField.setAttName(newFieldName);
+                                System.out.println(oldFieldName + " in class " + classWithFieldName +
+                                        " renamed to " + newField.getAttName());
                             }
                         }
                         break;
 
+                    case "rename att -m":
+                    case "r att -m":
+                        // Show user classes and attributes before asking for input
+                        listClasses();
+                        System.out.print("Enter class that contains method: ");
+                        String classWithMethodName = scan.next().trim();
+
+                        // Ensure class exists
+                        Class classWithMethod = findClass(classWithMethodName);
+                        if (classWithMethod != null) {
+                            // List attributes in class before asking for input
+                            findClass(classWithMethodName).listClass();
+                            System.out.print("Enter method to be renamed: ");
+                            String oldMethodName = scan.next().trim();
+
+                            // Ensure attribute exists
+                            Attribute newField = classWithMethod.findField(oldMethodName);
+                            if (newField != null) {
+                                // Rename attribute with user's new name
+                                System.out.print("Enter new name for " + oldMethodName + ": ");
+                                String newMethodName = scan.next().trim();
+                                if (!ifValidInput(newMethodName)) {
+                                    System.out.println("\"" + newMethodName + "\" is not a valid identifier\n");
+                                    break;
+                                }
+                                if (classWithMethod.findField(newMethodName) != null) {
+                                    System.out.println("Method \"" + newMethodName +
+                                            "\" already exists in class \"" + classWithMethodName + "\"\n");
+                                    break;
+                                }
+                                newField.setAttName(newMethodName);
+                                System.out.println(oldMethodName + " in class " + classWithMethodName +
+                                        " renamed to " + newField.getAttName());
+                            }
+                        }
+                        break;
+                        
                     case "add rel":
                     case "a rel":
                         System.out.print("Enter source class name: ");
@@ -616,6 +720,23 @@ public class Driver {
             return false;
         }
         return true;
+    }
+
+    public static boolean isTypeValid(String input) {
+        switch(input) {
+            case "string": 
+            case "int":
+            case "double":
+            case "float":
+            case "char":
+            case "boolean":
+            case "short":
+            case "long":
+                return true;
+            default: 
+                return false;
+        }
+         
     }
 
     /**
