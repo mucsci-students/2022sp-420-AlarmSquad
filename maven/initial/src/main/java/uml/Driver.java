@@ -114,7 +114,7 @@ public class Driver {
                         }
                         break;
 
-                    case "add att":
+                    case "add att -f":
                     case "a att -f":
                         // Call find class method
                         Class classToAddField = findClass();
@@ -144,6 +144,7 @@ public class Driver {
                                     + classToAddField.getClassName() + "\"\n");
                         }
                         break;
+                    case "add att -m":
                     case "a att -m":
                         // Call find class method
                         Class classToAddMethod = findClass();
@@ -211,6 +212,7 @@ public class Driver {
                         }
 
                         break;
+                    case "delete att -m":
                     case "d att -m":
                         // Call find class method to find the class the method is in
                         Class classToDelMethod = findClass();
