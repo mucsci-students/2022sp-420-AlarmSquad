@@ -8,9 +8,9 @@ package uml;
 public class Relationship {
 
     // The source of the relationship
-    private final Class source;
+    private final UMLClass source;
     // The destination of the relationship
-    private final Class destination;
+    private final UMLClass destination;
 
 
     /**
@@ -20,7 +20,7 @@ public class Relationship {
      * @param destination the destination of the relationship
      */
 
-    public Relationship(Class source, Class destination) {
+    public Relationship(UMLClass source, UMLClass destination) {
         this.source = source;
         this.destination = destination;
     }
@@ -30,7 +30,7 @@ public class Relationship {
      *
      * @return the source of the relationship
      */
-    public Class getSource() {
+    public UMLClass getSource() {
         return this.source;
     }
 
@@ -39,7 +39,7 @@ public class Relationship {
      *
      * @return the destination of the relationship
      */
-    public Class getDestination() {
+    public UMLClass getDestination() {
         return this.destination;
     }
 

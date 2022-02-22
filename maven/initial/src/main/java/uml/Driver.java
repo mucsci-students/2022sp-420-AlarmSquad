@@ -14,7 +14,7 @@ public class Driver {
     // Creates a new scanner
     private static final Scanner scan = new Scanner(System.in);
     // The arraylist of Classes in the diagram
-    private static ArrayList<Class> classList = new ArrayList<Class>();
+    private static ArrayList<UMLClass> UMLClassList = new ArrayList<UMLClass>();
     // The arraylist of relationships the Class has
     private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
 
@@ -35,6 +35,9 @@ public class Driver {
 
         // Enters the command loop
         while (true) {
+
+            //TODO
+            // MOVE SWITCH STATEMENT AND CASES TO CONTROLLER
 
             // Takes in the next line of user input
             String input = scan.nextLine().trim();
@@ -65,14 +68,14 @@ public class Driver {
                             break;
                         }
 
-                        if (classList.stream().anyMatch(o -> o.getClassName().equals(className))) {
+                        if (UMLClassList.stream().anyMatch(o -> o.getClassName().equals(className))) {
                             System.out.printf("Class %s already exists\n", className);
                             break;
                         }
 
                         System.out.println("Added class \"" + className + "\"");
-                        Class newClass = new Class(className);
-                        classList.add(newClass);
+                        UMLClass newUMLClass = new UMLClass(className);
+                        UMLClassList.add(newUMLClass);
                         break;
 
                     case "delete class":
@@ -80,10 +83,10 @@ public class Driver {
                         // Get user input of Class name to be deleted
                         System.out.print("Enter class name to delete: ");
                         String classDeleteInput = scan.next().trim();
-                        Class classToDel = findClass(classDeleteInput);
-                        if (classToDel != null) {
+                        UMLClass UMLClassToDel = UMLModel.findClass(classDeleteInput);
+                        if (UMLClassToDel != null) {
                             // Copy classList into new ArrayList with deleted Class
-                            classList = deleteClass(classDeleteInput);
+                            UMLClassList = deleteClass(classDeleteInput);
 
                         }
                         break;
@@ -95,42 +98,42 @@ public class Driver {
                         String oldClassName = scan.next().trim();
 
                         // If Class exists, set Class name to user inputted name
-                        Class oldClass = findClass(oldClassName);
+                        UMLClass oldUMLClass = UMLModel.findClass(oldClassName);
 
-                        if (oldClass != null) {
-                            System.out.print("Enter new name for class " + oldClass.getClassName() + ": ");
+                        if (oldUMLClass != null) {
+                            System.out.print("Enter new name for class " + oldUMLClass.getClassName() + ": ");
                             String newName = scan.next().trim();
                             if (ifNotValidInput(newName)) {
                                 System.out.println("\"" + newName + "\" is not a valid identifier\n");
                                 break;
                             }
-                            if (findClass(newName) != null) {
+                            if (UMLModel.findClass(newName) != null) {
                                 System.out.println("Class \"" + newName + "\" already exists\n");
                                 break;
                             }
-                            oldClass.setClassName(newName);
+                            oldUMLClass.setClassName(newName);
                             // Inform user of renamed Class
                             System.out.println("The class \"" + oldClassName +
-                                    "\" has been renamed to \"" + oldClass.getClassName() + "\"");
+                                    "\" has been renamed to \"" + oldUMLClass.getClassName() + "\"");
                         }
                         break;
 
                     case "add att -f":
                     case "a att -f":
                         // Call find class method
-                        Class classToAddField = findClass();
-                        if (classToAddField != null) {
+                        UMLClass UMLClassToAddField = findClass();
+                        if (UMLClassToAddField != null) {
                             // Adds the Attribute to the desired class
                             System.out.print("Enter field name: ");
                             String fieldName = scan.next().trim();
-                            if (!ifValidInput(fieldName)) {
+                            if (ifNotValidInput(fieldName)) {
                                 System.out.println("\"" + fieldName + "\" is not a valid identifier\n");
                                 break;
                             }
-                            if (classToAddField.getFieldList().stream()
+                            if (UMLClassToAddField.getFieldList().stream()
                                     .anyMatch(attObj -> attObj.getAttName().equals(fieldName))) {
                                 System.out.println("Field " + fieldName +
-                                        " already exists in class " + classToAddField.getClassName());
+                                        " already exists in class " + UMLClassToAddField.getClassName());
                                 break;
                             }
                             System.out.print("Enter field type: ");
@@ -140,16 +143,16 @@ public class Driver {
                                 break;
                             }
                             Field field = new Field(fieldName, fieldType);
-                            classToAddField.addField(field);
+                            UMLClassToAddField.addField(field);
                             System.out.print("Added field \"" + fieldName + "\" to class \""
-                                    + classToAddField.getClassName() + "\"\n");
+                                    + UMLClassToAddField.getClassName() + "\"\n");
                         }
                         break;
                     case "add att -m":
                     case "a att -m":
                         // Call find class method
-                        Class classToAddMethod = findClass();
-                        if (classToAddMethod != null) {
+                        UMLClass UMLClassToAddMethod = findClass();
+                        if (UMLClassToAddMethod != null) {
                             // Adds the Attribute to the desired class
                             System.out.print("Enter method name: ");
                             String methodName = scan.next().trim();
@@ -157,10 +160,10 @@ public class Driver {
                                 System.out.println("\"" + methodName + "\" is not a valid identifier\n");
                                 break;
                             }
-                            if (classToAddMethod.getMethodList().stream()
+                            if (UMLClassToAddMethod.getMethodList().stream()
                                     .anyMatch(attObj -> attObj.getAttName().equals(methodName))) {
                                 System.out.println("Method " + methodName +
-                                        " already exists in class " + classToAddMethod.getClassName());
+                                        " already exists in class " + UMLClassToAddMethod.getClassName());
                                 break;
                             }
                             System.out.print("Enter method return type: ");
@@ -170,19 +173,19 @@ public class Driver {
                                 break;
                             }
                             Method method = new Method(methodName, returnType);
-                            classToAddMethod.addMethod(method);
+                            UMLClassToAddMethod.addMethod(method);
                             System.out.print("Added method \"" + methodName + "\" to class \""
-                                    + classToAddMethod.getClassName() + "\"\n");
+                                    + UMLClassToAddMethod.getClassName() + "\"\n");
                         }
                         break;
 
                     case "delete att -f":
                     case "d att -f":
                         // Call find class method to find the class the field is in
-                        Class classToDelField = findClass();
+                        UMLClass UMLClassToDelField = findClass();
                         Boolean fieldBool = false;
                         // Prompt user to delete an attribute
-                        if (classToDelField != null) {
+                        if (UMLClassToDelField != null) {
                             // while bool is false continue loop until the user does not want to delete an
                             // attribute
                             // or until an attribute is deleted
@@ -190,13 +193,13 @@ public class Driver {
                             while (!fieldBool) {
                                 System.out.print("Enter field name to delete: ");
                                 String fieldToDel = scan.next().trim();
-                                Field deletedField = classToDelField.findField(fieldToDel);
+                                Field deletedField = UMLClassToDelField.findField(fieldToDel);
                                 if (deletedField != null) {
                                     System.out.print("Delete field \"" + fieldToDel + "\"? (y/n): ");
                                     String answer = scan.next().trim();
                                     // If the user wants to delete an attribute, proceed to do so
                                     if (answer.equalsIgnoreCase("y")) {
-                                        classToDelField.deleteField(deletedField);
+                                        UMLClassToDelField.deleteField(deletedField);
                                         System.out.print("Field \"" + fieldToDel + "\" has been deleted \n");
                                         fieldBool = true;
                                     }
@@ -216,10 +219,10 @@ public class Driver {
                     case "delete att -m":
                     case "d att -m":
                         // Call find class method to find the class the method is in
-                        Class classToDelMethod = findClass();
+                        UMLClass UMLClassToDelMethod = findClass();
                         Boolean methodBool = false;
                         // Prompt user to delete a method
-                        if (classToDelMethod != null) {
+                        if (UMLClassToDelMethod != null) {
                             // while bool is false continue loop until the user does not want to delete an
                             // method
                             // or until an method is deleted
@@ -227,13 +230,13 @@ public class Driver {
                             while (!methodBool) {
                                 System.out.print("Enter method name to delete: ");
                                 String methodToDel = scan.next().trim();
-                                Method deletedMethod = classToDelMethod.findMethod(methodToDel);
+                                Method deletedMethod = UMLClassToDelMethod.findMethod(methodToDel);
                                 if (deletedMethod != null) {
                                     System.out.print("Delete method \"" + methodToDel + "\"? (y/n): ");
                                     String answer = scan.next().trim();
                                     // If the user wants to delete a method, proceed to do so
                                     if (answer.toLowerCase().equals("y")) {
-                                        classToDelMethod.deleteMethod(deletedMethod);
+                                        UMLClassToDelMethod.deleteMethod(deletedMethod);
                                         System.out.print("Field \"" + methodToDel + "\" has been deleted \n");
                                         fieldBool = true;
                                     }
@@ -256,24 +259,24 @@ public class Driver {
                         String classWithFieldName = scan.next().trim();
 
                         // Ensure class exists
-                        Class classWithField = findClass(classWithFieldName);
-                        if (classWithField != null) {
+                        UMLClass UMLClassWithField = UMLModel.findClass(classWithFieldName);
+                        if (UMLClassWithField != null) {
                             // List attributes in class before asking for input
-                            findClass(classWithFieldName).listClass();
+                            UMLModel.findClass(classWithFieldName).listClass();
                             System.out.print("Enter field to be renamed: ");
                             String oldFieldName = scan.next().trim();
 
                             // Ensure attribute exists
-                            Attribute newField = classWithField.findField(oldFieldName);
+                            Attribute newField = UMLClassWithField.findField(oldFieldName);
                             if (newField != null) {
                                 // Rename attribute with user's new name
                                 System.out.print("Enter new name for " + oldFieldName + ": ");
                                 String newFieldName = scan.next().trim();
-                                if (!ifValidInput(newFieldName)) {
+                                if (ifNotValidInput(newFieldName)) {
                                     System.out.println("\"" + newFieldName + "\" is not a valid identifier\n");
                                     break;
                                 }
-                                if (classWithField.findField(newFieldName) != null) {
+                                if (UMLClassWithField.findField(newFieldName) != null) {
                                     System.out.println("Field \"" + newFieldName +
                                             "\" already exists in class \"" + classWithFieldName + "\"\n");
                                     break;
@@ -293,15 +296,15 @@ public class Driver {
                         String classWithMethodName = scan.next().trim();
 
                         // Ensure class exists
-                        Class classWithMethod = findClass(classWithMethodName);
-                        if (classWithMethod != null) {
+                        UMLClass UMLClassWithMethod = UMLModel.findClass(classWithMethodName);
+                        if (UMLClassWithMethod != null) {
                             // List attributes in class before asking for input
-                            findClass(classWithMethodName).listClass();
+                            UMLModel.findClass(classWithMethodName).listClass();
                             System.out.print("Enter method to be renamed: ");
                             String oldMethodName = scan.next().trim();
 
                             // Ensure attribute exists
-                            Attribute newField = classWithMethod.findField(oldMethodName);
+                            Attribute newField = UMLClassWithMethod.findField(oldMethodName);
                             if (newField != null) {
                                 // Rename attribute with user's new name
                                 System.out.print("Enter new name for " + oldMethodName + ": ");
@@ -310,7 +313,7 @@ public class Driver {
                                     System.out.println("\"" + newMethodName + "\" is not a valid identifier\n");
                                     break;
                                 }
-                                if (classWithMethod.findField(newMethodName) != null) {
+                                if (UMLClassWithMethod.findField(newMethodName) != null) {
                                     System.out.println("Method \"" + newMethodName +
                                             "\" already exists in class \"" + classWithMethodName + "\"\n");
                                     break;
@@ -327,19 +330,19 @@ public class Driver {
                         System.out.print("Enter source class name: ");
                         String sourceName = scan.next().trim();
                         // If source class is valid and exists get destination class
-                        if (findClass(sourceName) != (null)) {
+                        if (UMLModel.findClass(sourceName) != (null)) {
                             System.out.print("Enter destination: ");
                             String destinationName = scan.next().trim();
                             // If destination class is valid and exists add
                             // relationship to relationship array list
-                            if (findClass(destinationName) != (null)) {
+                            if (UMLModel.findClass(destinationName) != (null)) {
                                 if (findRelationship(sourceName, destinationName) != null) {
                                     System.out.println("Relationship already exists between " +
                                             sourceName + " and " + destinationName);
                                     break;
                                 }
-                                Relationship newRelationship = new Relationship(findClass(sourceName),
-                                        findClass(destinationName));
+                                Relationship newRelationship = new Relationship(UMLModel.findClass(sourceName),
+                                        UMLModel.findClass(destinationName));
                                 relationshipList.add(newRelationship);
                                 System.out.println("Relationship added between " + sourceName
                                         + " and " + destinationName);
@@ -349,6 +352,9 @@ public class Driver {
 
                     case "delete rel":
                     case "d rel":
+
+                        //TODO
+                        // UPDATE WITH NEW FINDRELATIONSHIP METHOD IN MODEL
 
                         // Find the relationship
                         Relationship r = findRelationship();
@@ -388,15 +394,15 @@ public class Driver {
                     case "list classes":
                     case "l classes":
                         // if there are classes to list, list them
-                        if (classList.size() != 0) {
+                        if (UMLClassList.size() != 0) {
                             // Loops through classList and calls listClass on all elements
                             System.out.println("\n--------------------");
-                            if (classList.size() >= 1) {
-                                classList.get(0).listClass();
+                            if (UMLClassList.size() >= 1) {
+                                UMLClassList.get(0).listClass();
                             }
-                            for (int i = 1; i < classList.size(); ++i) {
+                            for (int i = 1; i < UMLClassList.size(); ++i) {
                                 System.out.println();
-                                classList.get(i).listClass();
+                                UMLClassList.get(i).listClass();
                             }
                             System.out.println("--------------------\n");
                         }
@@ -410,11 +416,11 @@ public class Driver {
                     case "list class":
                     case "l class":
                         // Get user to input desired class
-                        Class classToList = findClass();
+                        UMLClass UMLClassToList = findClass();
                         // print class name
-                        if (classToList != null) {
+                        if (UMLClassToList != null) {
                             System.out.println("\n--------------------");
-                            classToList.listClass();
+                            UMLClassToList.listClass();
                             System.out.println("--------------------\n");
                         }
                         break;
@@ -467,6 +473,9 @@ public class Driver {
      *
      ********************************************************************/
 
+
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     private static void clearScreen() {
         // Clears Screen in java
         try {
@@ -478,21 +487,23 @@ public class Driver {
         }
     }
 
+    //TODO
+    // SAFELY DELETE THIS METHOD WHEN ABLE
     /**
      * Prompts the user for the name of a class, returns it if it's in the
      * classList. Otherwise, prompts them that it does not exist and returns null
      *
      * @return the Class with the matching name field, otherwise null
      */
-    private static Class findClass() {
+    private static UMLClass findClass() {
         // prompts user for name and scans the name
         System.out.print("Enter class name: ");
         String classToFind = scan.next().trim();
         // iterates through the arraylist
-        for (Class aClass : classList) {
+        for (UMLClass aUMLClass : UMLClassList) {
             // if the name matches, return class
-            if (classToFind.equals(aClass.getClassName())) {
-                return aClass;
+            if (classToFind.equals(aUMLClass.getClassName())) {
+                return aUMLClass;
             }
         }
         // otherwise, tell the user it does not exist and return null
@@ -500,36 +511,22 @@ public class Driver {
         return null;
     }
 
-    /**
-     * Searches for a given class name in the classList and returns the class,
-     * otherwise, returns null
-     *
-     * @param classToFind the given class name
-     * @return the class with the given class name
-     */
-    public static Class findClass(String classToFind) {
-        // iterates through the arraylist
-        for (Class aClass : classList) {
-            // if the name matches, return class
-            if (classToFind.equals(aClass.getClassName())) {
-                return aClass;
-            }
-        }
-        // otherwise, tell the user it does not exist and return null
-        System.out.println("Class \"" + classToFind + "\" was not found");
-        return null;
-    }
-
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     /**
      * List all classes and their accompanying attributes
      */
     public static void listClasses() {
         // Loops through classList and calls listClass on all elements
-        for (Class aClass : classList) {
-            aClass.listClass();
+        for (UMLClass aUMLClass : UMLClassList) {
+            aUMLClass.listClass();
         }
     }
 
+
+    //TODO
+    // SAFELY DELETE THIS METHOD WHEN ABLE
+    // ADD ONE TO CONTROLLER FOR ERROR HANDLING.
     /**
      * Prompts the user for the name of a relationship, returns it if it's in the
      * relationshipList. Otherwise, prompts them that it does not exist and returns
@@ -540,13 +537,13 @@ public class Driver {
     public static Relationship findRelationship() {
         System.out.print("Enter relationship source name: ");
         String sourceToFind = scan.next().trim();
-        Class src = findClass(sourceToFind);
+        UMLClass src = UMLModel.findClass(sourceToFind);
 
         if (src != null) {
             // If source name was found, proceed to find dest name
             System.out.print("Enter relationship destination name: ");
             String destToFind = scan.next().trim();
-            Class dest = findClass(destToFind);
+            UMLClass dest = UMLModel.findClass(destToFind);
 
             if (dest != null) {
                 // If dest name was found, proceed to find relationship
@@ -567,6 +564,9 @@ public class Driver {
         return null;
     }
 
+    //TODO
+    // METHOD IS ALREADY IN MODEL. MODEL VERSION DOES CHECK SOURCE AND
+    // DEST EXIST BEFOREHAND. SAFELY DELETE THIS
     /**
      * Takes in the source and destination name, returns it if it's in the
      * relationshipList. Otherwise, returns
@@ -577,10 +577,10 @@ public class Driver {
      * @return
      */
     private static Relationship findRelationship(String srcName, String destName) {
-        Class src = findClass(srcName);
+        UMLClass src = UMLModel.findClass(srcName);
         if (src != null) {
             // If source name was found, proceed to find dest name
-            Class dest = findClass(destName);
+            UMLClass dest = UMLModel.findClass(destName);
             if (dest != null) {
                 // If dest name was found, proceed to find relationship
                 for (Relationship relationship : relationshipList) {
@@ -597,6 +597,8 @@ public class Driver {
         return null;
     }
 
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     /**
      * Deletes the class with the matching name field if it exists, and returns the
      * classList.
@@ -604,34 +606,34 @@ public class Driver {
      * @param classToDeleteName the name of the class to delete
      * @return the classList
      */
-    public static ArrayList<Class> deleteClass(String classToDeleteName) {
+    public static ArrayList<UMLClass> deleteClass(String classToDeleteName) {
         // Create new class object. If a class matches the user inputted name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
-        Class classToDelete = null;
+        UMLClass UMLClassToDelete = null;
 
         // While loop to make sure the user can make a mistake when typing in
         // a class name to delete, and continue to delete a class afterwards
-        while (classToDelete == null) {
+        while (UMLClassToDelete == null) {
             // Iterate through ArrayList of classes to see if class exists
-            for (Class classObj : classList) {
-                if (classObj.getClassName().equals(classToDeleteName)) {
-                    classToDelete = classObj;
+            for (UMLClass UMLClassObj : UMLClassList) {
+                if (UMLClassObj.getClassName().equals(classToDeleteName)) {
+                    UMLClassToDelete = UMLClassObj;
                 }
             }
             // Remove whatever class classToDelete was assigned as from
             // the ArrayList
-            if (classToDelete != null) {
+            if (UMLClassToDelete != null) {
                 System.out.print("Delete class \"" + classToDeleteName + "\"? (y/n): ");
                 String theNextAnswer = scan.next().trim();
 
                 // User confirms if they wish to delete. If no, break out of loop
                 if (theNextAnswer.equalsIgnoreCase("y")) {
-                    relationshipList = updateRelationshipList(classToDeleteName);
-                    classList.remove(classToDelete);
-                    System.out.print("Class \"" + classToDelete.getClassName() + "\" has been deleted\n");
+                    relationshipList = UMLModel.updateRelationshipList(classToDeleteName);
+                    UMLClassList.remove(UMLClassToDelete);
+                    System.out.print("Class \"" + UMLClassToDelete.getClassName() + "\" has been deleted\n");
                     break;
                 } else if (theNextAnswer.equalsIgnoreCase("n")) {
-                    System.out.print("Class \"" + classToDelete.getClassName() + "\" has NOT been deleted\n");
+                    System.out.print("Class \"" + UMLClassToDelete.getClassName() + "\" has NOT been deleted\n");
                     break;
                 }
             }
@@ -641,9 +643,11 @@ public class Driver {
                 System.out.println("Class \"" + classToDeleteName + "\" was not found");
             }
         }
-        return classList;
+        return UMLClassList;
     }
 
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     public static boolean isValidIdentifier(String input) {
         if (input == null) {
             return false;
@@ -662,6 +666,8 @@ public class Driver {
         return false;
     }
 
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     public static boolean ifNotValidInput(String input) {
         if (!isValidIdentifier(input)) {
             System.out.printf("Input %s is not a valid identifier\n", input);
@@ -670,6 +676,8 @@ public class Driver {
         return false;
     }
 
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     public static boolean isTypeValid(String input) {
         switch(input) {
             case "string":
@@ -687,6 +695,8 @@ public class Driver {
 
     }
 
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     /**
      * Display list of commands and their accompanying descriptions
      */
@@ -707,17 +717,5 @@ public class Driver {
         helpMessage += "exit\t\t\tExit the application\n";
 
         System.out.println(helpMessage);
-    }
-
-    /**
-     * Pass in name of class being deleted. If any relationship with
-     *
-     * @param className
-     * @return updated relationship list
-     */
-    private static ArrayList<Relationship> updateRelationshipList(String className) {
-        relationshipList.removeIf(rel -> rel.getSource().getClassName().equals(className) ||
-                rel.getDestination().getClassName().equals(className));
-        return relationshipList;
     }
 }

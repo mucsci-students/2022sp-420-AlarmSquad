@@ -1,25 +1,26 @@
 package uml;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-
 import uml.managers.ClassManager;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit tests for Class
  * 
  * @authors Ryan Ganzke
  */
-public class ClassTest {
+public class UMLClassTest {
     private static ClassManager classManager = new ClassManager();
 
-    @Test
-    public void testClassConstruction() {
-        Class studentClass = new Class("Student");
-        assertEquals(true, studentClass.getClassName().equals("Student"));
-        assertEquals(true, studentClass.getAttributeList().isEmpty());
-    }
+    //TODO
+    // MAKE THIS FOR FIELDS AND METHODS
+//    @Test
+//    public void testClassConstruction() {
+//        UMLClass studentUMLClass = new UMLClass("Student");
+//        assertEquals(true, studentUMLClass.getClassName().equals("Student"));
+//        assertEquals(true, studentUMLClass.getAttributeList().isEmpty());
+//    }
 
     @Test
     public void testAddClass() {

@@ -17,7 +17,7 @@ public class JSON {
     // directory of the save files
     private final static String FILE_DIR = "savefiles";
     // a copy of the classList from Driver
-    private static final ArrayList<Class> classList = UMLModel.getClassList();
+    private static final ArrayList<UMLClass> UML_CLASS_LIST = UMLModel.getClassList();
     // a copy of the relationshipList from Driver
     private static final ArrayList<Relationship> relationshipList = UMLModel.getRelationshipList();
     // the JSON object to be saved
@@ -38,17 +38,20 @@ public class JSON {
         JSONArray saveRelationships = new JSONArray();
 
         // iterate through the classList
-        for (Class classObj : classList) {
+        for (UMLClass UMLClassObj : UML_CLASS_LIST) {
             JSONObject classToBeSaved = new JSONObject();
             // add name to JSON
-            classToBeSaved.put("className", classObj.getClassName());
+            classToBeSaved.put("className", UMLClassObj.getClassName());
             // make new JSONArray
             JSONArray attList = new JSONArray();
             // iterate through the Class object's attributeList
-            for (Attribute attObj : classObj.getAttributeList()) {
-                // put each attribute in the JSONArray
-                attList.add(attObj.getAttName());
-            }
+            //TODO
+            // MAKE THIS SAVE FIELDS AND METHODS
+
+//            for (Attribute attObj : UMLClassObj.getAttributeList()) {
+//                // put each attribute in the JSONArray
+//                attList.add(attObj.getAttName());
+//            }
             // put the attributeList JSONArray into the JSON Class object
             classToBeSaved.put("attList", attList);
             // put the JSONArray into the JSON object
@@ -96,7 +99,7 @@ public class JSON {
             File dir = new File(FILE_DIR);
             // a list of the names of the files in the directory
             String[] fileList = dir.list();
-            boolean hasFoundFile = false;
+            Boolean hasFoundFile = false;
             // loops through the list of file names
             for (int i = 0; i < Objects.requireNonNull(fileList).length; ++i) {
                 // if the list only has one file (and placeholder.txt) and it is the correct name
@@ -141,15 +144,18 @@ public class JSON {
                 // finds the list of attributes at the key "attList"
                 ArrayList<String> attList = (ArrayList<String>) attIter.next().get("attList");
                 // make the new class
-                Class newClass = new Class(className);
+                UMLClass newUMLClass = new UMLClass(className);
                 // loop through the attList
-                for (String attName : attList) {
-                    // make a new Attribute and add it to the class
-                    Attribute newAtt = new Attribute(attName);
-                    newClass.addAttribute(newAtt);
-                }
+
+                //TODO
+                // MAKE THIS LOAD FIELDS AND METHODS
+//                for (String attName : attList) {
+//                    // make a new Attribute and add it to the class
+//                    Attribute newAtt = new Attribute(attName);
+//                    newUMLClass.addAttribute(newAtt);
+//                }
                 // add the filled class to the classList
-                UMLModel.addClass(newClass);
+                UMLModel.addClass(newUMLClass);
             }
 
             // JSONArray for getting the saved relationshipList
@@ -166,8 +172,8 @@ public class JSON {
                 // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
                 // make a new relationship with the correct parameters
-                Relationship newRelationship = new Relationship(Objects.requireNonNull(Driver.findClass(sourceName)),
-                        Objects.requireNonNull(Driver.findClass(destinationName)));
+                Relationship newRelationship = new Relationship(Objects.requireNonNull(UMLModel.findClass(sourceName)),
+                        Objects.requireNonNull(UMLModel.findClass(destinationName)));
                 // add the relationship to the relationship list
                 UMLModel.addRel(newRelationship);
             }

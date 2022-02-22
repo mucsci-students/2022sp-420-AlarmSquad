@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  * @authors
  */
-public class Class {
+public class UMLClass {
 
     // The name of the class
     private String className;
@@ -19,9 +19,9 @@ public class Class {
     /**
      * Default constructor
      * 
-     * @param name the name of the class
+     * @param className the name of the class
      */
-    public Class(String className) {
+    public UMLClass(String className) {
         this.className = className;
         this.fieldList = new ArrayList<Field>();
         this.methodList = new ArrayList<Method>();
@@ -99,6 +99,8 @@ public class Class {
         this.methodList.remove(method);
     }
 
+    //TODO
+    // SAFELY MOVE THIS METHOD TO CONTROLLER
     /**
      * Lists the name of the class and its attributes in a nice way
      */

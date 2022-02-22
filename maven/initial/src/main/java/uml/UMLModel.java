@@ -4,19 +4,19 @@ import java.util.ArrayList;
 
 public class UMLModel {
     // The arraylist of classes the diagram has
-    private static ArrayList<Class> classList = new ArrayList<Class>();
+    private static ArrayList<UMLClass> UMLClassList = new ArrayList<UMLClass>();
     // The arraylist of relationships the diagram has
     private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
 
     public UMLModel() {
     }
 
-    public static ArrayList<Class> getClassList() {
-        return classList;
+    public static ArrayList<UMLClass> getClassList() {
+        return UMLClassList;
     }
 
-    public static void setClassList(ArrayList<Class> classList) {
-        UMLModel.classList = classList;
+    public static void setClassList(ArrayList<UMLClass> UMLClassList) {
+        UMLModel.UMLClassList = UMLClassList;
     }
 
     public static ArrayList<Relationship> getRelationshipList() {
@@ -27,12 +27,12 @@ public class UMLModel {
         UMLModel.relationshipList = relationshipList;
     }
 
-    public static void addClass(Class newClass) {
-        classList.add(newClass);
+    public static void addClass(UMLClass newUMLClass) {
+        UMLClassList.add(newUMLClass);
     }
 
-    public static void deleteClass(Class delClass) {
-        classList.remove(delClass);
+    public static void deleteClass(UMLClass delUMLClass) {
+        UMLClassList.remove(delUMLClass);
     }
 
     public static void addRel(Relationship newRel) {
@@ -47,7 +47,7 @@ public class UMLModel {
      * Clears the classList
      */
     public static void clearClassList() {
-        classList.clear();
+        UMLClassList.clear();
     }
 
     /**
@@ -61,17 +61,17 @@ public class UMLModel {
      * Iterate through arraylist and return true if class with
      * matching name is found. Return false otherwise.
      *
-     * @param nameOfClass
+     *
      * @return true if class exists in arraylist, false if not
      */
-    public boolean classExists(String nameOfClass) {
-        for (Class aClass : classList) {
+    public static UMLClass findClass(String nameOfClass) {
+        for (UMLClass aUMLClass : UMLClassList) {
             // if the name matches, return class
-            if (nameOfClass.equals(aClass.getClassName())) {
-                return true;
+            if (nameOfClass.equals(aUMLClass.getClassName())) {
+                return aUMLClass;
             }
-        }
-        return false;
+    }
+    return null;
     }
 
     /**
@@ -82,16 +82,28 @@ public class UMLModel {
      * @param dest class name
      * @return true if class exists in arraylist, false if not
      */
-    public boolean relExists(String source, String dest) {
+    public static Relationship findRelationship(String source, String dest) {
         for (Relationship relationship : relationshipList) {
             // If the name matches, return class
             if (relationship.getSource().getClassName().equals(source) &&
                     relationship.getDestination().getClassName().equals(dest)) {
 
-                return true;
+                return relationship;
             }
         }
-        return false;
+        return null;
+    }
+
+    /**
+     * If a class has been deleted, also delete any relationships associated
+     * with that class
+     *
+     * @param className
+     * @return updated relationship list
+     */
+    public static ArrayList<Relationship> updateRelationshipList(String className) {
+        relationshipList.removeIf(rel -> rel.getSource().getClassName().equals(className) ||
+                rel.getDestination().getClassName().equals(className));
+        return relationshipList;
     }
 }
-

@@ -1,7 +1,7 @@
 package uml.managers;
 
-import uml.Class;
 import uml.Relationship;
+import uml.UMLClass;
 
 import java.util.ArrayList;
 
@@ -33,7 +33,7 @@ public class RelationshipManager {
     }
 
     public String deleteRelationship(ClassManager classManager, String sourceToFind, String destToFind) {
-        Class dest = classManager.findClass(destToFind);
+        UMLClass dest = classManager.findClass(destToFind);
 
         if (dest != null) {
             // If dest name was found, proceed to find relationship
@@ -53,11 +53,11 @@ public class RelationshipManager {
     }
 
     public Relationship findRelationship(ClassManager classManager, String sourceToFind, String destToFind) {
-        Class src = classManager.findClass(sourceToFind);
+        UMLClass src = classManager.findClass(sourceToFind);
 
         if (src != null) {
             // If source name was found, proceed to find dest name
-            Class dest = classManager.findClass(destToFind);
+            UMLClass dest = classManager.findClass(destToFind);
 
             if (dest != null) {
                 // If dest name was found, proceed to find relationship
