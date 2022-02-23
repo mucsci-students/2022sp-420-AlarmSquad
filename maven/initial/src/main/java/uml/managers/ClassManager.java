@@ -1,6 +1,6 @@
 package uml.managers;
 
-import uml.Driver;
+import uml.CLIController;
 import uml.UMLClass;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class ClassManager {
     }
 
     public String addClass(String className) {
-        if (Driver.ifNotValidInput(className)) {
+        if (CLIController.isNotValidInput(className)) {
             return "\"" + className + "\" is not a valid identifier\n";
         }
 
@@ -41,7 +41,7 @@ public class ClassManager {
     }
 
     public String renameClass(String oldClassName, String newName) {
-        if (Driver.ifNotValidInput(newName)) {
+        if (CLIController.isNotValidInput(newName)) {
             return "\"" + newName + "\" is not a valid identifier\n";
         }
         if(findClass(newName) != null) {

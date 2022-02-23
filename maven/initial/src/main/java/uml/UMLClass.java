@@ -99,36 +99,6 @@ public class UMLClass {
         this.methodList.remove(method);
     }
 
-    //TODO
-    // SAFELY MOVE THIS METHOD TO CONTROLLER
-    /**
-     * Lists the name of the class and its attributes in a nice way
-     */
-    public void listClass() {
-        // prints the name of the class
-        System.out.println("Class name: " + this.className);
-        // prints all the field in a set
-        System.out.print("Fields");
-        System.out.print("[ ");
-        if (fieldList.size() >= 1) {
-            System.out.print(fieldList.get(0).getAttName());
-        }
-        for (int i = 1; i < fieldList.size(); ++i) {
-            System.out.print(", " + fieldList.get(i).getAttName());
-        }
-        System.out.println(" ]");
-        // prints all the methods in a set
-        System.out.print("Methods");
-        System.out.print("[ ");
-        if (methodList.size() >= 1) {
-            System.out.print(methodList.get(0).getAttName());
-        }
-        for (int i = 1; i < methodList.size(); ++i) {
-            System.out.print(", " + methodList.get(i).getAttName());
-        }
-        System.out.println(" ]");
-    }
-
     /**
      * Iterates through fieldList, returns with .get()
      *
@@ -165,5 +135,20 @@ public class UMLClass {
         // otherwise tell the user it does not exist and return null
         System.out.println("Method \"" + methodToFind + "\" not found in class " + getClassName());
         return null;
+    }
+
+    /**
+     * Gets the method or field list of the class. Returns null if list
+     * does not exist.
+     * @param attType String "method" or "field"
+     * @return methodList or fieldList or null if
+     */
+    public ArrayList<? extends Attribute> getAttList(String attType) {
+        if (attType.equalsIgnoreCase("method"))
+            return this.methodList;
+        else if (attType.equalsIgnoreCase("field"))
+            return this.fieldList;
+        else
+            return null;
     }
 }

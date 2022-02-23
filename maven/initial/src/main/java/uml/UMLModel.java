@@ -75,8 +75,8 @@ public class UMLModel {
     }
 
     /**
-     * Iterate through arraylist and return true if class with
-     * matching name is found. Return false otherwise.
+     * Iterate through arraylist and return the relationship if relationship with
+     * matching source and destination names is found. Return false otherwise.
      *
      * @param source class name
      * @param dest class name
