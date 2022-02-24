@@ -138,8 +138,7 @@ public class CLIController {
                                     }
                                 }
                                 switch (inputList.get(2)) {
-                                    case "-f", "-m" -> addAtt("field");
-                                    //case "-m" -> addAtt("method");
+                                    case "-f", "-m" -> addAtt(inputList.get(2));
                                     default -> {
                                         System.out.println("Invalid flag");
                                         System.out.print(prompt);
