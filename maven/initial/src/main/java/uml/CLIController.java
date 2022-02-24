@@ -138,6 +138,7 @@ public class CLIController {
                                     }
                                 }
                                 switch (inputList.get(2)) {
+
                                     case "-f", "-m" -> {
                                         String flagName = flagToString(inputList.get(2));
                                         if (!flagName.equals("")) {
@@ -152,6 +153,7 @@ public class CLIController {
                                             }
                                         }
                                     }
+                                    
                                     default -> {
                                         System.out.println("Invalid flag");
                                         System.out.print(prompt);
