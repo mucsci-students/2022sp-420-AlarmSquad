@@ -133,6 +133,7 @@ public class CLIController {
                                         break;
                                 }
                                 switch (inputList.get(2)) {
+
                                     case "-f", "-m" -> {
                                         // Convert flag to "field" or "method".
                                         // Needed for method calls later on
