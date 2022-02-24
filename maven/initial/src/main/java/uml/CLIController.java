@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
-@SuppressWarnings("DanglingJavadoc")
 public class CLIController {
 
     // Creates a new scanner
@@ -85,7 +84,7 @@ public class CLIController {
                         switch (inputList.get(1)) {
                             case "class" -> {
                                 // Get user defined name for Class, then adds new Class to the classList
-                                String className = getClassName("");
+                                String className = getClassName("add", "");
 
                                 // Edge cases for class name, checks validity
                                 if (isNotValidInput(className)) {
@@ -128,30 +127,47 @@ public class CLIController {
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    System.out.print("type \"-f\" to add a field, or \"-m\" to input a method: ");
-                                    String attAddFlag = scan.next().trim();
-
-                                    if (attAddFlag.equals("-f") || attAddFlag.equals("-m"))
-                                        inputList.add(attAddFlag);
-                                    else {
-                                        System.out.println("Invalid flag, no attribute added");
-                                    }
+                                    addAttFlag(inputList, "add");
+                                    // If user tried to input an invalid flag, break
+                                    if (inputList.size() == 2)
+                                        break;
                                 }
                                 switch (inputList.get(2)) {
                                     case "-f", "-m" -> {
-                                        String flagName = flagToString(inputList.get(2));
-                                        if (!flagName.equals("")) {
+                                        // Convert flag to "field" or "method".
+                                        // Needed for method calls later on
+                                        String attType = flagToString(inputList.get(2));
+                                        if (!attType.equals("")) {
                                             // Get name of class user wants to add attribute to and
                                             // ensure the class exists
-                                            String classToAddAttName = getClassName(flagName);
+                                            String classToAddAttName = getClassName("add", attType);
                                             UMLClass classToAddAtt = UMLModel.findClass(classToAddAttName);
+                                            // If class exists...
                                             if (classToAddAtt != null) {
-                                                addAttribute(classToAddAtt, flagName);
+                                                // Get name of attribute user wants to add
+                                                String attName = getAttName(attType);
+                                                // Ensure attribute name is valid
+                                                if (!isNotValidInput(attName)) {
+                                                    // If attribute doesn't already exist in class, add it to class
+                                                    if (classToAddAtt.getAttList(attType).stream()
+                                                            .noneMatch(attObj -> attObj.getAttName().equals(attName))) {
+                                                        addAttribute(classToAddAtt, attType, attName);
+                                                        System.out.println("Added " + attType + " " + attName + " to class "
+                                                                + classToAddAttName);
+                                                    }
+                                                    // If attribute user entered already exists in class, inform user and break
+                                                    else {
+                                                        System.out.println(attType + " " + attName +
+                                                                " already exists in class " + classToAddAtt.getClassName());
+                                                    }
+                                                }
+                                                // If class user entered does not exist, inform user and break
                                             } else {
                                                 System.out.println("Class " + classToAddAttName + " does not exist");
                                             }
                                         }
                                     }
+                                    // If flag user entered is invalid, inform user and break
                                     default -> {
                                         System.out.println("Invalid flag");
                                         System.out.print(prompt);
@@ -161,9 +177,9 @@ public class CLIController {
                         }
                     }
 
-                    // delete class of the user's choice from the class list
                     case "delete", "d" -> {
                         switch (inputList.get(1)) {
+                            // delete class of the user's choice from the class list
                             case "class" -> {
                                 // Get user input of Class name to be deleted
                                 System.out.print("Enter class name to delete: ");
@@ -208,80 +224,39 @@ public class CLIController {
                                 }
                             }
 
-                            // delete field
                             case "att" -> {
+                                // If user inputted "a att" with no flag, ask for one.
+                                // If user inputs invalid flag, break
+                                if (inputList.size() == 2) {
+                                    if (!addAttFlag(inputList, "delete"))
+                                        break;
+                                }
                                 switch (inputList.get(2)) {
-                                    case "-f" -> {
-                                        // Get user input of Class name to delete field from
-                                        System.out.print("Enter class name to delete field: ");
-                                        String classToDelFieldName = scan.next().trim();
-                                        // Call find class method to find the class the field is in
-                                        UMLClass UMLClassToDelField = UMLModel.findClass(classToDelFieldName);
-                                        boolean fieldBool = false;
-                                        // Prompt user to delete an attribute
-                                        if (UMLClassToDelField != null) {
-                                            // while bool is false continue loop until the user does not want to delete an
-                                            // attribute
-                                            // or until an attribute is deleted
-                                            // (this may be changed so the user can type exit to exit the program as well)
-                                            while (!fieldBool) {
-                                                System.out.print("Enter field name to delete: ");
-                                                String fieldToDel = scan.next().trim();
-                                                Field deletedField = UMLClassToDelField.findField(fieldToDel);
-                                                if (deletedField != null) {
-                                                    System.out.print("Delete field \"" + fieldToDel + "\"? (y/n): ");
-                                                    String answer = scan.next().trim();
-                                                    // If the user wants to delete an attribute, proceed to do so
-                                                    if (answer.equalsIgnoreCase("y")) {
-                                                        UMLClassToDelField.deleteField(deletedField);
-                                                        System.out.print("Field \"" + fieldToDel + "\" has been deleted \n");
-                                                        fieldBool = true;
-                                                    }
-                                                    // if user types n, break out of loop and case
-                                                    // and bring back prompt for new command
-                                                    else {
-                                                        System.out.println("Field " + fieldToDel + " has NOT been deleted");
-                                                        break;
-                                                    }
-                                                }
+                                    case "-f", "-m" -> {
+                                        // Convert -f flag to the string "field",
+                                        // and the same for -m flag, etc.
+                                        String flagName = flagToString(inputList.get(2));
+
+                                        // If user entered a valid flag...
+                                        if (!flagName.equals("")) {
+                                            // Get name of class user wants to add attribute to and
+                                            // ensure the class exists
+                                            String classToDelAttName = getClassName("delete", flagName);
+                                            UMLClass classToDelAtt = UMLModel.findClass(classToDelAttName);
+                                            if (classToDelAtt != null) {
+                                                // Delete attribute within specified class
+                                                delAttribute(classToDelAtt, flagName);
+                                            }
+                                            // If class was not found, inform user and break
+                                            else {
+                                                System.out.println("Class " + classToDelAttName + " does not exist");
                                             }
                                         }
                                     }
-                                    case "-m" -> {
-                                        // Get user input of Class name to delete method from
-                                        System.out.print("Enter class name to delete method: ");
-                                        String classToDelMethName = scan.next().trim();
-                                        // Call find class method to find the class the method is in
-                                        UMLClass UMLClassToDelMethod = UMLModel.findClass(classToDelMethName);
-                                        boolean methodBool = false;
-                                        // Prompt user to delete a method
-                                        if (UMLClassToDelMethod != null) {
-                                            // while bool is false continue loop until the user does not want to delete a
-                                            // method
-                                            // or until a method is deleted
-                                            // (this may be changed so the user can type exit to exit the program as well)
-                                            while (!methodBool) {
-                                                System.out.print("Enter method name to delete: ");
-                                                String methodToDel = scan.next().trim();
-                                                Method deletedMethod = UMLClassToDelMethod.findMethod(methodToDel);
-                                                if (deletedMethod != null) {
-                                                    System.out.print("Delete method \"" + methodToDel + "\"? (y/n): ");
-                                                    String answer = scan.next().trim();
-                                                    // If the user wants to delete a method, proceed to do so
-                                                    if (answer.equalsIgnoreCase("y")) {
-                                                        UMLClassToDelMethod.deleteMethod(deletedMethod);
-                                                        System.out.print("Method \"" + methodToDel + "\" has been deleted \n");
-                                                        methodBool = true;
-                                                    }
-                                                    // if user types n, break out of loop, then break out of case
-                                                    // and bring back prompt for new command
-                                                    else {
-                                                        System.out.println("Method " + methodToDel + " has NOT been deleted");
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    // If user entered invalid flag, inform user and break
+                                    default -> {
+                                        System.out.println("Invalid flag");
+                                        System.out.println(prompt);
                                     }
                                 }
                             }
@@ -477,9 +452,9 @@ public class CLIController {
 
     }
 
-    public static String getClassName(String s) {
+    public static String getClassName(String operation, String attType) {
         // Get user input of Class name
-        System.out.print("Enter class name to add " + s + ": ");
+        System.out.print("Enter class name to " + operation + " " + attType + ": ");
         return scan.next().trim();
     }
 
@@ -496,21 +471,24 @@ public class CLIController {
         return scan.next().trim();
     }
 
-    public static void addAttribute(UMLClass classToAddAtt, String attType) {
+    public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
+        System.out.print("type \"-f\" to " + operation + " a field, or \"-m\" to " +
+                operation + " a method: ");
+        String attFlag = scan.next().trim();
 
-
-        // Get name of attribute user wants to add and
-        // ensure it is valid and not a duplicate
-        String attName = getAttName(attType);
-        if (isNotValidInput(attName)) {
-            System.out.println("\"" + attName + "\" is not a valid identifier\n");
+        switch (attFlag) {
+            case "-f", "-m" -> {
+                userInputList.add(attFlag);
+                return true;
+            }
+            default -> {
+                System.out.println("Invalid flag, no attribute added");
+                return false;
+            }
         }
-        if (classToAddAtt.getAttList(attType).stream()
-                .anyMatch(attObj -> attObj.getAttName().equals(attName))) {
-            System.out.println(attType + " " + attName +
-                    " already exists in class " + classToAddAtt.getClassName());
-        }
+    }
 
+    public static void addAttribute(UMLClass classToAddAtt, String attType, String attName) {
         // If attribute is a method, get its return type.
         // If attribute is a field, get its type.
         // Ensure type is valid
@@ -533,18 +511,43 @@ public class CLIController {
         }
     }
 
+    public static void delAttribute(UMLClass classWithAttToDel, String attType) {
+        // Get name of field or method user wants to delete
+        System.out.print("Enter " + attType + " to delete: ");
+        String attToDel = scan.next().trim();
+
+        // Ensure attribute exists
+        Attribute deletedAtt = classWithAttToDel.findAtt(attToDel, attType);
+        if (deletedAtt != null) {
+            // Confirm  user wants to delete attribute
+            System.out.print("Delete " + attType + " \"" + attToDel + "\"? (y/n): ");
+            String answer = scan.next().trim();
+            // If the user wants to delete an attribute, proceed to do so
+            if (answer.equalsIgnoreCase("y")) {
+                classWithAttToDel.deleteAttribute(deletedAtt);
+                System.out.print(attType + " \"" + attToDel + "\" has been deleted \n");
+            }
+            // If user types n, confirm and return
+            else {
+                System.out.println(attType + " \"" + attToDel + "\" has NOT been deleted");
+            }
+            // If attribute doesn't exist in class, inform user and return
+        } else {
+            System.out.println("Attribute does not exist");
+        }
+    }
+
     /**
      * @param flag the flag of the attribute to add,
      *             either -f for field or -m for method
      */
     public static String flagToString(String flag) {
-        String flagName = switch (flag) {
+
+        return switch (flag) {
             case "-f" -> "field";
             case "-m" -> "method";
             default -> "";
         };
-
-        return flagName;
     }
 
     /**

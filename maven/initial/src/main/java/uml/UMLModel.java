@@ -61,7 +61,6 @@ public class UMLModel {
      * Iterate through arraylist and return true if class with
      * matching name is found. Return false otherwise.
      *
-     *
      * @return true if class exists in arraylist, false if not
      */
     public static UMLClass findClass(String nameOfClass) {
@@ -70,8 +69,8 @@ public class UMLModel {
             if (nameOfClass.equals(aUMLClass.getClassName())) {
                 return aUMLClass;
             }
-    }
-    return null;
+        }
+        return null;
     }
 
     /**
@@ -79,7 +78,7 @@ public class UMLModel {
      * matching source and destination names is found. Return false otherwise.
      *
      * @param source class name
-     * @param dest class name
+     * @param dest   class name
      * @return true if class exists in arraylist, false if not
      */
     public static Relationship findRelationship(String source, String dest) {
