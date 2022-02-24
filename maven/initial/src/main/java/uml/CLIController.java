@@ -138,7 +138,22 @@ public class CLIController {
                                     }
                                 }
                                 switch (inputList.get(2)) {
-                                    case "-f", "-m" -> addAtt(inputList.get(2));
+
+                                    case "-f", "-m" -> {
+                                        String flagName = flagToString(inputList.get(2));
+                                        if (!flagName.equals("")) {
+                                            // Get name of class user wants to add attribute to and
+                                            // ensure the class exists
+                                            String classToAddAttName = getClassName(flagName);
+                                            UMLClass classToAddAtt = UMLModel.findClass(classToAddAttName);
+                                            if (classToAddAtt != null) {
+                                                addAttribute(classToAddAtt, flagName);
+                                            } else {
+                                                System.out.println("Class " + classToAddAttName + " does not exist");
+                                            }
+                                        }
+                                    }
+                                    
                                     default -> {
                                         System.out.println("Invalid flag");
                                         System.out.print(prompt);
@@ -442,16 +457,13 @@ public class CLIController {
     }
 
 
-/**
- * ****************************************************************
- * <p>
- * Programmer defined Helper Methods
- * ****************************************************************
- * <p>
- * Execute OS clear function to clear terminal
- */
-
     /**
+     * ****************************************************************
+     * <p>
+     * Programmer defined Helper Methods
+     * ****************************************************************
+     * <p>
+     * /**
      * Execute OS clear function to clear terminal
      */
     private static void clearScreen() {
@@ -527,24 +539,14 @@ public class CLIController {
      * @param flag the flag of the attribute to add,
      *             either -f for field or -m for method
      */
-    public static void addAtt(String flag) {
-        String attr = switch (flag) {
+    public static String flagToString(String flag) {
+        String flagName = switch (flag) {
             case "-f" -> "field";
             case "-m" -> "method";
             default -> "";
         };
 
-        if (!attr.equals("")) {
-            // Get name of class user wants to add attribute to and
-            // ensure the class exists
-            String classToAddAttName = getClassName(attr);
-            UMLClass classToAddAtt = UMLModel.findClass(classToAddAttName);
-            if (classToAddAtt != null) {
-                addAttribute(classToAddAtt, attr);
-            } else {
-                System.out.println("Class " + classToAddAttName + " does not exist");
-            }
-        }
+        return flagName;
     }
 
     /**
