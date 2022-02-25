@@ -6,6 +6,11 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
+/**
+ * The controller for the CLI version of the UML Diagram
+ *
+ * @authors AlarmSquad
+ */
 @SuppressWarnings("DanglingJavadoc")
 public class CLIController {
 
@@ -138,7 +143,22 @@ public class CLIController {
                                     }
                                 }
                                 switch (inputList.get(2)) {
-                                    case "-f", "-m" -> addAtt(inputList.get(2));
+
+                                    case "-f", "-m" -> {
+                                        String flagName = flagToString(inputList.get(2));
+                                        if (!flagName.equals("")) {
+                                            // Get name of class user wants to add attribute to and
+                                            // ensure the class exists
+                                            String classToAddAttName = getClassName(flagName);
+                                            UMLClass classToAddAtt = UMLModel.findClass(classToAddAttName);
+                                            if (classToAddAtt != null) {
+                                                addAttribute(classToAddAtt, flagName);
+                                            } else {
+                                                System.out.println("Class " + classToAddAttName + " does not exist");
+                                            }
+                                        }
+                                    }
+
                                     default -> {
                                         System.out.println("Invalid flag");
                                         System.out.print(prompt);
@@ -442,17 +462,15 @@ public class CLIController {
     }
 
 
-/**
- * ****************************************************************
- * <p>
+/******************************************************************
+ *
  * Programmer defined Helper Methods
- * ****************************************************************
- * <p>
- * Execute OS clear function to clear terminal
- */
+ *
+ ******************************************************************/
 
     /**
      * Execute OS clear function to clear terminal
+     *
      */
     private static void clearScreen() {
         // Clears Screen in java
@@ -467,28 +485,43 @@ public class CLIController {
 
     }
 
-    public static String getClassName(String s) {
+    /**
+     * Prompts the user for the name of a class to be added
+     *
+     * @param classNameToAdd the name of the class to add
+     * @return the user's given name for the class
+     */
+    public static String getClassName(String classNameToAdd) {
         // Get user input of Class name
-        System.out.print("Enter class name to add " + s + ": ");
+        System.out.print("Enter class name to add " + classNameToAdd + ": ");
         return scan.next().trim();
     }
 
-    public static String getType(String attType) {
+    /**
+     * Prompts the user for the type of an attribute
+     *
+     * @param attType the type of attribute to be defined
+     * @return the user's given type for the attribute
+     */
+    public static String getAttType(String attType) {
         if (attType.equals("method"))
             attType += " return";
-
         System.out.print("Enter " + attType + " type: ");
         return scan.next().trim();
     }
 
+    /**
+     * Prompts the user for the name of an attribute with the given type
+     *
+     * @param attType the type of the attribute to be named
+     * @return the user's given name for the attribute
+     */
     public static String getAttName(String attType) {
         System.out.print("Enter " + attType + " name: ");
         return scan.next().trim();
     }
 
     public static void addAttribute(UMLClass classToAddAtt, String attType) {
-
-
         // Get name of attribute user wants to add and
         // ensure it is valid and not a duplicate
         String attName = getAttName(attType);
@@ -500,15 +533,13 @@ public class CLIController {
             System.out.println(attType + " " + attName +
                     " already exists in class " + classToAddAtt.getClassName());
         }
-
         // If attribute is a method, get its return type.
         // If attribute is a field, get its type.
         // Ensure type is valid
-        String type = getType(attType);
+        String type = getAttType(attType);
         if (isNotValidType(type)) {
             System.out.println("\"" + type + "\" is not a valid return type\n");
         }
-
         // If user wants to add a method, get its return type and
         // ensure it is valid. Then return updated class with added method.
         if (attType.equalsIgnoreCase("method")) {
@@ -523,17 +554,12 @@ public class CLIController {
         }
     }
 
-    /**
-     * @param flag the flag of the attribute to add,
-     *             either -f for field or -m for method
-     */
     public static void addAtt(String flag) {
         String attr = switch (flag) {
             case "-f" -> "field";
             case "-m" -> "method";
             default -> "";
         };
-
         if (!attr.equals("")) {
             // Get name of class user wants to add attribute to and
             // ensure the class exists
@@ -548,7 +574,9 @@ public class CLIController {
     }
 
     /**
-     * Lists the name of the class and its attributes in a nice way
+     * List all the contents of a specific class in a nice way
+     *
+     * @param className the name of the class to list
      */
     public static void listClass(String className) {
         // copy class and attribute lists for more readable
@@ -556,7 +584,6 @@ public class CLIController {
         UMLClass copyClass = UMLModel.findClass(className);
         ArrayList<Field> copyFieldList = Objects.requireNonNull(copyClass).getFieldList();
         ArrayList<Method> copyMethList = Objects.requireNonNull(copyClass).getMethodList();
-
         // prints the name of the class
         System.out.println("Class name: " + copyClass.getClassName());
         // prints all the field in a set
@@ -581,12 +608,11 @@ public class CLIController {
         System.out.println(" ]");
     }
 
-
     /**
-     * List all classes from UMLModel in a nice way
+     * List all the contents of all classes in the diagram in a nice way
+     *
      */
     public static void listClasses() {
-
         // if there are classes to list, list them
         if (UMLModel.getClassList().size() != 0) {
             // Loops through classList and calls listClass on all elements
@@ -608,10 +634,9 @@ public class CLIController {
         }
     }
 
-
     /**
      * Deletes the class with the matching name field if it exists, and returns the
-     * classList.
+     * classList
      *
      * @param classToDeleteName the name of the class to delete
      * @return the classList
@@ -620,7 +645,6 @@ public class CLIController {
         // Create new class object. If a class matches the user inputted name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
         UMLClass UMLClassToDelete = null;
-
         // While loop to make sure the user can make a mistake when typing in
         // a class name to delete, and continue to delete a class afterwards
         while (UMLClassToDelete == null) {
@@ -635,7 +659,6 @@ public class CLIController {
             if (UMLClassToDelete != null) {
                 System.out.print("Delete class \"" + classToDeleteName + "\"? (y/n): ");
                 String theNextAnswer = scan.next().trim();
-
                 // User confirms if they wish to delete. If no, break out of loop
                 if (theNextAnswer.equalsIgnoreCase("y")) {
                     UMLModel.setRelationshipList(UMLModel.updateRelationshipList(classToDeleteName));
@@ -657,19 +680,17 @@ public class CLIController {
     }
 
     /**
-     * Deletes the class with the matching name field if it exists, and returns the
-     * classList (helper class of isNotValidInput).
+     * Takes a string and checks if it is a valid identifier
+     * (helper class of isNotValidInput)
      *
-     * @param input the name of the class to delete
-     * @return a boolean determining if the string is a valid identifier
+     * @param input the string to check
+     * @return true if valid, otherwise false
      */
     public static boolean isValidIdentifier(String input) {
         if (input == null) {
             return false;
         }
-
         char[] c = input.toCharArray();
-
         if (Character.isJavaIdentifierStart(c[0])) {
             for (int i = 1; i < input.length(); i++) {
                 if (!Character.isJavaIdentifierPart(c[i])) {
@@ -682,10 +703,10 @@ public class CLIController {
     }
 
     /**
-     * Takes in a string, and checks if it is not a valid name
+     * Takes a string and checks if it is a valid name
      *
-     * @param input the string name representing a type
-     * @return a boolean returns false if valid otherwise true
+     * @param input the string to check
+     * @return false if valid, otherwise true
      */
     public static boolean isNotValidInput(String input) {
         if (!isValidIdentifier(input)) {
@@ -696,24 +717,23 @@ public class CLIController {
     }
 
     /**
-     * Takes a string and checks if it's a valid field type
+     * Takes a string and checks if it is a valid field type
      *
-     * @param input the name of the class to delete
-     * @return a boolean returns false if valid otherwise true
+     * @param input the string to check
+     * @return false if valid, otherwise true
      */
     public static boolean isNotValidType(String input) {
         return switch (input) {
             case "string", "int", "double", "float", "char", "boolean", "short", "long", "void" -> false;
             default -> true;
         };
-
     }
 
     /**
      * Display list of commands and their accompanying descriptions
+     *
      */
     public static void displayHelp() {
-
         String helpMenu = """
                    Commands		   Description
                 --------------	-----------------
@@ -733,7 +753,6 @@ public class CLIController {
                 clear			Clear the command history
                 help			Display list of commands
                 exit			Exit the application""";
-
         System.out.println(helpMenu);
     }
 }
