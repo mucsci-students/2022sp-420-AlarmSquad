@@ -61,7 +61,6 @@ public class UMLModel {
      * Iterate through arraylist and return true if class with
      * matching name is found. Return false otherwise.
      *
-     *
      * @return true if class exists in arraylist, false if not
      */
     public static UMLClass findClass(String nameOfClass) {
@@ -70,8 +69,8 @@ public class UMLModel {
             if (nameOfClass.equals(aUMLClass.getClassName())) {
                 return aUMLClass;
             }
-    }
-    return null;
+        }
+        return null;
     }
 
     /**
@@ -79,16 +78,38 @@ public class UMLModel {
      * matching source and destination names is found. Return false otherwise.
      *
      * @param source class name
-     * @param dest class name
+     * @param dest   class name
+     * @param relType type name
      * @return true if class exists in arraylist, false if not
      */
-    public static Relationship findRelationship(String source, String dest) {
+    public static Relationship findRelationship(String source, String dest, String relType) {
         for (Relationship relationship : relationshipList) {
             // If the name matches, return class
             if (relationship.getSource().getClassName().equals(source) &&
-                    relationship.getDestination().getClassName().equals(dest)) {
+                    relationship.getDestination().getClassName().equals(dest) &&
+                    relationship.getRelType().equals(relType)) {
 
                 return relationship;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Iterates through relationship list and finds the type of a
+     * relationship given its source and destination
+     *
+     * @param source class name
+     * @param dest class name
+     * @return string of relationship type
+     */
+    public static String findRelType(String source, String dest) {
+        for(Relationship relationship : relationshipList){
+            // if name matches, return relationship type
+            if(relationship.getSource().getClassName().equals(source) &&
+                    relationship.getDestination().getClassName().equals(dest)){
+
+                return relationship.getRelType();
             }
         }
         return null;

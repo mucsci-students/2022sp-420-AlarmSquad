@@ -9,7 +9,7 @@ public class Driver {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            GUIController.main(args);
+            CLIController.main(args);
         } else {
             if (args[0].equals("--cli")) {
                 CLIController.main(args);

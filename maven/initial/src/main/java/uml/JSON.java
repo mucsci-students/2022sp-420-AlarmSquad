@@ -171,9 +171,12 @@ public class JSON {
                 String sourceName = (String) srcIter.next().get("source");
                 // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
+
+                String relType = UMLModel.findRelType(sourceName, destinationName);
                 // make a new relationship with the correct parameters
                 Relationship newRelationship = new Relationship(Objects.requireNonNull(UMLModel.findClass(sourceName)),
-                        Objects.requireNonNull(UMLModel.findClass(destinationName)));
+                        Objects.requireNonNull(UMLModel.findClass(destinationName)), relType);
+                        //UMLModel.findRelationship(sourceName, destinationName, relType));
                 // add the relationship to the relationship list
                 UMLModel.addRel(newRelationship);
             }
