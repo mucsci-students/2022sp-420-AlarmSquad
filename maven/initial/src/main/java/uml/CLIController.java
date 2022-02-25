@@ -104,9 +104,9 @@ public class CLIController {
                             case "rel" -> {
                                 // If user inputted "a rel" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    addRelFlag(inputList, "add");
+                                    if(!addRelFlag(inputList, "add"))
                                     // If user tried to input an invalid flag, break
-                                    if (inputList.size() == 2)
+                                    //if (inputList.size() == 2)
                                         break;
                                 }
                                 switch (inputList.get(2)){
@@ -136,6 +136,14 @@ public class CLIController {
                                                     System.out.println("Relationship added between " + sourceName
                                                             + " and " + destinationName + " with " + relType + " type");
                                                 }
+                                                // If destination class does not exist, inform user and break
+                                                else {
+                                                    System.out.println("Class " + destinationName + " does not exist");
+                                                }
+                                            }
+                                            // If source class does not exist, inform user and break
+                                            else {
+                                                System.out.println("Class " + sourceName + " does not exist");
                                             }
                                         }
                                     }
@@ -149,9 +157,8 @@ public class CLIController {
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    addAttFlag(inputList, "add");
-                                    // If user tried to input an invalid flag, break
-                                    if (inputList.size() == 2)
+                                    if (addAttFlag(inputList, "add"))
+                                        // If user tried to input an invalid flag, break
                                         break;
                                 }
                                 switch (inputList.get(2)) {
@@ -252,9 +259,9 @@ public class CLIController {
 
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one.
-                                // If user inputs invalid flag, break
                                 if (inputList.size() == 2) {
-                                    if (!addAttFlag(inputList, "delete"))
+                                    if (addAttFlag(inputList, "delete"))
+                                        // If user inputs invalid flag, break
                                         break;
                                 }
                                 switch (inputList.get(2)) {
@@ -505,11 +512,11 @@ public class CLIController {
         switch (attFlag) {
             case "-f", "-m" -> {
                 userInputList.add(attFlag);
-                return true;
+                return false;
             }
             default -> {
                 System.out.println("Invalid flag, no attribute added");
-                return false;
+                return true;
             }
         }
     }
