@@ -12,7 +12,7 @@ public class RelationshipManager {
         relationshipList = new ArrayList<Relationship>();
     }
 
-    public String addRelationship(ClassManager classManager, String sourceName, String destinationName) {
+    public String addRelationship(ClassManager classManager, String sourceName, String destinationName, String relType) {
         if (classManager.findClass(destinationName) != (null)) {
             if (relationshipList.stream()
                     .anyMatch(srcObj -> srcObj.getSource().getClassName().equals(sourceName) &&
@@ -23,7 +23,7 @@ public class RelationshipManager {
                         sourceName + "\" and \"" + destinationName + "\"\n";
             }
             Relationship newRelationship = new Relationship(classManager.findClass(sourceName),
-                    classManager.findClass(destinationName));
+                    classManager.findClass(destinationName), relType);
             relationshipList.add(newRelationship);
             return "Relationship added between \"" + sourceName
                     + "\" and \"" + destinationName + "\"\n";
@@ -52,7 +52,7 @@ public class RelationshipManager {
         return "Relationship not found between \"" + sourceToFind + "\" and \"" + destToFind + "\"\n";
     }
 
-    public Relationship findRelationship(ClassManager classManager, String sourceToFind, String destToFind) {
+    public Relationship findRelationship(ClassManager classManager, String sourceToFind, String destToFind, String relType) {
         UMLClass src = classManager.findClass(sourceToFind);
 
         if (src != null) {
@@ -64,7 +64,8 @@ public class RelationshipManager {
                 for (Relationship relationship : relationshipList) {
                     // If the name matches, return class
                     if (relationship.getSource().getClassName().equals(sourceToFind) &&
-                            relationship.getDestination().getClassName().equals(destToFind)) {
+                            relationship.getDestination().getClassName().equals(destToFind) &&
+                            relationship.getRelType().equals(relType)) {
 
                         return relationship;
                     }
