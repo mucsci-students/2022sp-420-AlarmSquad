@@ -102,25 +102,47 @@ public class CLIController {
                                 }
                             }
                             case "rel" -> {
-                                System.out.print("Enter source class name: ");
-                                String sourceName = scan.next().trim();
-                                // If source class is valid and exists get destination class
-                                if (UMLModel.findClass(sourceName) != (null)) {
-                                    System.out.print("Enter destination: ");
-                                    String destinationName = scan.next().trim();
-                                    // If destination class is valid and exists add
-                                    // relationship to relationship array list
-                                    if (UMLModel.findClass(destinationName) != (null)) {
-                                        if (UMLModel.findRelationship(sourceName, destinationName) != null) {
-                                            System.out.println("Relationship already exists between " +
-                                                    sourceName + " and " + destinationName);
-                                            break;
+                                // If user inputted "a rel" with no flag, ask for one
+                                if (inputList.size() == 2) {
+                                    addRelFlag(inputList, "add");
+                                    // If user tried to input an invalid flag, break
+                                    if (inputList.size() == 2)
+                                        break;
+                                }
+                                switch (inputList.get(2)){
+
+                                    case "-a", "-c", "-i", "-r" -> {
+                                        String relType = flagToString(inputList.get(2));
+
+                                        if(!relType.equals("")){
+                                            System.out.print("Enter source class name: ");
+                                            String sourceName = scan.next().trim();
+                                            // If source class is valid and exists get destination class
+                                            if (UMLModel.findClass(sourceName) != (null)) {
+                                                System.out.print("Enter destination: ");
+                                                String destinationName = scan.next().trim();
+                                                // If destination class is valid and exists add
+                                                // relationship to relationship array list
+                                                if (UMLModel.findClass(destinationName) != (null)) {
+                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType) != null) {
+                                                        System.out.println("Relationship already exists between " +
+                                                                sourceName + " and " + destinationName + " with "
+                                                                + relType + " type");
+                                                        break;
+                                                    }
+                                                    Relationship newRelationship = new Relationship(UMLModel.findClass(sourceName),
+                                                            UMLModel.findClass(destinationName), relType);
+                                                    UMLModel.addRel(newRelationship);
+                                                    System.out.println("Relationship added between " + sourceName
+                                                            + " and " + destinationName + " with " + relType + " type");
+                                                }
+                                            }
                                         }
-                                        Relationship newRelationship = new Relationship(UMLModel.findClass(sourceName),
-                                                UMLModel.findClass(destinationName));
-                                        UMLModel.addRel(newRelationship);
-                                        System.out.println("Relationship added between " + sourceName
-                                                + " and " + destinationName);
+                                    }
+                                    // If flag user entered is invalid, inform user and break
+                                    default -> {
+                                        System.out.println("Invalid flag");
+                                        System.out.print(prompt);
                                     }
                                 }
                             }
@@ -193,6 +215,7 @@ public class CLIController {
                             }
 
                             case "rel" -> {
+
                                 System.out.print("Enter relationship source name: ");
                                 String sourceToFind = scan.next().trim();
                                 UMLClass src = UMLModel.findClass(sourceToFind);
@@ -204,8 +227,10 @@ public class CLIController {
                                     UMLClass dest = UMLModel.findClass(destToFind);
                                     if (dest != null) {
 
+                                        // Find the type of relationship
+                                        String relType = UMLModel.findRelType(sourceToFind, destToFind);
                                         // Find the relationship
-                                        Relationship r = UMLModel.findRelationship(sourceToFind, destToFind);
+                                        Relationship r = UMLModel.findRelationship(sourceToFind, destToFind, relType);
                                         if (r != null) {
                                             System.out.print("Delete relationship between \"" +
                                                     r.getSource().getClassName() + "\" and \"" + r.getDestination().getClassName()
@@ -403,13 +428,13 @@ public class CLIController {
                                 System.out.println("\n--------------------");
                                 if (UMLModel.getRelationshipList().size() >= 1) {
                                     System.out.print(UMLModel.getRelationshipList().get(0).getSource().getClassName());
-                                    System.out.print(" -> ");
+                                    System.out.print(" [" + UMLModel.getRelationshipList().get(0).getRelType() + "] -> ");
                                     System.out.print(UMLModel.getRelationshipList().get(0).getDestination().getClassName());
                                 }
                                 for (int i = 1; i < UMLModel.getRelationshipList().size(); ++i) {
                                     System.out.println();
                                     System.out.print("\n" + UMLModel.getRelationshipList().get(i).getSource().getClassName());
-                                    System.out.print(" -> ");
+                                    System.out.print(" [" + UMLModel.getRelationshipList().get(0).getRelType() + "] -> ");
                                     System.out.print(UMLModel.getRelationshipList().get(i).getDestination().getClassName());
                                 }
                                 System.out.println("\n--------------------\n");
@@ -538,6 +563,24 @@ public class CLIController {
         }
     }
 
+    // User adds a type to a relationship with no type that they provided
+    public static boolean addRelFlag(ArrayList<String> userInputList, String operation) {
+        System.out.print("type \"-a\" for aggregation, \n\"-c\" for composition, \n" +
+                "\"-i\" for inheritance, \nor \"-r\" for realization to " + operation + " that relationship type: ");
+        String relFlag = scan.next().trim();
+
+        switch (relFlag) {
+            case "-a", "-c", "-i", "-r" -> {
+                userInputList.add(relFlag);
+                return true;
+            }
+            default -> {
+                System.out.println("Invalid flag, no relationship added");
+                return false;
+            }
+        }
+    }
+
     /**
      * @param flag the flag of the attribute to add,
      *             either -f for field or -m for method
@@ -547,6 +590,10 @@ public class CLIController {
         return switch (flag) {
             case "-f" -> "field";
             case "-m" -> "method";
+            case "-a" -> "aggregation";
+            case "-c" -> "composition";
+            case "-i" -> "inheritance";
+            case "-r" -> "realization";
             default -> "";
         };
     }

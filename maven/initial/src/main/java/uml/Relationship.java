@@ -11,18 +11,21 @@ public class Relationship {
     private final UMLClass source;
     // The destination of the relationship
     private final UMLClass destination;
+    // The type of the relationship
+    private String relType;
 
 
     /**
      * Default constructor
-     *
      * @param source      the source of the relationship
      * @param destination the destination of the relationship
-     */
+     * @param relType     the type of the relationship
+     * */
 
-    public Relationship(UMLClass source, UMLClass destination) {
+    public Relationship(UMLClass source, UMLClass destination, String relType) {
         this.source = source;
         this.destination = destination;
+        this.relType = relType;
     }
 
     /**
@@ -43,5 +46,11 @@ public class Relationship {
         return this.destination;
     }
 
+    /**
+     * Gets the type of the relationship
+     *
+     * @return the relationship type
+     */
+    public String getRelType() { return this.relType; }
 
 }
