@@ -113,10 +113,7 @@ public class JSON {
             // a file which acts as the save file directory
             File dir = new File(FILE_DIR);
             // a list of the names of the files in the directory
-            String[] fileList = dir.list();
-            for (String file : Objects.requireNonNull(dir.list())) {
-                System.out.println(file);
-            }
+
             boolean hasFoundFile = false;
 
             for (String file : Objects.requireNonNull(dir.list())) {
@@ -130,25 +127,6 @@ public class JSON {
                 return;
             }
 
-
-//            // loops through the list of file names
-//            for (int i = 0; i < Objects.requireNonNull(fileList).length; ++i) {
-//                // if the list only has one file (and placeholder.txt) and it is the correct name
-//                if (fileList.length == 2 && fileList[i].equals(fileName + ".json")) {
-//                    hasFoundFile = true;
-//                    // otherwise, keep looping
-//                } else {
-//                    // if the end of the list has been reached and the file has not been found
-//                    if (i == (fileList.length - 1) && !hasFoundFile) {
-//                        // tell the user the file does not exist and exit
-//                        System.out.println("File does not exist");
-//                        return;
-//                        // if the file has been found
-//                    } else if (fileList[i].equals(fileName + ".json")) {
-//                        hasFoundFile = true;
-//                    }
-//                }
-//            }
 
             // wipe both lists
             UMLModel.clearClassList();
@@ -164,17 +142,16 @@ public class JSON {
             // JSONArray for getting the saved classList
             JSONArray classArray = (JSONArray) jo.get("classList");
             // iterator for iterating classList
-            Iterator<JSONObject> classIter = classArray.iterator();
 
 
             // loops through the classes and attributes of the classes
-            while (classIter.hasNext()) {
+            for (JSONObject current : (Iterable<JSONObject>) classArray) {
                 // finds the class' name at the key "className"
-                String className = (String) classIter.next().get("className");
+                String className = (String) current.get("className");
 
-                JSONArray fieldArray = (JSONArray) jo.get("fieldList");
+                JSONArray fieldArray = (JSONArray) current.get("fieldList");
 
-                JSONArray methArray = (JSONArray) jo.get("methodList");
+                JSONArray methArray = (JSONArray) current.get("methodList");
                 // iterator for iterating fieldList
                 Iterator<JSONObject> fieldIter = fieldArray.iterator();
                 // iterator for iterating fieldList
@@ -189,18 +166,20 @@ public class JSON {
                 // make the new class
                 UMLClass newUMLClass = new UMLClass(className);
                 // loop through the fieldList
-               while (fieldIter.hasNext()) {
-                   String fieldName = (String) fieldIter.next().get("name");
-                   String fieldType = (String) fieldIter.next().get("type");
-                   // make new field
-                   Field newField = new Field(fieldName, fieldType);
-                   // add field to class
-                   newUMLClass.addField(newField);
-               }
+                while (fieldIter.hasNext()) {
+                    JSONObject currentField = fieldIter.next();
+                    String fieldName = (String) currentField.get("name");
+                    String fieldType = (String) currentField.get("type");
+                    // make new field
+                    Field newField = new Field(fieldName, fieldType);
+                    // add field to class
+                    newUMLClass.addField(newField);
+                }
                 // loop through the methodList
                 while (methIter.hasNext()) {
-                    String methName = (String) methIter.next().get("name");
-                    String methType = (String) methIter.next().get("returnType");
+                    JSONObject currentMeth = methIter.next();
+                    String methName = (String) currentMeth.get("name");
+                    String methType = (String) currentMeth.get("returnType");
                     // make new method
                     Method newMeth = new Method(methName, methType);
                     // add method to class
