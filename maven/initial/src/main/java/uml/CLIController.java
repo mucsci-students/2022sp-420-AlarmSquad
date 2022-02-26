@@ -111,8 +111,8 @@ public class CLIController {
                                 // If user inputted "a rel" with no flag, ask for one
                                 if (inputList.size() == 2) {
                                     if(!addRelFlag(inputList, "add"))
-                                    // If user tried to input an invalid flag, break
-                                    //if (inputList.size() == 2)
+                                        // If user tried to input an invalid flag, break
+                                        //if (inputList.size() == 2)
                                         break;
                                 }
                                 switch (inputList.get(2)){
@@ -469,11 +469,11 @@ public class CLIController {
     }
 
 
-/******************************************************************
- *
- * Programmer defined Helper Methods
- *
- ******************************************************************/
+    /******************************************************************
+     *
+     * Programmer defined Helper Methods
+     *
+     ******************************************************************/
     private static void clearScreen() {
         // Clears Screen in java
         try {
@@ -490,7 +490,7 @@ public class CLIController {
     /**
      * Prompts the user for the name of a class to be added
      *
-     * @param classNameToAdd the name of the class to add
+     * @param operation the name of the class to add
      * @return the user's given name for the class
      */
     public static String getClassName(String operation, String attType) {
@@ -520,7 +520,12 @@ public class CLIController {
      */
     public static String getAttName(String attType) {
         System.out.print("Enter " + attType + " name: ");
-        return scan.next().trim();
+        String attName = scan.next().trim();
+        // If user doesn't end method name with "()",
+        // add it to end of their input
+        if (attType.equals("method") && !attName.endsWith("()"))
+            attName += "()";
+        return  attName;
     }
 
     public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
@@ -547,10 +552,14 @@ public class CLIController {
         String type = getAttType(attType);
         if (isNotValidType(type)) {
             System.out.println("\"" + type + "\" is not a valid return type\n");
+            return;
         }
         // If user wants to add a method, get its return type and
         // ensure it is valid. Then return updated class with added method.
         if (attType.equalsIgnoreCase("method")) {
+            // Ensure methods end with parenthesis
+            if (!attName.endsWith("()"))
+                attName += "()";
             Method method = new Method(attName, type);
             classToAddAtt.addMethod(method);
         }
@@ -640,20 +649,24 @@ public class CLIController {
         System.out.print("Fields");
         System.out.print("[ ");
         if (copyClass.getFieldList().size() >= 1) {
-            System.out.print(copyClass.getFieldList().get(0).getAttName());
+            System.out.print(copyClass.getFieldList().get(0).getFieldType() + " " +
+                    copyClass.getFieldList().get(0).getAttName());
         }
         for (int i = 1; i < copyFieldList.size(); ++i) {
-            System.out.print(", " + copyFieldList.get(i).getAttName());
+            System.out.print(", " + copyClass.getFieldList().get(i).getFieldType() +
+                    " " + copyClass.getFieldList().get(i).getAttName());
         }
         System.out.println(" ]");
         // prints all the methods in a set
         System.out.print("Methods");
         System.out.print("[ ");
         if (copyMethList.size() >= 1) {
-            System.out.print(copyMethList.get(0).getAttName());
+            System.out.print(copyMethList.get(0).getReturnType() +
+                    " " + copyMethList.get(0).getAttName());
         }
         for (int i = 1; i < copyMethList.size(); ++i) {
-            System.out.print(", " + copyMethList.get(i).getAttName());
+            System.out.print(", " + copyMethList.get(i).getReturnType() +
+                    " " + copyMethList.get(i).getAttName());
         }
         System.out.println(" ]");
     }
