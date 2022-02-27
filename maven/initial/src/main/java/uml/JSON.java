@@ -15,6 +15,7 @@ import java.util.Objects;
 public class JSON {
 
     // directory of the save files
+    // TODO fix directory when saving, should just save to initial
     private final static String FILE_DIR = "savefiles";
     // a copy of the classList from Driver
     private static final ArrayList<UMLClass> UML_CLASS_LIST = UMLModel.getClassList();

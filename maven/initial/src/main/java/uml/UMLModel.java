@@ -8,9 +8,6 @@ public class UMLModel {
     // The arraylist of relationships the diagram has
     private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
 
-    public UMLModel() {
-    }
-
     public static ArrayList<UMLClass> getClassList() {
         return UMLClassList;
     }

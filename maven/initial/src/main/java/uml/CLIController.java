@@ -17,6 +17,7 @@ public class CLIController {
     // Creates a new scanner
     private static final Scanner scan = new Scanner(System.in);
 
+
     // Interprets user input
     public static void main(String[] args) {
 
