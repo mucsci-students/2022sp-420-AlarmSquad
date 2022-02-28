@@ -55,8 +55,8 @@ public class UMLModel {
     }
 
     /**
-     * Iterate through arraylist and return true if class with
-     * matching name is found. Return false otherwise.
+     * Iterate through arraylist and return the class if a class with
+     * matching name is found. Return null otherwise.
      *
      * @return true if class exists in arraylist, false if not
      */
@@ -72,7 +72,7 @@ public class UMLModel {
 
     /**
      * Iterate through arraylist and return the relationship if relationship with
-     * matching source and destination names is found. Return false otherwise.
+     * matching source and destination names is found. Return null otherwise.
      *
      * @param source class name
      * @param dest   class name
@@ -123,5 +123,61 @@ public class UMLModel {
         relationshipList.removeIf(rel -> rel.getSource().getClassName().equals(className) ||
                 rel.getDestination().getClassName().equals(className));
         return relationshipList;
+    }
+
+    /**
+     * Gets the text for the help menu in a CLI format
+     *
+     * @return the help menu
+     */
+    public static String getCLIHelpMenu() {
+        String helpMenu = """
+                   Commands		   Description
+                --------------	-----------------
+                a class			Add a new class
+                d class			Delete an existing class
+                r class			Rename an existing class
+                a att -f	    Add a new field to an existing class
+                a att -m	    Add a new method to an existing class
+                d att -f	    Delete a field from an existing class
+                d att -m	    Delete a method from an existing class
+                r att -f	    Rename a field from an existing class
+                r att -m	    Rename a method from an existing class
+                a rel			Add a new relationship
+                d rel			Delete an existing relationship
+                save			Save the current UML diagram
+                load			Load a previously saved UML diagram
+                clear			Clear the command history
+                help			Display list of commands
+                exit			Exit the application""";
+        return helpMenu;
+    }
+
+    /**
+     * Gets the text for the help menu in a GUI format
+     *
+     * @return the help menu
+     */
+    public static String getGUIHelpMenu() {
+        String helpMenu = """
+                 Commands\t   Description
+                --------------\t-----------------
+                a class\t\tAdd a new class
+                d class\t\tDelete an existing class
+                r class\t\tRename an existing class
+                a att -f\t\tAdd a new field to an existing class
+                a att -m\t\tAdd a new method to an existing class
+                d att -f\t\tDelete a field from an existing class
+                d att -m\t\tDelete a method from an existing class
+                r att -f\t\tRename a field from an existing class
+                r att -m\t\tRename a method from an existing class
+                a rel\t\t\tAdd a new relationship
+                d rel\t\t\tDelete an existing relationship
+                save\t\t\tSave the current UML diagram
+                load\t\t\tLoad a previously saved UML diagram
+                clear\t\t\tClear the command history
+                help\t\t\tDisplay list of commands
+                exit\t\t\tExit the application""";
+        return helpMenu;
     }
 }

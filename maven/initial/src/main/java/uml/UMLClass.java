@@ -15,7 +15,6 @@ public class UMLClass {
     private final ArrayList<Field> fieldList;
     private final ArrayList<Method> methodList;
 
-
     /**
      * Default constructor
      * 

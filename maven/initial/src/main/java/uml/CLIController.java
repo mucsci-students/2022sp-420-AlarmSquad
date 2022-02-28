@@ -492,7 +492,8 @@ public class CLIController {
     /**
      * Prompts the user for the name of a class to be added
      *
-     * @param classNameToAdd the name of the class to add
+     * @param operation the operation to perform on the class
+     * @param attType the type of attribute to be defined
      * @return the user's given name for the class
      */
     public static String getClassName(String operation, String attType) {
@@ -786,25 +787,6 @@ public class CLIController {
      *
      */
     public static void displayHelp() {
-        String helpMenu = """
-                   Commands		   Description
-                --------------	-----------------
-                a class			Add a new class
-                d class			Delete an existing class
-                r class			Rename an existing class
-                a att -f	    Add a new field to an existing class
-                a att -m	    Add a new method to an existing class
-                d att -f	    Delete a field from an existing class
-                d att -m	    Delete a method from an existing class
-                r att -f	    Rename a field from an existing class
-                r att -m	    Rename a method from an existing class
-                a rel			Add a new relationship
-                d rel			Delete an existing relationship
-                save			Save the current UML diagram
-                load			Load a previously saved UML diagram
-                clear			Clear the command history
-                help			Display list of commands
-                exit			Exit the application""";
-        System.out.println(helpMenu);
+        System.out.println(UMLModel.getCLIHelpMenu());
     }
 }
