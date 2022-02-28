@@ -475,6 +475,7 @@ public class CLIController {
  * Programmer defined Helper Methods
  *
  ******************************************************************/
+
     private static void clearScreen() {
         // Clears Screen in java
         try {

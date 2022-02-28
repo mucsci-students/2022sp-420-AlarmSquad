@@ -1,20 +1,26 @@
 package uml;
 
-import javafx.application.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.*;
-import javafx.stage.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
  *
- * @authors AlarmSquad
+ * @author AlarmSquad
  */
 public class GUIView extends Application {
+
+    // create the menu bar
+    private MenuBar menuBar = new MenuBar();
 
     /**
      * Starts the initial window for the diagram
@@ -23,12 +29,17 @@ public class GUIView extends Application {
      */
     @Override
     public void start(Stage stage) {
+        // initialize the root
         Group root = new Group();
+        // add the menu to the root
         root.getChildren().add(createDiagramMenu());
+        // initialize the window, and set the color
         Scene window = new Scene(root, Color.DIMGRAY);
+        // set the title, height, and width of the window
         stage.setTitle("UML Editor");
         stage.setWidth(900);
         stage.setHeight(600);
+        // set the stage and show it
         stage.setScene(window);
         stage.show();
     }
@@ -39,8 +50,6 @@ public class GUIView extends Application {
      * @return a VBox which encapsulates the menu
      */
     private VBox createDiagramMenu() {
-        // create the menu bar
-        MenuBar menuBar = new MenuBar();
         // create the file menu and its menu items
         Menu file = new Menu("File");
         MenuItem save = new MenuItem("Save");
@@ -98,90 +107,153 @@ public class GUIView extends Application {
         return vBox;
     }
 
+    /******************************************************************
+     *
+     * Start of window methods
+     *
+     ******************************************************************/
+
+    /**
+     * Creates a window for the add class method and its data
+     */
     private void addClassWindow() {
+        // initialize the stage and root
         Stage stage = new Stage();
         Group root = new Group();
+        // create a label for the text box
         Label label = new Label("Enter class name: ");
-        Button add = new Button("Add");
+        // create the text box for user input
         TextField text = new TextField();
+        text.setPrefColumnCount(13);
+        // create a button to add the class with the inputted name
+        Button add = new Button("Add");
+        add.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent event) {
+                GUIController.addClassAction(text.getText(), stage);
+            }
+        });
+        // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
-        String input = text.getText();
-        add.setOnAction(GUIController.addClassAction(input));
-        text.setPrefColumnCount(14);
         cancel.setOnAction(GUIController.cancelAction(stage));
 
+        // create the pane for the objects and add them all
         GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(10);
-        pane.setPadding(new Insets(10, 10, 10, 10));
         pane.add(label, 0, 0);
         pane.add(text, 1, 0);
         pane.add(add, 0, 1);
         pane.add(cancel, 1, 1);
 
-        BorderPane border = new BorderPane();
-        border.setCenter(pane);
-
-        root.getChildren().add(border);
-        stage.setTitle("Add Class");
-        stage.setWidth(300);
-        stage.setHeight(300);
-        stage.setResizable(false);
-        Scene window = new Scene(root);
-        stage.setScene(window);
-        stage.show();
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Add Class", 125, 300);
     }
 
+    /**
+     * Creates a window for the save method and its data
+     */
     private void saveWindow() {
+        // initialize the stage and root
         Stage stage = new Stage();
         Group root = new Group();
 
+        // create a label for the text box
         Label label = new Label("Enter file name: ");
-        Button save = new Button("Save");
+        // create a text box for user input
         TextField text = new TextField();
-        Button cancel = new Button("Cancel");
-        save.setOnAction(GUIController.saveAction(text.getText()));
         text.setPrefColumnCount(14);
+        // create a button to save the diagram to a file with the inputted name
+        Button save = new Button("Save");
+        save.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent event) {
+                GUIController.saveAction(text.getText(), stage);
+            }
+        });
+        // create a button to cancel out of the window
+        Button cancel = new Button("Cancel");
         cancel.setOnAction(GUIController.cancelAction(stage));
 
+        // create the pane for the objects and add them all
         GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(10);
-        pane.setPadding(new Insets(10, 10, 10, 10));
         pane.add(label, 0, 0);
         pane.add(text, 1, 0);
         pane.add(save, 0, 1);
         pane.add(cancel, 1, 1);
 
-        BorderPane border = new BorderPane();
-        border.setCenter(pane);
-
-        root.getChildren().add(border);
-        stage.setTitle("Save Project");
-        stage.setWidth(300);
-        stage.setHeight(300);
-        stage.setResizable(false);
-        Scene window = new Scene(root);
-        stage.setScene(window);
-        stage.show();
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Save Project", 125, 300);
     }
 
+    /**
+     * Creates a standard popup window for telling the user something
+     *
+     * @param title the title of the popup window
+     * @param text  the text to be displayed in the popup
+     */
     public static void popUpWindow(String title, String text) {
+        // initialize the stage and root
         Stage stage = new Stage();
         Group root = new Group();
+        // create a message for the user
         Label message = new Label(text);
+        // create a button to cancel out of the window
         Button cancel = new Button("Okay");
         cancel.setOnAction(GUIController.cancelAction(stage));
+
+        // create the pane for the objects and add them all
         GridPane pane = new GridPane();
-        pane.setPadding(new Insets(10, 10, 10, 10));
         pane.add(message, 0, 0);
         pane.add(cancel, 1, 0);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, title, 100, 300);
+    }
+
+    /******************************************************************
+     *
+     * End of window methods
+     *
+     ******************************************************************/
+
+    public void disableMenu(Stage stage) {
+        for (Menu m : menuBar.getMenus()) {
+            for (MenuItem mi : m.getItems()) {
+                if (stage.isShowing()) {
+                    mi.setDisable(true);
+                } else {
+                    mi.setDisable(false);
+                }
+            }
+        }
+    }
+
+    public static void updateClass() {
+
+    }
+
+    public static void updateRelationships() {
+
+    }
+
+    /**
+     * Takes in many parameters from the window and gives it standardized formatting,
+     * then finalizes and shows it
+     *
+     * @param stage the stage of the window
+     * @param root the group of objects in the window
+     * @param pane the pane of objects
+     * @param title the title of the window
+     * @param height the height of the window
+     * @param width the width of the window
+     */
+    private static void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
         pane.setHgap(5);
+        pane.setVgap(10);
+        pane.setPadding(new Insets(10, 10, 10, 10));
+        stage.setTitle(title);
+        stage.setWidth(width);
+        stage.setHeight(height);
+        stage.setResizable(false);
         root.getChildren().add(pane);
         Scene window = new Scene(root);
-        stage.setTitle(title);
-        stage.setWidth(300);
-        stage.setHeight(100);
         stage.setScene(window);
         stage.show();
     }
