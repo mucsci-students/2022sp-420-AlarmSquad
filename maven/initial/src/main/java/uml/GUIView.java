@@ -8,8 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Box;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import java.util.ArrayList;
 
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
@@ -19,7 +21,7 @@ import javafx.stage.Stage;
 public class GUIView extends Application {
 
     // create the menu bar
-    private final MenuBar menuBar = new MenuBar();
+    private MenuBar menuBar = new MenuBar();
 
     /**
      * Starts the initial window for the diagram
@@ -526,14 +528,6 @@ public class GUIView extends Application {
                 mi.setDisable(stage.isShowing());
             }
         }
-    }
-
-    public static void updateClass() {
-
-    }
-
-    public static void updateRelationships() {
-
     }
 
     /**

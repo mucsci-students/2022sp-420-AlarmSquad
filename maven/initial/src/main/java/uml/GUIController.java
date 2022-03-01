@@ -42,8 +42,6 @@ public class GUIController {
             // otherwise, load the file and exit the window
         } else {
             JSON.load(fileName);
-            GUIView.updateClass();
-            GUIView.updateRelationships();
             stage.close();
         }
     }
@@ -65,7 +63,6 @@ public class GUIController {
             if (UMLModel.findClass(className) == null) {
                 UMLClass newClass = new UMLClass(className);
                 UMLModel.addClass(newClass);
-                GUIView.updateClass();
                 stage.close();
             // if the class does exist, pop an error up
             } else {
@@ -101,7 +98,6 @@ public class GUIController {
                     UMLClass dest = UMLModel.findClass(destName);
                     Relationship newRel = new Relationship(src, dest, relType);
                     UMLModel.addRel(newRel);
-                    GUIView.updateRelationships();
                     stage.close();
                 }
             // if the relationship does exist, error message will be displayed
@@ -131,8 +127,6 @@ public class GUIController {
             } else {
                 UMLClass classToDelete = UMLModel.findClass(className);
                 UMLModel.deleteClass(classToDelete);
-                GUIView.updateClass();
-                GUIView.updateRelationships();
                 stage.close();
             }
         }
@@ -167,7 +161,6 @@ public class GUIController {
             Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
                     UMLModel.findRelType(srcName, destName));
             UMLModel.deleteRel(relToDelete);
-            GUIView.updateRelationships();
             stage.close();
         }
     }
@@ -193,7 +186,6 @@ public class GUIController {
             } else {
                 UMLClass classToRename = UMLModel.findClass(className);
                 classToRename.setClassName(newClassName);
-                GUIView.updateClass();
                 stage.close();
             }
         }
