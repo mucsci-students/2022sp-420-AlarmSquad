@@ -110,17 +110,17 @@ public class CLIController {
                             case "rel" -> {
                                 // If user inputted "a rel" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    if(!addRelFlag(inputList, "add"))
+                                    if (!addRelFlag(inputList, "add"))
                                         // If user tried to input an invalid flag, break
                                         //if (inputList.size() == 2)
                                         break;
                                 }
-                                switch (inputList.get(2)){
+                                switch (inputList.get(2)) {
 
                                     case "-a", "-c", "-i", "-r" -> {
                                         String relType = flagToString(inputList.get(2));
 
-                                        if(!relType.equals("")){
+                                        if (!relType.equals("")) {
                                             System.out.print("Enter source class name: ");
                                             String sourceName = scan.next().trim();
                                             // If source class is valid and exists get destination class
@@ -202,6 +202,18 @@ public class CLIController {
                                                 System.out.println("Class " + classToAddAttName + " does not exist");
                                             }
                                         }
+                                    }
+                                    case "-p" -> {
+                                        UMLClass classToAddParam;
+                                        Method methodToAddParam;
+                                        String paramName;
+                                        if((classToAddParam = searchForClass("add", "parameter")) == null) break;
+                                        if((methodToAddParam = searchForMethod(classToAddParam)) == null) break;
+                                        if((paramName = searchForParamName(methodToAddParam)) == null) break;
+
+                                        String paramType = getAttType("");
+                                        Parameter param = new Parameter(paramName, paramType);
+                                        methodToAddParam.addParameter(param);
                                     }
                                     // If flag user entered is invalid, inform user and break
                                     default -> {
@@ -292,7 +304,27 @@ public class CLIController {
                                             }
                                         }
                                     }
-                                    // If user entered invalid flag, inform user and break
+                                    case "-p" -> {
+                                        UMLClass classToDeleteParam;
+                                        Method methodToDeleteParam;
+                                        Parameter param;
+                                        if((classToDeleteParam = searchForClass("delete", "parameter")) == null) break;
+                                        if((methodToDeleteParam = searchForMethod(classToDeleteParam)) == null) break;
+                                        if((param = searchForParam(methodToDeleteParam)) == null) break;
+
+                                        String paramName = param.getAttName();
+                                        System.out.printf("Delete parameter \"%s\"? (y/n): ", paramName);
+                                        String answer = scan.next().trim();
+                                        // If the user wants to delete a parameter, proceed to do so
+                                        if (answer.equalsIgnoreCase("y")) {
+                                            methodToDeleteParam.deleteParameter(param);
+                                            System.out.printf("Parameter \"%s\" has been deleted\n", paramName);
+                                        }
+                                        // If user types n, confirm and return
+                                        else {
+                                            System.out.printf("Parameter \"%s\" has NOT been deleted\n", paramName);
+                                        }
+                                    } // If user entered invalid flag, inform user and break
                                     default -> {
                                         System.out.println("Invalid flag");
                                         System.out.println(prompt);
@@ -331,7 +363,11 @@ public class CLIController {
                                             "\" has been renamed to \"" + oldUMLClass.getClassName() + "\"");
                                 }
                             }
+                        }
+                    }
 
+                    case "c", "change" -> {
+                        switch (inputList.get(1)) {
                             case "att" -> {
                                 switch (inputList.get(2)) {
                                     case "-f" -> {
@@ -404,11 +440,25 @@ public class CLIController {
                                             }
                                         }
                                     }
+                                    case "-p" -> {
+                                        UMLClass classToChangeParam;
+                                        Method methodToChangeParam;
+                                        Parameter param;
+                                        if((classToChangeParam = searchForClass("change", "parameter")) == null) break;
+                                        if((methodToChangeParam = searchForMethod(classToChangeParam)) == null) break;
+                                        if((param = searchForParam(methodToChangeParam)) == null) break;
+
+                                        String oldParamName = param.getAttName();
+                                        String newParamName = getAttName("");
+                                        String newParamType = getAttType("");
+
+                                        param = new Parameter(newParamName, newParamType);
+                                        methodToChangeParam.changeParameter(oldParamName, param);
+                                    }
                                 }
                             }
                         }
                     }
-
 
                     case "list", "l" -> {
                         switch (inputList.get(1)) {
@@ -488,9 +538,10 @@ public class CLIController {
     }
 
     /**
-     * Prompts the user for the name of a class to be added
+     * Prompts the user for the name of a class to perform an operation on
      *
-     * @param operation the name of the class to add
+     * @param operation the name of the class
+     * @param attType the type of attribute
      * @return the user's given name for the class
      */
     public static String getClassName(String operation, String attType) {
@@ -508,6 +559,7 @@ public class CLIController {
     public static String getAttType(String attType) {
         if (attType.equals("method"))
             attType += " return";
+
         System.out.print("Enter " + attType + " type: ");
         return scan.next().trim();
     }
@@ -525,7 +577,35 @@ public class CLIController {
         // add it to end of their input
         if (attType.equals("method") && !attName.endsWith("()"))
             attName += "()";
-        return  attName;
+        return attName;
+    }
+
+    public static <E> boolean ifDoesntExist(E obj, String type, String name) {
+        if (obj == null) {
+            System.out.printf("%s %s does not exist", type, name);
+            return true;
+        }
+        return false;
+    }
+
+    public static <E> boolean ifExists(E obj, String type, String name) {
+        if (obj != null) {
+            System.out.printf("%s %s already exists", type, name);
+            return true;
+        }
+        return false;
+    }
+
+    public static void addAttribute(UMLClass classToAddAtt, String attType) {
+
+
+        // Get name of attribute user wants to add and
+        // ensure it is valid and not a duplicate
+        String attName = getAttName(attType);
+        if (isNotValidInput(attName)) {
+            System.out.println("\"" + attName + "\" is not a valid identifier\n");
+            return;
+        }
     }
 
     public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
@@ -597,6 +677,35 @@ public class CLIController {
         }
     }
 
+    public static UMLClass searchForClass(String op, String type) {
+        String className = getClassName(op, type);
+        UMLClass umlClass = UMLModel.findClass(className);
+        if (ifDoesntExist(umlClass, "Class", className)) return null;
+        return umlClass;
+    }
+
+
+    public static Method searchForMethod(UMLClass umlClass) {
+        String methodName = getAttName("method");
+        Method method = umlClass.findMethod(methodName);
+        if (ifDoesntExist(method, "Method", methodName)) return null;
+        return method;
+    }
+
+    public static Parameter searchForParam(Method method) {
+        String paramName = getAttName("param");
+        Parameter param = method.findParameter(paramName);
+        if (ifDoesntExist(param, "Parameter", paramName)) return null;
+        return param;
+    }
+
+    public static String searchForParamName(Method method) {
+        String paramName = getAttName("");
+        Parameter param = method.findParameter(paramName);
+        if (ifExists(param, "Parameter", paramName)) return null;
+        return paramName;
+    }
+
     // User adds a type to a relationship with no type that they provided
     public static boolean addRelFlag(ArrayList<String> userInputList, String operation) {
         System.out.print("type \"-a\" for aggregation, \n\"-c\" for composition, \n" +
@@ -624,6 +733,7 @@ public class CLIController {
         return switch (flag) {
             case "-f" -> "field";
             case "-m" -> "method";
+            case "-p" -> "parameter";
             case "-a" -> "aggregation";
             case "-c" -> "composition";
             case "-i" -> "inheritance";
@@ -646,34 +756,41 @@ public class CLIController {
         // prints the name of the class
         System.out.println("Class name: " + copyClass.getClassName());
         // prints all the field in a set
-        System.out.print("Fields");
-        System.out.print("[ ");
-        if (copyClass.getFieldList().size() >= 1) {
-            System.out.print(copyClass.getFieldList().get(0).getFieldType() + " " +
-                    copyClass.getFieldList().get(0).getAttName());
-        }
-        for (int i = 1; i < copyFieldList.size(); ++i) {
-            System.out.print(", " + copyClass.getFieldList().get(i).getFieldType() +
-                    " " + copyClass.getFieldList().get(i).getAttName());
+        System.out.print("Fields [");
+        for (int i = 0; i < copyFieldList.size(); ++i) {
+            Field field = copyFieldList.get(i);
+            if (i == 0) {
+                System.out.printf(" (%s, %s)", field.getAttName(), field.getFieldType());
+            } else {
+                System.out.printf(", (%s, %s)", field.getAttName(), field.getFieldType());
+            }
         }
         System.out.println(" ]");
         // prints all the methods in a set
         System.out.print("Methods");
         System.out.print("[ ");
-        if (copyMethList.size() >= 1) {
-            System.out.print(copyMethList.get(0).getReturnType() +
-                    " " + copyMethList.get(0).getAttName());
-        }
-        for (int i = 1; i < copyMethList.size(); ++i) {
-            System.out.print(", " + copyMethList.get(i).getReturnType() +
-                    " " + copyMethList.get(i).getAttName());
+        for (int i = 0; i < copyMethList.size(); ++i) {
+            Method method = copyMethList.get(i);
+            if (i == 0) {
+                System.out.printf("%s{ ", method.getAttName());
+            } else {
+                System.out.print(", " + copyMethList.get(i).getAttName() + "{ ");
+            }
+            for (int j = 0; j < copyMethList.get(i).returnList().size(); ++j) {
+                Parameter param = copyMethList.get(i).returnList().get(j);
+                if (j == 0) {
+                    System.out.printf("(%s, %s)", param.getAttName(), param.getFieldType());
+                } else {
+                    System.out.printf(",(%s, %s)", param.getAttName(), param.getFieldType());
+                }
+            }
+            System.out.printf(" }, %s", method.getReturnType());
         }
         System.out.println(" ]");
     }
 
     /**
      * List all the contents of all classes in the diagram in a nice way
-     *
      */
     public static void listClasses() {
         // if there are classes to list, list them
@@ -794,7 +911,6 @@ public class CLIController {
 
     /**
      * Display list of commands and their accompanying descriptions
-     *
      */
     public static void displayHelp() {
         String helpMenu = """
