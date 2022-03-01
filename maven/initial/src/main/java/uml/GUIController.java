@@ -90,7 +90,8 @@ public class GUIController {
         // otherwise, create and add the relationship and exit the window
         } else {
             // if the relationship does not exist, add it and close
-            if (UMLModel.findRelationship(srcName, destName, relType) == null) {
+            if (UMLModel.findRelationship(srcName, destName, relType) == null &&
+                !UMLModel.isRelated(srcName, destName)) {
                 if (UMLModel.findClass(srcName) == null) {
                     GUIView.popUpWindow("Error", "Source does not exist");
                 } else if (UMLModel.findClass(destName) == null) {
@@ -103,7 +104,7 @@ public class GUIController {
                     GUIView.updateRelationships();
                     stage.close();
                 }
-            // if the relationship does exist, pop an error up
+            // if the relationship does exist, error message will be displayed
             } else {
                 GUIView.popUpWindow("Error", "Relationship already exists");
             }
@@ -126,7 +127,7 @@ public class GUIController {
             // if the class does not exist, pop an error up
             if (UMLModel.findClass(className) == null) {
                 GUIView.popUpWindow("Error", "Class does not exist");
-            // if the class does exist, delete it and close
+            // if the class does exist, delete it, update the view and close
             } else {
                 UMLClass classToDelete = UMLModel.findClass(className);
                 UMLModel.deleteClass(classToDelete);
@@ -134,6 +135,40 @@ public class GUIController {
                 GUIView.updateRelationships();
                 stage.close();
             }
+        }
+    }
+
+    /**
+     * Deletes a relationship in the relationship list if the given strings
+     * are nonempty and the relationship exists, display error otherwise
+     *
+     * @param srcName the name of the source class
+     * @param destName the name of the destination class
+     * @param stage the working stage
+     */
+    public static void deleteRelAction(String srcName, String destName, Stage stage) {
+        // if the source name is not given, display error message
+        if(srcName.isEmpty()){
+            GUIView.popUpWindow("Error", "Source name is required");
+        }
+        // if the destination name is not given, display error message
+        else if(destName.isEmpty()){
+            GUIView.popUpWindow("Error", "Destination name is required");
+        }
+        // if the relationship between the two classes in src->dest order does
+        // exist, display error message
+        else if(UMLModel.findRelationship(srcName, destName,
+                    UMLModel.findRelType(srcName, destName)) == null){
+
+                GUIView.popUpWindow("Error", "Relationship does not exist");
+        }
+        // delete the relationship, update the view and close
+        else{
+            Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
+                    UMLModel.findRelType(srcName, destName));
+            UMLModel.deleteRel(relToDelete);
+            GUIView.updateRelationships();
+            stage.close();
         }
     }
 
@@ -171,11 +206,7 @@ public class GUIController {
      * @return an event handler telling the window to close
      */
     public static EventHandler<ActionEvent> exitAction(Stage stage) {
-        return new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                stage.close();
-            }
-        };
+        return event -> stage.close();
     }
 
     /******************************************************************

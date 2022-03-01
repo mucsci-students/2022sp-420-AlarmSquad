@@ -1,5 +1,6 @@
 package uml;
 
+import javax.management.relation.Relation;
 import java.util.ArrayList;
 
 public class UMLModel {
@@ -77,7 +78,7 @@ public class UMLModel {
      * @param source class name
      * @param dest   class name
      * @param relType type name
-     * @return true if class exists in arraylist, false if not
+     * @return the relationship, null if not found
      */
     public static Relationship findRelationship(String source, String dest, String relType) {
         for (Relationship relationship : relationshipList) {
@@ -113,6 +114,23 @@ public class UMLModel {
     }
 
     /**
+     * Iterates through the relationship list and finds the relationship
+     * between two classes, if one is found, there is a relation
+     *
+     * @param source the source class name
+     * @param dest the destination class name
+     * @return true if two classes are related in src->dest order, false otherwise
+     */
+    public static boolean isRelated(String source, String dest){
+        for(Relationship relationship : relationshipList){
+            if(findRelationship(source, dest, findRelType(source,dest)) != null){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * If a class has been deleted, also delete any relationships associated
      * with that class
      *
@@ -143,7 +161,10 @@ public class UMLModel {
                 d att -m	    Delete a method from an existing class
                 r att -f	    Rename a field from an existing class
                 r att -m	    Rename a method from an existing class
-                a rel			Add a new relationship
+                a rel -a        Add an aggregation type relationship
+                a rel -c        Add a composition type relationship
+                a rel -i        Add an inheritance type relationship
+                a rel -r        Add a realization type relationship
                 d rel			Delete an existing relationship
                 save			Save the current UML diagram
                 load			Load a previously saved UML diagram
@@ -171,7 +192,10 @@ public class UMLModel {
                 d att -m\t\tDelete a method from an existing class
                 r att -f\t\tRename a field from an existing class
                 r att -m\t\tRename a method from an existing class
-                a rel\t\t\tAdd a new relationship
+                a rel -a\t\t\tAdd an aggregation type relationship
+                a rel -c\t\t\tAdd a composition type relationship
+                a rel -i\t\t\tAdd an inheritance type relationship
+                a rel -r\t\t\tAdd a realization type relationship
                 d rel\t\t\tDelete an existing relationship
                 save\t\t\tSave the current UML diagram
                 load\t\t\tLoad a previously saved UML diagram

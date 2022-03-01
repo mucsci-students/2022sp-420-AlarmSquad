@@ -30,7 +30,6 @@
             <artifactId>javafx-controls</artifactId>
             <version>11</version>
         </dependency>
-        
     </dependencies>
 
     <build>

@@ -1,10 +1,7 @@
 package uml;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,7 +19,7 @@ import javafx.stage.Stage;
 public class GUIView extends Application {
 
     // create the menu bar
-    private MenuBar menuBar = new MenuBar();
+    private final MenuBar menuBar = new MenuBar();
 
     /**
      * Starts the initial window for the diagram
@@ -56,93 +53,62 @@ public class GUIView extends Application {
         Menu file = new Menu("File");
         MenuItem save = new MenuItem("Save");
         // if the save button is pressed, open a new window to save
-        save.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                saveWindow();
-            }
-        });
+        save.setOnAction(event -> saveWindow());
         MenuItem load = new MenuItem("Load");
         // if the load button is pressed, open a new window to load
-        load.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                loadWindow();
-            }
-        });
+        load.setOnAction(event -> loadWindow());
         file.getItems().addAll(save, load);
 
         // create the add menu and its menu items
         Menu add = new Menu("Add");
         MenuItem addClass = new MenuItem("Add Class");
         // if the add class button is pressed, open a new window to add class
-        addClass.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                addClassWindow();
-            }
-        });
+        addClass.setOnAction(event -> addClassWindow());
         // create the add attribute menu and its menu items
         Menu addAttribute = new Menu("Add Attribute");
         // if the add field button is pressed, open a new window to add field
         MenuItem addField = new MenuItem("Add Field");
-        addField.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                addFieldWindow();
-            }
-        });
+        addField.setOnAction(event -> addFieldWindow());
         // if the add method button is pressed, open a new window to add method
         MenuItem addMethod = new MenuItem("Add Method");
-        addMethod.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                addMethodWindow();
-            }
-        });
+        addMethod.setOnAction(event -> addMethodWindow());
         addAttribute.getItems().addAll(addField, addMethod);
         // if the add relationship button is pressed, open a new window to add relationship
-        MenuItem addRelationship = new MenuItem("Add Relationship");
-        addRelationship.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                addRelationshipWindow();
-            }
-        });
-        add.getItems().addAll(addClass, addAttribute, addRelationship);
+        MenuItem addRel = new MenuItem("Add Relationship");
+        addRel.setOnAction(event -> addRelWindow());
+        add.getItems().addAll(addClass, addAttribute, addRel);
 
         // create the delete menu and its menu items
         Menu delete = new Menu("Delete");
+        // Menu item for deleting a class, when clicked, launch delete class window
         MenuItem deleteClass = new MenuItem("Delete Class");
-        // if the delete class button is pressed, open a new window to delete class
-        deleteClass.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                deleteClassWindow();
-            }
-        });
+        deleteClass.setOnAction(event -> deleteClassWindow());
+
         MenuItem deleteAttribute = new MenuItem("Delete Attribute");
-        MenuItem deleteRelationship = new MenuItem("Delete Relationship");
-        delete.getItems().addAll(deleteClass, deleteAttribute, deleteRelationship);
+        // Menu item for deleting a relationship,
+        // when clicked, launch delete relationship window
+        MenuItem deleteRel = new MenuItem("Delete Relationship");
+        deleteRel.setOnAction(event -> deleteRelWindow());
+
+        delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel);
 
         // create the rename menu and its menu items
         Menu rename = new Menu("Rename");
         MenuItem renameClass = new MenuItem("Rename Class");
         // if the rename class button is pressed, open a new window to rename class
-        renameClass.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                renameClassWindow();
-            }
-        });
+        renameClass.setOnAction(event -> renameClassWindow());
         MenuItem renameAttribute = new MenuItem("Rename Attribute");
-        MenuItem renameRelationship = new MenuItem("Rename Relationship");
-        rename.getItems().addAll(renameClass, renameAttribute, renameRelationship);
+        MenuItem renameRel = new MenuItem("Rename Relationship");
+        rename.getItems().addAll(renameClass, renameAttribute, renameRel);
 
-        // create the edit menu and add the add, delete, and rename menus to it
+        // create the edit menu and add the 'add', 'delete', and 'rename' menus to it
         Menu edit = new Menu("Edit");
         edit.getItems().addAll(add, delete, rename);
 
         // create the help menu and its menu item
         Menu help = new Menu("Help");
         MenuItem showCommands = new MenuItem("Show Commands");
-        showCommands.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                showCommandsWindow();
-            }
-        });
+        showCommands.setOnAction(event -> showCommandsWindow());
         help.getItems().add(showCommands);
 
         // adds all menus to the menu bar
@@ -175,11 +141,7 @@ public class GUIView extends Application {
         text.setPrefColumnCount(17);
         // create a button to save the diagram to a file with the inputted name
         Button save = new Button("Save");
-        save.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                GUIController.saveAction(text.getText(), stage);
-            }
-        });
+        save.setOnAction(event -> GUIController.saveAction(text.getText(), stage));
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
         cancel.setOnAction(GUIController.exitAction(stage));
@@ -208,13 +170,9 @@ public class GUIView extends Application {
         // create a text box for user input
         TextField text = new TextField();
         text.setPrefColumnCount(17);
-        // create a button to save the diagram to a file with the inputted name
+        // create a button to load the diagram of a file with the inputted name
         Button load = new Button("Load");
-        load.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                GUIController.loadAction(text.getText(), stage);
-            }
-        });
+        load.setOnAction(event -> GUIController.loadAction(text.getText(), stage));
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
         cancel.setOnAction(GUIController.exitAction(stage));
@@ -244,11 +202,7 @@ public class GUIView extends Application {
         text.setPrefColumnCount(16);
         // create a button to add the class with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                GUIController.addClassAction(text.getText(), stage);
-            }
-        });
+        add.setOnAction(event -> GUIController.addClassAction(text.getText(), stage));
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
         cancel.setOnAction(GUIController.exitAction(stage));
@@ -277,7 +231,7 @@ public class GUIView extends Application {
         Label fieldNameText = new Label("Field name: ");
         // create a label for the text box for the field type
         Label fieldTypeText = new Label("Field type: ");
-        // create the text box for the class
+        // create the text box for the class name
         TextField className = new TextField();
         className.setPrefColumnCount(16);
         // create the text box for the field name
@@ -286,13 +240,11 @@ public class GUIView extends Application {
         // create the text box for the field type
         TextField fieldType = new TextField();
         fieldType.setPrefColumnCount(16);
-        // create a button to add the class with the inputted name
+        // create a button to add the field with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                // TODO create add field function in GUIController
-                // GUIController.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage);
-            }
+        add.setOnAction(event -> {
+            //TODO create add field function in GUIController
+            // GUIController.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage);
         });
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
@@ -326,7 +278,7 @@ public class GUIView extends Application {
         Label methodNameText = new Label("Method name: ");
         // create a label for the text box for the return type
         Label returnTypeText = new Label("Return type: ");
-        // create the text box for the class
+        // create the text box for the class name
         TextField className = new TextField();
         className.setPrefColumnCount(14);
         // create the text box for the method name
@@ -335,13 +287,11 @@ public class GUIView extends Application {
         // create the text box for the return type
         TextField returnType = new TextField();
         returnType.setPrefColumnCount(14);
-        // create a button to add the class with the inputted name
+        // create a button to add the method with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                // TODO create add method function in GUIController
-                // GUIController.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage);
-            }
+        add.setOnAction(event -> {
+            //TODO create add method function in GUIController
+            // GUIController.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage);
         });
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
@@ -365,7 +315,7 @@ public class GUIView extends Application {
     /**
      * Creates a window for the add relationship method and its data
      */
-    private void addRelationshipWindow() {
+    private void addRelWindow() {
         // initialize the stage and root
         Stage stage = new Stage();
         Group root = new Group();
@@ -384,13 +334,10 @@ public class GUIView extends Application {
         // create the text box for the type of relationship
         TextField relType = new TextField();
         relType.setPrefColumnCount(13);
-        // create a button to add the class with the inputted name
+        // create a button to add the relationship with the correct src and dest names
         Button add = new Button("Add");
-        add.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                GUIController.addRelationshipAction(srcName.getText(), destName.getText(), relType.getText(), stage);
-            }
-        });
+        add.setOnAction(event -> GUIController.addRelationshipAction(srcName.getText(),
+                                    destName.getText(), relType.getText(), stage));
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
         cancel.setOnAction(GUIController.exitAction(stage));
@@ -422,13 +369,9 @@ public class GUIView extends Application {
         // create the text box for user input
         TextField text = new TextField();
         text.setPrefColumnCount(16);
-        // create a button to add the class with the inputted name
+        // create a button to delete the class with the inputted name
         Button delete = new Button("Delete");
-        delete.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                GUIController.deleteClassAction(text.getText(), stage);
-            }
-        });
+        delete.setOnAction(event -> GUIController.deleteClassAction(text.getText(), stage));
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
         cancel.setOnAction(GUIController.exitAction(stage));
@@ -442,6 +385,44 @@ public class GUIView extends Application {
 
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Class", 125, 300);
+    }
+
+    /**
+     * Creates a window for the add relationship method and its data
+     */
+    private void deleteRelWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        // create a label for the text box for the source class name
+        Label srcNameText = new Label("Source: ");
+        // create a label for the text box for the destination class name
+        Label destNameText = new Label("Destination: ");
+        // create the text box for the source class name
+        TextField srcName = new TextField();
+        srcName.setPrefColumnCount(13);
+        // create the text box for the destination class name
+        TextField destName = new TextField();
+        destName.setPrefColumnCount(13);
+        // create a button to delete the relationship with the correct src and dest names
+        Button delete = new Button("Delete");
+        delete.setOnAction(event -> GUIController.deleteRelAction(srcName.getText(),
+                destName.getText(), stage));
+        // create a button to cancel out of the window
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(GUIController.exitAction(stage));
+
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(srcNameText, 0, 0);
+        pane.add(destNameText, 0, 1);
+        pane.add(srcName, 1, 0);
+        pane.add(destName, 1, 1);
+        pane.add(delete, 0, 3);
+        pane.add(cancel, 1, 3);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Delete Relationship", 180, 300);
     }
 
     /**
@@ -463,11 +444,7 @@ public class GUIView extends Application {
         newClassName.setPrefColumnCount(14);
         // create a button to add the class with the inputted name
         Button rename = new Button("Rename");
-        rename.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                GUIController.renameClassAction(classToRename.getText(), newClassName.getText(), stage);
-            }
-        });
+        rename.setOnAction(event -> GUIController.renameClassAction(classToRename.getText(), newClassName.getText(), stage));
         // create a button to cancel out of the window
         Button cancel = new Button("Cancel");
         cancel.setOnAction(GUIController.exitAction(stage));
@@ -504,7 +481,7 @@ public class GUIView extends Application {
         pane.add(exit, 1, 1);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Show Commands", 390, 390);
+        finalizeWindow(stage, root, pane, "Show Commands", 430, 390);
     }
 
     /**
@@ -541,16 +518,12 @@ public class GUIView extends Application {
     /**
      * TODO get this working somewhere
      *
-     * @param stage
+     * @param stage the stage that will be showing or not
      */
     public void disableMenu(Stage stage) {
         for (Menu m : menuBar.getMenus()) {
             for (MenuItem mi : m.getItems()) {
-                if (stage.isShowing()) {
-                    mi.setDisable(true);
-                } else {
-                    mi.setDisable(false);
-                }
+                mi.setDisable(stage.isShowing());
             }
         }
     }

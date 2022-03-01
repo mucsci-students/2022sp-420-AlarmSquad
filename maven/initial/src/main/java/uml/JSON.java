@@ -68,6 +68,8 @@ public class JSON {
             relToBeSaved.put("source", relObj.getSource().getClassName());
             // add destination to JSON object
             relToBeSaved.put("destination", relObj.getDestination().getClassName());
+            // add relType to JSON object
+            relToBeSaved.put("relType", relObj.getRelType());
             // put the JSON object in the JSONArray
             saveRelationships.add(relToBeSaved);
         }
@@ -165,19 +167,20 @@ public class JSON {
             Iterator<JSONObject> srcIter = relArray.iterator();
             // iterator for iterating for destination
             Iterator<JSONObject> destIter = relArray.iterator();
+            // iterator for iterating for relType
+            Iterator<JSONObject> typeIter = relArray.iterator();
 
             // iterate through the relationships
             while (srcIter.hasNext()) {
                 // get the source name of the relationship
                 String sourceName = (String) srcIter.next().get("source");
+                // get the type name of the relationship (possible problem with multiple relationships)
+                String relTypeName = (String) typeIter.next().get("relType");
                 // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
-
-                String relType = UMLModel.findRelType(sourceName, destinationName);
                 // make a new relationship with the correct parameters
                 Relationship newRelationship = new Relationship(Objects.requireNonNull(UMLModel.findClass(sourceName)),
-                        Objects.requireNonNull(UMLModel.findClass(destinationName)), relType);
-                        //UMLModel.findRelationship(sourceName, destinationName, relType));
+                        Objects.requireNonNull(UMLModel.findClass(destinationName)), relTypeName);
                 // add the relationship to the relationship list
                 UMLModel.addRel(newRelationship);
             }

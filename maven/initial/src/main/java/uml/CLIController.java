@@ -131,10 +131,13 @@ public class CLIController {
                                                 // If destination class is valid and exists add
                                                 // relationship to relationship array list
                                                 if (UMLModel.findClass(destinationName) != (null)) {
-                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType) != null) {
+                                                    //TODO make a new test to test this situation of adding a new relationship
+                                                    // for two classes that already have a relationship in the same order or src->dest
+                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType) != null ||
+                                                        UMLModel.isRelated(sourceName, destinationName)) {
                                                         System.out.println("Relationship already exists between " +
                                                                 sourceName + " and " + destinationName + " with "
-                                                                + relType + " type");
+                                                                + UMLModel.findRelType(sourceName,destinationName) + " type");
                                                         break;
                                                     }
                                                     Relationship newRelationship = new Relationship(UMLModel.findClass(sourceName),
@@ -448,7 +451,7 @@ public class CLIController {
                                 for (int i = 1; i < UMLModel.getRelationshipList().size(); ++i) {
                                     System.out.println();
                                     System.out.print("\n" + UMLModel.getRelationshipList().get(i).getSource().getClassName());
-                                    System.out.print(" [" + UMLModel.getRelationshipList().get(0).getRelType() + "] -> ");
+                                    System.out.print(" [" + UMLModel.getRelationshipList().get(i).getRelType() + "] -> ");
                                     System.out.print(UMLModel.getRelationshipList().get(i).getDestination().getClassName());
                                 }
                                 System.out.println("\n--------------------\n");
