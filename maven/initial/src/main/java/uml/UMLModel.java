@@ -131,6 +131,22 @@ public class UMLModel {
     }
 
     /**
+     * Checks if the given relationship type is correct
+     *
+     * @param relType the relationship type
+     * @return false if none are correct, true otherwise
+     */
+    public static boolean checkType(String relType){
+        if(!relType.equalsIgnoreCase("aggregation") ||
+                !relType.equalsIgnoreCase("composition") ||
+                !relType.equalsIgnoreCase("inheritance") ||
+                !relType.equalsIgnoreCase("realization")){
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * If a class has been deleted, also delete any relationships associated
      * with that class
      *
