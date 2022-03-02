@@ -1,5 +1,6 @@
 package uml;
 
+import javax.management.relation.Relation;
 import java.util.ArrayList;
 
 public class UMLModel {
@@ -7,9 +8,6 @@ public class UMLModel {
     private static ArrayList<UMLClass> UMLClassList = new ArrayList<UMLClass>();
     // The arraylist of relationships the diagram has
     private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
-
-    public UMLModel() {
-    }
 
     public static ArrayList<UMLClass> getClassList() {
         return UMLClassList;
@@ -58,8 +56,8 @@ public class UMLModel {
     }
 
     /**
-     * Iterate through arraylist and return true if class with
-     * matching name is found. Return false otherwise.
+     * Iterate through arraylist and return the class if a class with
+     * matching name is found. Return null otherwise.
      *
      * @return true if class exists in arraylist, false if not
      */
@@ -75,12 +73,12 @@ public class UMLModel {
 
     /**
      * Iterate through arraylist and return the relationship if relationship with
-     * matching source and destination names is found. Return false otherwise.
+     * matching source and destination names is found. Return null otherwise.
      *
      * @param source class name
      * @param dest   class name
      * @param relType type name
-     * @return true if class exists in arraylist, false if not
+     * @return the relationship, null if not found
      */
     public static Relationship findRelationship(String source, String dest, String relType) {
         for (Relationship relationship : relationshipList) {
@@ -116,6 +114,39 @@ public class UMLModel {
     }
 
     /**
+     * Iterates through the relationship list and finds the relationship
+     * between two classes, if one is found, there is a relation
+     *
+     * @param source the source class name
+     * @param dest the destination class name
+     * @return true if two classes are related in src->dest order, false otherwise
+     */
+    public static boolean isRelated(String source, String dest){
+        for(Relationship relationship : relationshipList){
+            if(findRelationship(source, dest, findRelType(source,dest)) != null){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the given relationship type is correct
+     *
+     * @param relType the relationship type
+     * @return false if none are correct, true otherwise
+     */
+    public static boolean checkType(String relType){
+        if(!relType.equalsIgnoreCase("aggregation") ||
+                !relType.equalsIgnoreCase("composition") ||
+                !relType.equalsIgnoreCase("inheritance") ||
+                !relType.equalsIgnoreCase("realization")){
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * If a class has been deleted, also delete any relationships associated
      * with that class
      *
@@ -126,5 +157,120 @@ public class UMLModel {
         relationshipList.removeIf(rel -> rel.getSource().getClassName().equals(className) ||
                 rel.getDestination().getClassName().equals(className));
         return relationshipList;
+    }
+
+    /**
+     * Takes a string and checks if it is a valid identifier
+     * (helper class of isNotValidInput)
+     *
+     * @param input the string to check
+     * @return true if valid, otherwise false
+     */
+    public static boolean isValidIdentifier(String input) {
+        if (input == null) {
+            return false;
+        }
+        char[] c = input.toCharArray();
+        if (Character.isJavaIdentifierStart(c[0])) {
+            for (int i = 1; i < input.length(); i++) {
+                if (!Character.isJavaIdentifierPart(c[i])) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Takes a string and checks if it is a valid name
+     *
+     * @param input the string to check
+     * @return false if valid, otherwise true
+     */
+    public static boolean isNotValidInput(String input) {
+        if (!isValidIdentifier(input)) {
+            System.out.printf("Input %s is not a valid identifier\n", input);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Takes a string and checks if it is a valid field type
+     *
+     * @param input the string to check
+     * @return false if valid, otherwise true
+     */
+    public static boolean isNotValidType(String input) {
+        return switch (input) {
+            case "string", "int", "double", "float", "char", "boolean", "short", "long", "void" -> false;
+            default -> true;
+        };
+    }
+
+    /**
+     * Gets the text for the help menu in a CLI format
+     *
+     * @return the help menu
+     */
+    public static String getCLIHelpMenu() {
+        String helpMenu = """
+                   Commands		   Description
+                --------------	-----------------
+                a class			Add a new class
+                d class			Delete an existing class
+                r class			Rename an existing class
+                a att -f	    Add a new field to an existing class
+                a att -m	    Add a new method to an existing class
+                d att -f	    Delete a field from an existing class
+                d att -m	    Delete a method from an existing class
+                r att -f	    Rename a field from an existing class
+                r att -m	    Rename a method from an existing class
+                a rel -a        Add an aggregation type relationship
+                a rel -c        Add a composition type relationship
+                a rel -i        Add an inheritance type relationship
+                a rel -r        Add a realization type relationship
+                d rel			Delete an existing relationship
+                save			Save the current UML diagram
+                load			Load a previously saved UML diagram
+                clear			Clear the command history
+                help			Display list of commands
+                exit			Exit the application""";
+        return helpMenu;
+    }
+
+
+    // TODO change how we describe the "commands"(buttons) instead of CLI commands
+    /**
+     * Gets the text for the help menu in a GUI format
+     *
+     * @return the help menu
+     */
+    public static String getGUIHelpMenu() {
+        String helpMenu = """
+                 Commands\t   Description
+                --------------\t-----------------
+                a class\t\tAdd a new class
+                d class\t\tDelete an existing class
+                r class\t\tRename an existing class
+                a att -f\t\tAdd a new field to an existing class
+                a att -m\t\tAdd a new method to an existing class
+                d att -f\t\tDelete a field from an existing class
+                d att -m\t\tDelete a method from an existing class
+                r att -f\t\tRename a field from an existing class
+                r att -m\t\tRename a method from an existing class
+                a rel -a\t\tAdd an aggregation type relationship
+                a rel -c\t\tAdd a composition type relationship
+                a rel -i\t\tAdd an inheritance type relationship
+                a rel -r\t\tAdd a realization type relationship
+                c rel\t\t\tChange a relationship type
+                d rel\t\t\tDelete an existing relationship
+                save\t\t\tSave the current UML diagram
+                load\t\t\tLoad a previously saved UML diagram
+                clear\t\t\tClear the command history
+                help\t\t\tDisplay list of commands
+                exit\t\t\tExit the application""";
+        return helpMenu;
     }
 }

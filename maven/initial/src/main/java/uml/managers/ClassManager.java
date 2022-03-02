@@ -2,6 +2,7 @@ package uml.managers;
 
 import uml.CLIController;
 import uml.UMLClass;
+import uml.UMLModel;
 
 import java.util.ArrayList;
 
@@ -18,7 +19,7 @@ public class ClassManager {
     }
 
     public String addClass(String className) {
-        if (CLIController.isNotValidInput(className)) {
+        if (UMLModel.isNotValidInput(className)) {
             return "\"" + className + "\" is not a valid identifier\n";
         }
 
@@ -41,7 +42,7 @@ public class ClassManager {
     }
 
     public String renameClass(String oldClassName, String newName) {
-        if (CLIController.isNotValidInput(newName)) {
+        if (UMLModel.isNotValidInput(newName)) {
             return "\"" + newName + "\" is not a valid identifier\n";
         }
         if(findClass(newName) != null) {

@@ -15,6 +15,7 @@ import java.util.Objects;
 public class JSON {
 
     // directory of the save files
+    // TODO fix directory when saving, should just save to initial
     private final static String FILE_DIR = "savefiles";
     // a copy of the classList from Driver
     private static final ArrayList<UMLClass> UML_CLASS_LIST = UMLModel.getClassList();
@@ -80,8 +81,8 @@ public class JSON {
             relToBeSaved.put("source", relObj.getSource().getClassName());
             // add destination to JSON object
             relToBeSaved.put("destination", relObj.getDestination().getClassName());
-            // add type to JSON object
-            relToBeSaved.put("type", relObj.getRelType());
+            // add relType to JSON object
+            relToBeSaved.put("relType", relObj.getRelType());
             // put the JSON object in the JSONArray
             saveRelationships.add(relToBeSaved);
         }
@@ -157,12 +158,6 @@ public class JSON {
                 // iterator for iterating fieldList
                 Iterator<JSONObject> methIter = methArray.iterator();
 
-
-//                // finds the list of fields at the key "fieldList"
-//                String fieldList = (String) fieldIter.next().get("fieldList");
-//                // finds the list of attributes at the key "methodList"
-//                ArrayList<String> methList = (ArrayList<String>) methIter.next().get("methodList");
-
                 // make the new class
                 UMLClass newUMLClass = new UMLClass(className);
                 // loop through the fieldList
@@ -196,19 +191,20 @@ public class JSON {
             Iterator<JSONObject> srcIter = relArray.iterator();
             // iterator for iterating for destination
             Iterator<JSONObject> destIter = relArray.iterator();
+            // iterator for iterating for relType
+            Iterator<JSONObject> typeIter = relArray.iterator();
 
             // iterate through the relationships
             while (srcIter.hasNext()) {
                 // get the source name of the relationship
                 String sourceName = (String) srcIter.next().get("source");
+                // get the type name of the relationship (possible problem with multiple relationships)
+                String relTypeName = (String) typeIter.next().get("relType");
                 // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
-
-                String relType = UMLModel.findRelType(sourceName, destinationName);
                 // make a new relationship with the correct parameters
                 Relationship newRelationship = new Relationship(Objects.requireNonNull(UMLModel.findClass(sourceName)),
-                        Objects.requireNonNull(UMLModel.findClass(destinationName)), relType);
-                        //UMLModel.findRelationship(sourceName, destinationName, relType));
+                        Objects.requireNonNull(UMLModel.findClass(destinationName)), relTypeName);
                 // add the relationship to the relationship list
                 UMLModel.addRel(newRelationship);
             }

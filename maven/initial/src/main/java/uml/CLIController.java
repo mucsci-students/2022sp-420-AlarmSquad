@@ -1,10 +1,7 @@
 package uml;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * The controller for the CLI version of the UML Diagram
@@ -16,6 +13,7 @@ public class CLIController {
 
     // Creates a new scanner
     private static final Scanner scan = new Scanner(System.in);
+
 
     // Interprets user input
     public static void main(String[] args) {
@@ -93,7 +91,7 @@ public class CLIController {
                                 String className = getClassName("add", "");
 
                                 // Edge cases for class name, checks validity
-                                if (isNotValidInput(className)) {
+                                if (UMLModel.isNotValidInput(className)) {
                                     break;
                                 }
 
@@ -130,10 +128,13 @@ public class CLIController {
                                                 // If destination class is valid and exists add
                                                 // relationship to relationship array list
                                                 if (UMLModel.findClass(destinationName) != (null)) {
-                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType) != null) {
+                                                    //TODO make a new test to test this situation of adding a new relationship
+                                                    // for two classes that already have a relationship in the same order or src->dest
+                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType) != null ||
+                                                        UMLModel.isRelated(sourceName, destinationName)) {
                                                         System.out.println("Relationship already exists between " +
                                                                 sourceName + " and " + destinationName + " with "
-                                                                + relType + " type");
+                                                                + UMLModel.findRelType(sourceName,destinationName) + " type");
                                                         break;
                                                     }
                                                     Relationship newRelationship = new Relationship(UMLModel.findClass(sourceName),
@@ -183,7 +184,7 @@ public class CLIController {
                                                 // Get name of attribute user wants to add
                                                 String attName = getAttName(attType);
                                                 // Ensure attribute name is valid
-                                                if (!isNotValidInput(attName)) {
+                                                if (!UMLModel.isNotValidInput(attName)) {
                                                     // If attribute doesn't already exist in class, add it to class
                                                     if (classToAddAtt.getAttList(attType).stream()
                                                             .noneMatch(attObj -> attObj.getAttName().equals(attName))) {
@@ -349,7 +350,7 @@ public class CLIController {
                                 if (oldUMLClass != null) {
                                     System.out.print("Enter new name for class " + oldUMLClass.getClassName() + ": ");
                                     String newName = scan.next().trim();
-                                    if (isNotValidInput(newName)) {
+                                    if (UMLModel.isNotValidInput(newName)) {
                                         System.out.println("\"" + newName + "\" is not a valid identifier\n");
                                         break;
                                     }
@@ -390,7 +391,7 @@ public class CLIController {
                                                 // Rename attribute with user's new name
                                                 System.out.print("Enter new name for " + oldFieldName + ": ");
                                                 String newFieldName = scan.next().trim();
-                                                if (isNotValidInput(newFieldName)) {
+                                                if (UMLModel.isNotValidInput(newFieldName)) {
                                                     System.out.println("\"" + newFieldName + "\" is not a valid identifier\n");
                                                     break;
                                                 }
@@ -425,7 +426,7 @@ public class CLIController {
                                                 // Rename attribute with user's new name
                                                 System.out.print("Enter new name for " + oldMethodName + ": ");
                                                 String newMethodName = scan.next().trim();
-                                                if (isNotValidInput(newMethodName)) {
+                                                if (UMLModel.isNotValidInput(newMethodName)) {
                                                     System.out.println("\"" + newMethodName + "\" is not a valid identifier\n");
                                                     break;
                                                 }
@@ -456,6 +457,43 @@ public class CLIController {
                                         methodToChangeParam.changeParameter(oldParamName, param);
                                     }
                                 }
+                            }
+                        }
+                    }
+                    case "change", "c" -> {
+                        switch (inputList.get(1)){
+                            case "rel" -> {
+                                System.out.print("Enter source name: ");
+                                String srcName = scan.next().trim();
+                                if(UMLModel.findClass(srcName) != (null)){
+                                    System.out.print("Enter destination name: ");
+                                    String destName = scan.next().trim();
+                                    if(UMLModel.findClass(destName) != (null)){
+                                        if(!UMLModel.isRelated(srcName, destName)){
+                                            System.out.println("Relationship does not exist");
+                                            break;
+                                        }
+                                        System.out.print("Enter old relationship type");
+                                        String oldRelType = scan.next().trim();
+                                        if(!UMLModel.findRelType(srcName, destName).equals(oldRelType)){
+                                            System.out.println("Relationship type does not exist for: "
+                                                    + srcName + " and " + destName);
+                                            break;
+                                        }
+                                        else {
+                                           System.out.print("Enter new relationship type");
+                                           String newRelType = scan.next().trim();
+                                           // TODO finish up change relationship type
+                                           if(UMLModel.checkType(newRelType)){
+
+                                           }
+                                        }
+                                    }
+                                }
+                            }
+                            case "parameter" -> {
+
+
                             }
                         }
                     }
@@ -497,7 +535,7 @@ public class CLIController {
                                 for (int i = 1; i < UMLModel.getRelationshipList().size(); ++i) {
                                     System.out.println();
                                     System.out.print("\n" + UMLModel.getRelationshipList().get(i).getSource().getClassName());
-                                    System.out.print(" [" + UMLModel.getRelationshipList().get(0).getRelType() + "] -> ");
+                                    System.out.print(" [" + UMLModel.getRelationshipList().get(i).getRelType() + "] -> ");
                                     System.out.print(UMLModel.getRelationshipList().get(i).getDestination().getClassName());
                                 }
                                 System.out.println("\n--------------------\n");
@@ -519,11 +557,12 @@ public class CLIController {
     }
 
 
-    /******************************************************************
-     *
-     * Programmer defined Helper Methods
-     *
-     ******************************************************************/
+/******************************************************************
+ *
+ * Programmer defined Helper Methods
+ *
+ ******************************************************************/
+
     private static void clearScreen() {
         // Clears Screen in java
         try {
@@ -540,8 +579,8 @@ public class CLIController {
     /**
      * Prompts the user for the name of a class to perform an operation on
      *
-     * @param operation the name of the class
-     * @param attType the type of attribute
+     * @param operation the operation to perform on the class
+     * @param attType the type of attribute to be defined
      * @return the user's given name for the class
      */
     public static String getClassName(String operation, String attType) {
@@ -630,7 +669,7 @@ public class CLIController {
         // If attribute is a field, get its type.
         // Ensure type is valid
         String type = getAttType(attType);
-        if (isNotValidType(type)) {
+        if (UMLModel.isNotValidType(type)) {
             System.out.println("\"" + type + "\" is not a valid return type\n");
             return;
         }
@@ -860,78 +899,9 @@ public class CLIController {
     }
 
     /**
-     * Takes a string and checks if it is a valid identifier
-     * (helper class of isNotValidInput)
-     *
-     * @param input the string to check
-     * @return true if valid, otherwise false
-     */
-    public static boolean isValidIdentifier(String input) {
-        if (input == null) {
-            return false;
-        }
-        char[] c = input.toCharArray();
-        if (Character.isJavaIdentifierStart(c[0])) {
-            for (int i = 1; i < input.length(); i++) {
-                if (!Character.isJavaIdentifierPart(c[i])) {
-                    return true;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Takes a string and checks if it is a valid name
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public static boolean isNotValidInput(String input) {
-        if (!isValidIdentifier(input)) {
-            System.out.printf("Input %s is not a valid identifier\n", input);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Takes a string and checks if it is a valid field type
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public static boolean isNotValidType(String input) {
-        return switch (input) {
-            case "string", "int", "double", "float", "char", "boolean", "short", "long", "void" -> false;
-            default -> true;
-        };
-    }
-
-    /**
      * Display list of commands and their accompanying descriptions
      */
     public static void displayHelp() {
-        String helpMenu = """
-                   Commands		   Description
-                --------------	-----------------
-                a class			Add a new class
-                d class			Delete an existing class
-                r class			Rename an existing class
-                a att -f	    Add a new field to an existing class
-                a att -m	    Add a new method to an existing class
-                d att -f	    Delete a field from an existing class
-                d att -m	    Delete a method from an existing class
-                r att -f	    Rename a field from an existing class
-                r att -m	    Rename a method from an existing class
-                a rel			Add a new relationship
-                d rel			Delete an existing relationship
-                save			Save the current UML diagram
-                load			Load a previously saved UML diagram
-                clear			Clear the command history
-                help			Display list of commands
-                exit			Exit the application""";
-        System.out.println(helpMenu);
+        System.out.println(UMLModel.getCLIHelpMenu());
     }
 }
