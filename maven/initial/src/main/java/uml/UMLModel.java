@@ -144,6 +144,56 @@ public class UMLModel {
     }
 
     /**
+     * Takes a string and checks if it is a valid identifier
+     * (helper class of isNotValidInput)
+     *
+     * @param input the string to check
+     * @return true if valid, otherwise false
+     */
+    public static boolean isValidIdentifier(String input) {
+        if (input == null) {
+            return false;
+        }
+        char[] c = input.toCharArray();
+        if (Character.isJavaIdentifierStart(c[0])) {
+            for (int i = 1; i < input.length(); i++) {
+                if (!Character.isJavaIdentifierPart(c[i])) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Takes a string and checks if it is a valid name
+     *
+     * @param input the string to check
+     * @return false if valid, otherwise true
+     */
+    public static boolean isNotValidInput(String input) {
+        if (!isValidIdentifier(input)) {
+            System.out.printf("Input %s is not a valid identifier\n", input);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Takes a string and checks if it is a valid field type
+     *
+     * @param input the string to check
+     * @return false if valid, otherwise true
+     */
+    public static boolean isNotValidType(String input) {
+        return switch (input) {
+            case "string", "int", "double", "float", "char", "boolean", "short", "long", "void" -> false;
+            default -> true;
+        };
+    }
+
+    /**
      * Gets the text for the help menu in a CLI format
      *
      * @return the help menu

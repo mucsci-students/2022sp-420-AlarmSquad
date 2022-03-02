@@ -8,11 +8,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Box;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
@@ -46,7 +44,6 @@ public class GUIView extends Application {
         stage.setScene(window);
         stage.setAlwaysOnTop(false);
         menuBar.prefWidthProperty().bind(stage.widthProperty());
-
         stage.show();
     }
 
@@ -60,22 +57,10 @@ public class GUIView extends Application {
         Menu file = new Menu("File");
         MenuItem save = new MenuItem("Save");
         // if the save button is pressed, open a new window to save
-        save.setOnAction(event -> {
-            saveWindow();
-            // if the window is open, disable all other menu items until closed
-            if(save.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        save.setOnAction(event -> saveWindow());
         MenuItem load = new MenuItem("Load");
         // if the load button is pressed, open a new window to load
-        load.setOnAction(event -> {
-            loadWindow();
-            // if the window is open, disable all other menu items until closed
-            if(load.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        load.setOnAction(event -> loadWindow());
         file.getItems().addAll(save, load);
 
         //***************************************//
@@ -86,43 +71,19 @@ public class GUIView extends Application {
         Menu add = new Menu("Add");
         MenuItem addClass = new MenuItem("Add Class");
         // if the add class button is pressed, open a new window to add class
-        addClass.setOnAction(event -> {
-            addClassWindow();
-            // if the window is open, disable all other menu items until closed
-            if(addClass.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        addClass.setOnAction(event -> addClassWindow());
         // create the add attribute menu and its menu items
         Menu addAttribute = new Menu("Add Attribute");
         // if the add field button is pressed, open a new window to add field
         MenuItem addField = new MenuItem("Add Field");
-        addField.setOnAction(event -> {
-            addFieldWindow();
-            // if the window is open, disable all other menu items until closed
-            if(addField.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        addField.setOnAction(event -> addFieldWindow());
         // if the add method button is pressed, open a new window to add method
         MenuItem addMethod = new MenuItem("Add Method");
-        addMethod.setOnAction(event -> {
-            addMethodWindow();
-            // if the window is open, disable all other menu items until closed
-            if(addMethod.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        addMethod.setOnAction(event -> addMethodWindow());
         addAttribute.getItems().addAll(addField, addMethod);
         // if the add relationship button is pressed, open a new window to add relationship
         MenuItem addRel = new MenuItem("Add Relationship");
-        addRel.setOnAction(event -> {
-            addRelWindow();
-            // if the window is open, disable all other menu items until closed
-            if(addRel.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        addRel.setOnAction(event -> addRelWindow());
         add.getItems().addAll(addClass, addAttribute, addRel);
 
         //***************************************//
@@ -133,25 +94,20 @@ public class GUIView extends Application {
         Menu delete = new Menu("Delete");
         // Menu item for deleting a class, when clicked, launch delete class window
         MenuItem deleteClass = new MenuItem("Delete Class");
-        deleteClass.setOnAction(event -> {
-            deleteClassWindow();
-            // if the window is open, disable all other menu items until closed
-            if(deleteClass.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
-
-        MenuItem deleteAttribute = new MenuItem("Delete Attribute");
+        deleteClass.setOnAction(event -> deleteClassWindow());
+        // create the delete attribute menu and its menu items
+        Menu deleteAttribute = new Menu("Delete Attribute");
+        // if the delete field button is pressed, open a new window to delete field
+        MenuItem deleteField = new MenuItem("Delete Field");
+        deleteField.setOnAction(event -> deleteFieldWindow());
+        // if the delete method button is pressed, open a new window to delete method
+        MenuItem deleteMethod = new MenuItem("Delete Method");
+        deleteMethod.setOnAction(event -> deleteMethodWindow());
+        deleteAttribute.getItems().addAll(deleteField, deleteMethod);
         // Menu item for deleting a relationship,
         // when clicked, launch delete relationship window
         MenuItem deleteRel = new MenuItem("Delete Relationship");
-        deleteRel.setOnAction(event -> {
-            deleteRelWindow();
-            // if the window is open, disable all other menu items until closed
-            if(deleteRel.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        deleteRel.setOnAction(event -> deleteRelWindow());
 
         delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel);
 
@@ -163,29 +119,25 @@ public class GUIView extends Application {
         Menu rename = new Menu("Rename");
         MenuItem renameClass = new MenuItem("Rename Class");
         // if the rename class button is pressed, open a new window to rename class
-        renameClass.setOnAction(event -> {
-            renameClassWindow();
-            // if the window is open, disable all other menu items until closed
-            if(renameClass.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
-        MenuItem renameAttribute = new MenuItem("Rename Attribute");
+        renameClass.setOnAction(event -> renameClassWindow());
+        // create the rename attribute menu and its menu items
+        Menu renameAttribute = new Menu("Rename Attribute");
+        // if the rename field button is pressed, open a new window to rename field
+        MenuItem renameField = new MenuItem("Rename Field");
+        renameField.setOnAction(event -> renameFieldWindow());
+        // if the rename method button is pressed, open a new window to rename method
+        MenuItem renameMethod = new MenuItem("Rename Method");
+        renameMethod.setOnAction(event -> renameMethodWindow());
+        renameAttribute.getItems().addAll(renameField, renameMethod);
 
-        // adds all of the rename menu items to rename option
+        // adds all the rename menu items to rename option
         rename.getItems().addAll(renameClass, renameAttribute);
 
         Menu change = new Menu("Change");
         MenuItem changeParam = new MenuItem("Parameter(s)");
         // open new window for changing the relType when the option is pressed
         MenuItem changeRelType = new MenuItem("Relationship Type");
-        changeRelType.setOnAction(event -> {
-            changeRelTypeWindow();
-            // if the window is open, disable all other menu items until closed
-            if(changeRelType.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        changeRelType.setOnAction(event -> changeRelTypeWindow());
         // all of the change options as part of the edit menu
         change.getItems().addAll(changeParam, changeRelType);
 
@@ -197,13 +149,7 @@ public class GUIView extends Application {
         // create the help menu and its menu item
         Menu help = new Menu("Help");
         MenuItem showCommands = new MenuItem("Show Commands");
-        showCommands.setOnAction(event -> {
-            showCommandsWindow();
-            // if the window is open, disable all other menu items until closed
-            if(showCommands.isVisible()) {
-                menuBar.setDisable(true);
-            }
-        });
+        showCommands.setOnAction(event -> showCommandsWindow());
         help.getItems().add(showCommands);
 
         // adds all menus to the menu bar
@@ -237,7 +183,7 @@ public class GUIView extends Application {
         save.setOnAction(event -> GUIController.saveAction(text.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(label, 0, 0);
@@ -267,7 +213,7 @@ public class GUIView extends Application {
         load.setOnAction(event -> GUIController.loadAction(text.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(label, 0, 0);
@@ -297,7 +243,7 @@ public class GUIView extends Application {
         add.setOnAction(event -> GUIController.addClassAction(text.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(label, 0, 0);
@@ -334,13 +280,10 @@ public class GUIView extends Application {
         fieldType.setPrefColumnCount(16);
         // create a button to add the field with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> {
-            //TODO create add field function in GUIController
-            // GUIController.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage);
-        });
+        add.setOnAction(event -> GUIController.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
@@ -382,13 +325,10 @@ public class GUIView extends Application {
         returnType.setPrefColumnCount(14);
         // create a button to add the method with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> {
-            //TODO create add method function in GUIController
-            // GUIController.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage);
-        });
+        add.setOnAction(event -> GUIController.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
@@ -434,7 +374,7 @@ public class GUIView extends Application {
                                     destName.getText(), relType.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
@@ -469,7 +409,7 @@ public class GUIView extends Application {
         delete.setOnAction(event -> GUIController.deleteClassAction(text.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
@@ -483,7 +423,83 @@ public class GUIView extends Application {
     }
 
     /**
-     * Creates a window for the add relationship method and its data
+     * Creates a window for the delete field method and its data
+     */
+    private void deleteFieldWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label classNameText = new Label("Class name: ");
+        // create a label for the text box for the field name
+        Label fieldNameText = new Label("Field name: ");
+        // create the text box for the class name
+        TextField className = new TextField();
+        className.setPrefColumnCount(16);
+        // create the text box for the field name
+        TextField fieldName = new TextField();
+        fieldName.setPrefColumnCount(16);
+        // create a button to add the field with the inputted name
+        Button delete = new Button("Delete");
+        delete.setOnAction(event -> GUIController.deleteFieldAction(className.getText(), fieldName.getText(), stage));
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
+
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(classNameText, 0, 0);
+        pane.add(fieldNameText, 0, 1);
+        pane.add(className, 1, 0);
+        pane.add(fieldName, 1, 1);
+        pane.add(delete, 0, 2);
+        pane.add(cancel, 1, 2);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Delete Field", 160, 300);
+    }
+
+    /**
+     * Creates a window for the delete method method and its data
+     */
+    private void deleteMethodWindow() {
+    // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label classNameText = new Label("Class name: ");
+        // create a label for the text box for the method name
+        Label fieldNameText = new Label("Method name: ");
+        // create the text box for the class name
+        TextField className = new TextField();
+        className.setPrefColumnCount(15);
+        // create the text box for the method name
+        TextField methodName = new TextField();
+        methodName.setPrefColumnCount(15);
+        // create a button to add the field with the inputted name
+        Button delete = new Button("Delete");
+        delete.setOnAction(event -> GUIController.deleteMethodAction(className.getText(), methodName.getText(), stage));
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
+
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(classNameText, 0, 0);
+        pane.add(fieldNameText, 0, 1);
+        pane.add(className, 1, 0);
+        pane.add(methodName, 1, 1);
+        pane.add(delete, 0, 2);
+        pane.add(cancel, 1, 2);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Delete Method", 160, 300);
+    }
+
+    /**
+     * Creates a window for the delete relationship method and its data
      */
     private void deleteRelWindow() {
         // initialize the stage and root
@@ -506,7 +522,7 @@ public class GUIView extends Application {
                 destName.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
@@ -544,7 +560,7 @@ public class GUIView extends Application {
         rename.setOnAction(event -> GUIController.renameClassAction(classToRename.getText(), newClassName.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
@@ -559,6 +575,101 @@ public class GUIView extends Application {
         finalizeWindow(stage, root, pane, "Rename Class", 160, 300);
     }
 
+    /**
+     * Creates a window for the rename field method and its data
+     */
+    private void renameFieldWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class with the field
+        Label givenClassLabel = new Label("Class name: ");
+        // create a label for the text box for the old field name
+        Label fieldLabel = new Label("Old field name: ");
+        // create a label for the text box for the new field name
+        Label nameLabel = new Label("New field name: ");
+        // create the text box for the class with the field
+        TextField givenClass = new TextField();
+        givenClass.setPrefColumnCount(14);
+        // create the text box for the field to be renamed
+        TextField fieldToRename = new TextField();
+        fieldToRename.setPrefColumnCount(14);
+        // create the text box for the new field name
+        TextField newFieldName = new TextField();
+        newFieldName.setPrefColumnCount(14);
+        // create a button to add the field with the inputted name
+        Button rename = new Button("Rename");
+        rename.setOnAction(event -> GUIController.renameFieldAction(givenClass.getText(),
+                                    fieldToRename.getText(), newFieldName.getText(), stage));
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
+
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(givenClassLabel, 0, 0);
+        pane.add(fieldLabel, 0, 1);
+        pane.add(nameLabel, 0, 2);
+        pane.add(givenClass, 1, 0);
+        pane.add(fieldToRename, 1, 1);
+        pane.add(newFieldName, 1, 2);
+        pane.add(rename, 0, 3);
+        pane.add(cancel, 1, 3);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Rename Field", 190, 300);
+    }
+
+    /**
+     * Creates a window for the rename method method and its data
+     */
+    private void renameMethodWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class with the method
+        Label givenClassLabel = new Label("Class name: ");
+        // create a label for the text box for the old method name
+        Label methodLabel = new Label("Old method name: ");
+        // create a label for the text box for the new method name
+        Label nameLabel = new Label("New method name: ");
+        // create the text box for the class with the method
+        TextField givenClass = new TextField();
+        givenClass.setPrefColumnCount(12);
+        // create the text box for the method to be renamed
+        TextField methodToRename = new TextField();
+        methodToRename.setPrefColumnCount(12);
+        // create the text box for the new method name
+        TextField newMethodName = new TextField();
+        newMethodName.setPrefColumnCount(12);
+        // create a button to add the method with the inputted name
+        Button rename = new Button("Rename");
+        rename.setOnAction(event -> GUIController.renameMethodAction(givenClass.getText(),
+                methodToRename.getText(), newMethodName.getText(), stage));
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
+
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(givenClassLabel, 0, 0);
+        pane.add(methodLabel, 0, 1);
+        pane.add(nameLabel, 0, 2);
+        pane.add(givenClass, 1, 0);
+        pane.add(methodToRename, 1, 1);
+        pane.add(newMethodName, 1, 2);
+        pane.add(rename, 0, 3);
+        pane.add(cancel, 1, 3);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Rename Method", 190, 300);
+    }
+
+    /**
+     * Creates a window for the change relationship method and its data
+     */
     private void changeRelTypeWindow(){
         // initialize the stage and root
         Stage stage = new Stage();
@@ -589,7 +700,7 @@ public class GUIView extends Application {
         rename.setOnAction(event -> GUIController.changeRelTypeAction(oldRelTypeName.getText(), newRelTypeName.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
@@ -620,7 +731,7 @@ public class GUIView extends Application {
         Text commandList = new Text(UMLModel.getGUIHelpMenu());
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        closeWindow(stage, menuBar, cancel);
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the object and adds it
         GridPane pane = new GridPane();
@@ -646,8 +757,6 @@ public class GUIView extends Application {
         Label message = new Label(text);
         // create a button to cancel out of the window
         Button cancel = new Button("Okay");
-        // **DO NOT change this cancel action (this method is static and...
-        // won't work with the closeWindow helper method)**
         cancel.setOnAction(event -> GUIController.exitAction(stage));
 
         // create the pane for the objects and add them all
@@ -666,23 +775,6 @@ public class GUIView extends Application {
      ******************************************************************/
 
     /**
-     * Takes in the stage, menubar and cancel button to close the window and
-     * enable the menu again with either cancel or [X]
-     *
-     * @param stage the current open stage
-     * @param bar the menubar from main UML Editor stage
-     * @param cancel the cancel button on the window
-     */
-    public void closeWindow(Stage stage, MenuBar bar, Button cancel){
-        cancel.setOnAction(event -> {
-            menuBar.setDisable(false);
-            GUIController.exitAction(stage);
-        });
-        // when [X] is pressed, enable menu
-        stage.setOnCloseRequest(event -> menuBar.setDisable(false));
-    }
-
-    /**
      * Takes in many parameters from the window and gives it standardized formatting,
      * then finalizes and shows it
      *
@@ -694,6 +786,7 @@ public class GUIView extends Application {
      * @param width the width of the window
      */
     private static void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
+        stage.initModality(Modality.APPLICATION_MODAL);
         pane.setHgap(5);
         pane.setVgap(10);
         pane.setPadding(new Insets(10, 10, 10, 10));

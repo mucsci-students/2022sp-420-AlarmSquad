@@ -94,7 +94,7 @@ public class CLIController {
                                 String className = getClassName("add", "");
 
                                 // Edge cases for class name, checks validity
-                                if (isNotValidInput(className)) {
+                                if (UMLModel.isNotValidInput(className)) {
                                     break;
                                 }
 
@@ -187,7 +187,7 @@ public class CLIController {
                                                 // Get name of attribute user wants to add
                                                 String attName = getAttName(attType);
                                                 // Ensure attribute name is valid
-                                                if (!isNotValidInput(attName)) {
+                                                if (!UMLModel.isNotValidInput(attName)) {
                                                     // If attribute doesn't already exist in class, add it to class
                                                     if (classToAddAtt.getAttList(attType).stream()
                                                             .noneMatch(attObj -> attObj.getAttName().equals(attName))) {
@@ -321,7 +321,7 @@ public class CLIController {
                                 if (oldUMLClass != null) {
                                     System.out.print("Enter new name for class " + oldUMLClass.getClassName() + ": ");
                                     String newName = scan.next().trim();
-                                    if (isNotValidInput(newName)) {
+                                    if (UMLModel.isNotValidInput(newName)) {
                                         System.out.println("\"" + newName + "\" is not a valid identifier\n");
                                         break;
                                     }
@@ -358,7 +358,7 @@ public class CLIController {
                                                 // Rename attribute with user's new name
                                                 System.out.print("Enter new name for " + oldFieldName + ": ");
                                                 String newFieldName = scan.next().trim();
-                                                if (isNotValidInput(newFieldName)) {
+                                                if (UMLModel.isNotValidInput(newFieldName)) {
                                                     System.out.println("\"" + newFieldName + "\" is not a valid identifier\n");
                                                     break;
                                                 }
@@ -393,7 +393,7 @@ public class CLIController {
                                                 // Rename attribute with user's new name
                                                 System.out.print("Enter new name for " + oldMethodName + ": ");
                                                 String newMethodName = scan.next().trim();
-                                                if (isNotValidInput(newMethodName)) {
+                                                if (UMLModel.isNotValidInput(newMethodName)) {
                                                     System.out.println("\"" + newMethodName + "\" is not a valid identifier\n");
                                                     break;
                                                 }
@@ -551,7 +551,7 @@ public class CLIController {
         // If attribute is a field, get its type.
         // Ensure type is valid
         String type = getAttType(attType);
-        if (isNotValidType(type)) {
+        if (UMLModel.isNotValidType(type)) {
             System.out.println("\"" + type + "\" is not a valid return type\n");
         }
         // If user wants to add a method, get its return type and
@@ -733,56 +733,6 @@ public class CLIController {
             }
         }
         return UMLModel.getClassList();
-    }
-
-    /**
-     * Takes a string and checks if it is a valid identifier
-     * (helper class of isNotValidInput)
-     *
-     * @param input the string to check
-     * @return true if valid, otherwise false
-     */
-    public static boolean isValidIdentifier(String input) {
-        if (input == null) {
-            return false;
-        }
-        char[] c = input.toCharArray();
-        if (Character.isJavaIdentifierStart(c[0])) {
-            for (int i = 1; i < input.length(); i++) {
-                if (!Character.isJavaIdentifierPart(c[i])) {
-                    return true;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Takes a string and checks if it is a valid name
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public static boolean isNotValidInput(String input) {
-        if (!isValidIdentifier(input)) {
-            System.out.printf("Input %s is not a valid identifier\n", input);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Takes a string and checks if it is a valid field type
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public static boolean isNotValidType(String input) {
-        return switch (input) {
-            case "string", "int", "double", "float", "char", "boolean", "short", "long", "void" -> false;
-            default -> true;
-        };
     }
 
     /**
