@@ -1,10 +1,7 @@
 package uml;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * The controller for the CLI version of the UML Diagram
@@ -412,7 +409,42 @@ public class CLIController {
                             }
                         }
                     }
+                    case "change", "c" -> {
+                        switch (inputList.get(1)){
+                            case "rel" -> {
+                                System.out.print("Enter source name: ");
+                                String srcName = scan.next().trim();
+                                if(UMLModel.findClass(srcName) != (null)){
+                                    System.out.print("Enter destination name: ");
+                                    String destName = scan.next().trim();
+                                    if(UMLModel.findClass(destName) != (null)){
+                                        if(!UMLModel.isRelated(srcName, destName)){
+                                            System.out.println("Relationship does not exist");
+                                            break;
+                                        }
+                                        System.out.print("Enter old relationship type");
+                                        String oldRelType = scan.next().trim();
+                                        if(!UMLModel.findRelType(srcName, destName).equals(oldRelType)){
+                                            System.out.println("Relationship type does not exist for: "
+                                                    + srcName + " and " + destName);
+                                            break;
+                                        }
+                                        else {
+                                           System.out.print("Enter new relationship type");
+                                           String newRelType = scan.next().trim();
+                                           // TODO finish up change relationship type
+                                           if(UMLModel.checkType(newRelType)){
 
+                                           }
+                                        }
+                                    }
+                                }
+                            }
+                            case "parameter" -> {
+
+                            }
+                        }
+                    }
 
                     case "list", "l" -> {
                         switch (inputList.get(1)) {
