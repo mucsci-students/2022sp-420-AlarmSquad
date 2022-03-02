@@ -366,7 +366,6 @@ public class CLIController {
                             }
                         }
                     }
-
                     case "c", "change" -> {
                         switch (inputList.get(1)) {
                             case "att" -> {
@@ -458,10 +457,6 @@ public class CLIController {
                                     }
                                 }
                             }
-                        }
-                    }
-                    case "change", "c" -> {
-                        switch (inputList.get(1)){
                             case "rel" -> {
                                 System.out.print("Enter source name: ");
                                 String srcName = scan.next().trim();
@@ -481,12 +476,12 @@ public class CLIController {
                                             break;
                                         }
                                         else {
-                                           System.out.print("Enter new relationship type");
-                                           String newRelType = scan.next().trim();
-                                           // TODO finish up change relationship type
-                                           if(UMLModel.checkType(newRelType)){
+                                            System.out.print("Enter new relationship type");
+                                            String newRelType = scan.next().trim();
+                                            // TODO finish up change relationship type
+                                            if(UMLModel.checkType(newRelType)){
 
-                                           }
+                                            }
                                         }
                                     }
                                 }
@@ -636,12 +631,10 @@ public class CLIController {
     }
 
     public static void addAttribute(UMLClass classToAddAtt, String attType) {
-
-
         // Get name of attribute user wants to add and
         // ensure it is valid and not a duplicate
         String attName = getAttName(attType);
-        if (isNotValidInput(attName)) {
+        if (UMLModel.isNotValidInput(attName)) {
             System.out.println("\"" + attName + "\" is not a valid identifier\n");
             return;
         }
