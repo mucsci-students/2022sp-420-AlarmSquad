@@ -277,25 +277,18 @@ public class GUIController {
      * @param stage the working stage
      */
     public static void deleteRelAction(String srcName, String destName, Stage stage) {
-        // if the source name is not given, display error message
-        if(srcName.isEmpty()){
-            GUIView.popUpWindow("Error", "Source name is required");
-        }
-        // if the destination name is not given, display error message
-        else if(destName.isEmpty()){
-            GUIView.popUpWindow("Error", "Destination name is required");
-        }
+        // if any string is empty, pop an error up
+        if (srcName.isEmpty() || destName.isEmpty()) {
+            GUIView.popUpWindow("Error", "All fields are required");
         // if the relationship between the two classes in src->dest order does
         // exist, display error message
-        else if(UMLModel.findRelationship(srcName, destName,
-                    UMLModel.findRelType(srcName, destName)) == null){
-
-                GUIView.popUpWindow("Error", "Relationship does not exist");
-        }
+        } else if (UMLModel.findRelationship(srcName, destName,
+                    UMLModel.findRelType(srcName, destName)) == null) {
+            GUIView.popUpWindow("Error", "Relationship does not exist");
         // delete the relationship, update the view and close
-        else{
+        } else {
             Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
-                    UMLModel.findRelType(srcName, destName));
+                                                                UMLModel.findRelType(srcName, destName));
             UMLModel.deleteRel(relToDelete);
             stage.close();
         }
@@ -313,25 +306,99 @@ public class GUIController {
         // if the string is empty, pop an error up
         if (className.isEmpty()) {
             GUIView.popUpWindow("Error", "Class name is required");
-            // otherwise, rename the class and exit the window
         } else {
             // if the class does not exist, pop an error up
             if (UMLModel.findClass(className) == null) {
                 GUIView.popUpWindow("Error", "Class does not exist");
-            // if the class does exist, rename it and close
+            // if the class name is not a valid string, pop an error up
+            } else if (UMLModel.isNotValidInput(newClassName)) {
+                GUIView.popUpWindow("Error", "The class name is invalid");
             } else {
-                UMLClass classToRename = UMLModel.findClass(className);
-                classToRename.setClassName(newClassName);
-                stage.close();
+                // if the class name is not already in use, rename the field
+                if (UMLModel.findClass(newClassName) == null) {
+                    UMLModel.findClass(className).setClassName(newClassName);
+                    stage.close();
+                // otherwise, pop an error up
+                } else {
+                    GUIView.popUpWindow("Error", "The field name is already in use");
+                }
             }
         }
     }
 
-    public static void renameFieldAction(String className, String fieldName, String newFieldName, Stage stage){
-
+    /**
+     * Renames a field to a given string in a class if the given string is nonempty and the class and field exist,
+     * pops an error up otherwise
+     *
+     * @param className the name of the class with the field
+     * @param fieldName the name of the field to be renamed
+     * @param newFieldName the new name for the field
+     * @param stage the working stage
+     */
+    public static void renameFieldAction(String className, String fieldName, String newFieldName, Stage stage) {
+        // if any strings are empty, pop an error up
+        if (className.isEmpty() || fieldName.isEmpty() || newFieldName.isEmpty()) {
+            GUIView.popUpWindow("Error", "All fields are required");
+        } else {
+            // if the class does not exist, pop an error up
+            if (UMLModel.findClass(className) == null) {
+                GUIView.popUpWindow("Error", "Class does not exist");
+                // if the field does not exist, pop an error up
+            } else if (UMLModel.findClass(className).findField(fieldName) == null) {
+                GUIView.popUpWindow("Error", "Field does not exist");
+                // if the field name is not a valid string, pop an error up
+            } else if (UMLModel.isNotValidInput(newFieldName)) {
+                GUIView.popUpWindow("Error", "The field name is invalid");
+            } else {
+                // if the field name is not already in use, rename the field
+                if (UMLModel.findClass(className).findField(newFieldName) == null) {
+                    UMLModel.findClass(className).findField(fieldName).setAttName(newFieldName);
+                    stage.close();
+                    // otherwise, pop an error up
+                } else {
+                    GUIView.popUpWindow("Error", "The field name is already in use");
+                }
+            }
+        }
     }
 
-    public static void renameMethodAction(String className, String methodName, String newMethodName, Stage stage){
+    /**
+     * Renames a method to a given string in a class if the given string is nonempty and the class and method exist,
+     * pops an error up otherwise
+     *
+     * @param className the name of the class with the method
+     * @param methodName the name of the method to be renamed
+     * @param newMethodName the new name for the method
+     * @param stage the working stage
+     */
+    public static void renameMethodAction(String className, String methodName, String newMethodName, Stage stage) {
+        // if any strings are empty, pop an error up
+        if (className.isEmpty() || methodName.isEmpty() || newMethodName.isEmpty()) {
+            GUIView.popUpWindow("Error", "All fields are required");
+        } else {
+            // if the class does not exist, pop an error up
+            if (UMLModel.findClass(className) == null) {
+                GUIView.popUpWindow("Error", "Class does not exist");
+            // if the method does not exist, pop an error up
+            } else if (UMLModel.findClass(className).findField(methodName) == null) {
+                GUIView.popUpWindow("Error", "Method does not exist");
+            // if the method name is not a valid string, pop an error up
+            } else if (UMLModel.isNotValidInput(newMethodName)) {
+                GUIView.popUpWindow("Error", "The method name is invalid");
+            } else {
+                // if the method name is not already in use, rename the field
+                if (UMLModel.findClass(className).findField(newMethodName) == null) {
+                    UMLModel.findClass(className).findField(methodName).setAttName(newMethodName);
+                    stage.close();
+                // otherwise, pop an error up
+                } else {
+                    GUIView.popUpWindow("Error", "The method name is already in use");
+                }
+            }
+        }
+    }
+
+    public static void changeParameterAction(String className, String paramName, String newParamName, Stage stage) {
 
     }
 

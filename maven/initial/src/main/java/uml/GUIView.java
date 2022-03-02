@@ -22,7 +22,6 @@ public class GUIView extends Application {
     // create the menu bar
     private MenuBar menuBar = new MenuBar();
 
-
     /**
      * Starts the initial window for the diagram
      *
@@ -134,7 +133,9 @@ public class GUIView extends Application {
         rename.getItems().addAll(renameClass, renameAttribute);
 
         Menu change = new Menu("Change");
+        // open new window for changing a parameter when the option is pressed
         MenuItem changeParam = new MenuItem("Parameter(s)");
+        changeParam.setOnAction(event -> changeParamWindow());
         // open new window for changing the relType when the option is pressed
         MenuItem changeRelType = new MenuItem("Relationship Type");
         changeRelType.setOnAction(event -> changeRelTypeWindow());
@@ -192,7 +193,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 1);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Save Project", 125, 300);
+        finalizeWindow(stage, root, pane, "Save Project", 120, 300);
     }
 
     /**
@@ -222,7 +223,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 1);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Load Project", 125, 300);
+        finalizeWindow(stage, root, pane, "Load Project", 120, 300);
     }
 
     /**
@@ -252,7 +253,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 1);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Add Class", 125, 300);
+        finalizeWindow(stage, root, pane, "Add Class", 120, 300);
     }
 
     /**
@@ -419,7 +420,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 1);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Delete Class", 125, 300);
+        finalizeWindow(stage, root, pane, "Delete Class", 120, 300);
     }
 
     /**
@@ -457,7 +458,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 2);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Delete Field", 160, 300);
+        finalizeWindow(stage, root, pane, "Delete Field", 155, 300);
     }
 
     /**
@@ -495,7 +496,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 2);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Delete Method", 160, 300);
+        finalizeWindow(stage, root, pane, "Delete Method", 155, 300);
     }
 
     /**
@@ -534,7 +535,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 3);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Delete Relationship", 180, 300);
+        finalizeWindow(stage, root, pane, "Delete Relationship", 165, 300);
     }
 
     /**
@@ -572,7 +573,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 2);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Rename Class", 160, 300);
+        finalizeWindow(stage, root, pane, "Rename Class", 155, 300);
     }
 
     /**
@@ -668,6 +669,13 @@ public class GUIView extends Application {
     }
 
     /**
+     * Creates a window for the change parameter method and its data
+     */
+    private void changeParamWindow() {
+
+    }
+
+    /**
      * Creates a window for the change relationship method and its data
      */
     private void changeRelTypeWindow(){
@@ -685,16 +693,16 @@ public class GUIView extends Application {
         Label newRelTypeLabel = new Label("New type: ");
         // create the text box for the type to be renamed
         TextField srcName = new TextField();
-        srcName.setPrefColumnCount(18);
+        srcName.setPrefColumnCount(16);
         // create the text box for the new type name
         TextField destName = new TextField();
-        destName.setPrefColumnCount(18);
+        destName.setPrefColumnCount(16);
         // create the text box for the type to be renamed
         TextField oldRelTypeName = new TextField();
-        oldRelTypeName.setPrefColumnCount(18);
+        oldRelTypeName.setPrefColumnCount(16);
         // create the text box for the new type name
         TextField newRelTypeName = new TextField();
-        newRelTypeName.setPrefColumnCount(18);
+        newRelTypeName.setPrefColumnCount(16);
         // create a button to add the class with the inputted name
         Button rename = new Button("Change");
         rename.setOnAction(event -> GUIController.changeRelTypeAction(oldRelTypeName.getText(), newRelTypeName.getText(), stage));
@@ -716,7 +724,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 4);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Change Relationship Type", 240, 325);
+        finalizeWindow(stage, root, pane, "Change Relationship Type", 225, 300);
     }
 
     /**
@@ -739,7 +747,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 1);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Show Commands", 445, 390);
+        finalizeWindow(stage, root, pane, "Show Commands", 445, 385);
     }
 
     /**
