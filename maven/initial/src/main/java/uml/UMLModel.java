@@ -174,6 +174,8 @@ public class UMLModel {
         return helpMenu;
     }
 
+
+    // TODO change how we describe the "commands"(buttons) instead of CLI commands
     /**
      * Gets the text for the help menu in a GUI format
      *
@@ -192,10 +194,11 @@ public class UMLModel {
                 d att -m\t\tDelete a method from an existing class
                 r att -f\t\tRename a field from an existing class
                 r att -m\t\tRename a method from an existing class
-                a rel -a\t\t\tAdd an aggregation type relationship
-                a rel -c\t\t\tAdd a composition type relationship
-                a rel -i\t\t\tAdd an inheritance type relationship
-                a rel -r\t\t\tAdd a realization type relationship
+                a rel -a\t\tAdd an aggregation type relationship
+                a rel -c\t\tAdd a composition type relationship
+                a rel -i\t\tAdd an inheritance type relationship
+                a rel -r\t\tAdd a realization type relationship
+                c rel\t\t\tChange a relationship type
                 d rel\t\t\tDelete an existing relationship
                 save\t\t\tSave the current UML diagram
                 load\t\t\tLoad a previously saved UML diagram

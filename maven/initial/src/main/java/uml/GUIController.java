@@ -71,6 +71,14 @@ public class GUIController {
         }
     }
 
+    public static void addFieldAction(){
+
+    }
+
+    public static void addMethodAction(){
+
+    }
+
     /**
      * Creates and adds a relationship to the relationshipList if the given strings are nonempty,
      * and the classes exist, pops an error up otherwise
@@ -132,6 +140,14 @@ public class GUIController {
         }
     }
 
+    public static void deleteFieldAction(){
+
+    }
+
+    public static void deleteMethodAction(){
+
+    }
+
     /**
      * Deletes a relationship in the relationship list if the given strings
      * are nonempty and the relationship exists, display error otherwise
@@ -191,14 +207,26 @@ public class GUIController {
         }
     }
 
+    public static void renameFieldAction(String oldFieldName, String newFieldName, Stage stage){
+
+    }
+
+    public static void renameMethodAction(String oldFieldName, String newFieldName, Stage stage){
+
+    }
+
+    public static void changeRelTypeAction(String oldReltype, String newRelType, Stage stage){
+
+    }
+
     /**
      * Exits the current window if called
      *
      * @param stage the working stage
      * @return an event handler telling the window to close
      */
-    public static EventHandler<ActionEvent> exitAction(Stage stage) {
-        return event -> stage.close();
+    public static void exitAction(Stage stage) {
+        stage.close();
     }
 
     /******************************************************************
