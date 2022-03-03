@@ -37,7 +37,7 @@ cd 2022sp-420-AlarmSquad\maven\initial
 5. To run the application, invoke the generated jar file
 
 ```
-# To run in GUI
+# To run in GUI (default)
 java -jar target\2022sp-420-AlarmSquad-1.0.jar
 
 # To run in CLI
