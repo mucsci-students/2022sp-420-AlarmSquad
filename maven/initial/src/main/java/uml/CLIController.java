@@ -511,6 +511,9 @@ public class CLIController {
                                     }
                                 }
                             }
+
+                            case "parameter" -> {
+                            }
                         }
                     }
                     // list case for class, classes, or relationships
