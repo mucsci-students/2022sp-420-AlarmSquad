@@ -900,7 +900,7 @@ public class CLIController {
         // if there are classes to list, list them
         if (UMLModel.getClassList().size() != 0) {
             // Loops through classList and calls listClass on all elements
-            System.out.print("\n--------------------");
+            System.out.print("\n--------------------\n");
             if (UMLModel.getClassList().size() == 1) {
                 listClass(UMLModel.getClassList().get(0).getClassName());
             } else {
