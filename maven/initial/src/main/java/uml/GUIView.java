@@ -37,8 +37,9 @@ public class GUIView extends Application {
         Scene window = new Scene(root, Color.DIMGRAY);
         // set the title, height, and width of the window
         stage.setTitle("UML Editor");
-        stage.setWidth(900);
+        stage.setWidth(1000);
         stage.setHeight(600);
+        stage.setResizable(false);
         // set the stage and show it
         stage.setScene(window);
         stage.setAlwaysOnTop(false);
@@ -83,7 +84,10 @@ public class GUIView extends Application {
         // if the add relationship button is pressed, open a new window to add relationship
         MenuItem addRel = new MenuItem("Add Relationship");
         addRel.setOnAction(event -> addRelWindow());
-        add.getItems().addAll(addClass, addAttribute, addRel);
+        // if the add parameter button is pressed, open a new window to add parameter
+        MenuItem addParam = new MenuItem("Add Parameter(s)");
+        addParam.setOnAction(event -> addParameterWindow());
+        add.getItems().addAll(addClass, addAttribute, addRel, addParam);
 
         //***************************************//
         //********** Delete Menu Items **********//
@@ -134,10 +138,10 @@ public class GUIView extends Application {
 
         Menu change = new Menu("Change");
         // open new window for changing a parameter when the option is pressed
-        MenuItem changeParam = new MenuItem("Parameter(s)");
+        MenuItem changeParam = new MenuItem("Change Parameter(s)");
         changeParam.setOnAction(event -> changeParamWindow());
         // open new window for changing the relType when the option is pressed
-        MenuItem changeRelType = new MenuItem("Relationship Type");
+        MenuItem changeRelType = new MenuItem("Change Relationship Type");
         changeRelType.setOnAction(event -> changeRelTypeWindow());
         // all of the change options as part of the edit menu
         change.getItems().addAll(changeParam, changeRelType);
@@ -390,6 +394,59 @@ public class GUIView extends Application {
 
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Relationship", 190, 300);
+    }
+
+    /**
+     * Creates a window for the add parameter method and its data
+     */
+    private void addParameterWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label classNameText = new Label("Class name: ");
+        // create a label for the text box for the method name
+        Label methodNameText = new Label("Method name: ");
+        // create a label for the text box for the parameter name
+        Label paramText = new Label("Parameter name: ");
+        // create a label for the text box for the parameter type
+        Label paramTypeText = new Label("Parameter type: ");
+        // create the text box for the class name
+        TextField className = new TextField();
+        className.setPrefColumnCount(14);
+        // create the text box for the method name
+        TextField methodName = new TextField();
+        methodName.setPrefColumnCount(14);
+        // create the text box for the parameter name
+        TextField paramName = new TextField();
+        paramName.setPrefColumnCount(14);
+        // create the text box for the parameter type
+        TextField paramType = new TextField();
+        paramType.setPrefColumnCount(14);
+        // create a button to add the method with the inputted name
+        Button add = new Button("Add");
+        add.setOnAction(event -> GUIController.addParameterAction(className.getText(), methodName.getText(),
+                paramName.getText(), paramType.getText(), stage));
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
+
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(classNameText, 0, 0);
+        pane.add(methodNameText, 0, 1);
+        pane.add(paramText, 0, 2);
+        pane.add(paramTypeText, 0, 3);
+        pane.add(className, 1, 0);
+        pane.add(methodName, 1, 1);
+        pane.add(paramName, 1, 2);
+        pane.add(paramType, 1, 3);
+        pane.add(add, 0, 4);
+        pane.add(cancel, 1, 4);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Add Parameter(s)", 225, 300);
     }
 
     /**
@@ -672,7 +729,60 @@ public class GUIView extends Application {
      * Creates a window for the change parameter method and its data
      */
     private void changeParamWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class with the method
+        Label givenClassLabel = new Label("Class name: ");
+        // create a label for the text box for the method with the parameter
+        Label givenMethodLabel = new Label("Method name: ");
+        // create a label for the text box for the old parameter name
+        Label paramLabel = new Label("Old parameter name: ");
+        // create a label for the text box for the new parameter name
+        Label nameLabel = new Label("New parameter name: ");
+        // create a label for the text box for the new parameter type
+        Label typeLabel = new Label("New parameter type: ");
+        // create the text box for the class with the method
+        TextField givenClass = new TextField();
+        givenClass.setPrefColumnCount(11);
+        // create the text box for the method with the parameter
+        TextField givenMethod = new TextField();
+        givenMethod.setPrefColumnCount(11);
+        // create the text box for the parameter to change
+        TextField paramToChange = new TextField();
+        paramToChange.setPrefColumnCount(11);
+        // create the text box for the new parameter name
+        TextField newParamName = new TextField();
+        newParamName.setPrefColumnCount(11);
+        // create the text box for the new parameter type
+        TextField newParamType = new TextField();
+        newParamType.setPrefColumnCount(11);
+        // create a button to add the method with the inputted name
+        Button change = new Button("Change");
+        change.setOnAction(event -> GUIController.changeParameterAction(givenClass.getText(), givenMethod.getText(),
+                paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage));
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
 
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(givenClassLabel, 0, 0);
+        pane.add(givenMethodLabel, 0, 1);
+        pane.add(paramLabel, 0, 2);
+        pane.add(nameLabel, 0, 3);
+        pane.add(typeLabel, 0, 4);
+        pane.add(givenClass, 1, 0);
+        pane.add(givenMethod, 1, 1);
+        pane.add(paramToChange, 1, 2);
+        pane.add(newParamName, 1, 3);
+        pane.add(newParamType, 1, 4);
+        pane.add(change, 0, 5);
+        pane.add(cancel, 1, 5);
+
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Change Parameter(s)", 260, 300);
     }
 
     /**

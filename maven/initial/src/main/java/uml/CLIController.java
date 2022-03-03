@@ -487,8 +487,6 @@ public class CLIController {
                                 }
                             }
                             case "parameter" -> {
-
-
                             }
                         }
                     }

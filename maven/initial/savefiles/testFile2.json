@@ -1,0 +1,21 @@
+{
+  "relationshipList": [],
+  "classList": [
+    {
+      "className": "testing",
+      "methodList": [
+        {
+          "name": "testMethod",
+          "parameters": [
+            {
+              "name": "testParams",
+              "type": "string"
+            }
+          ],
+          "returnType": "void"
+        }
+      ],
+      "fieldList": []
+    }
+  ]
+}
