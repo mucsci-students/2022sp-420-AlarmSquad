@@ -877,7 +877,7 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 1);
 
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Show Commands", 445, 385);
+        finalizeWindow(stage, root, pane, "Show Commands", 400, 615);
     }
 
     /**
