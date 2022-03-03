@@ -139,7 +139,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(methodName)) {
                 GUIView.popUpWindow("Error", "The method name is invalid");
             // if the return type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidType(returnType)) {
+            } else if (UMLModel.isNotValidReturnType(returnType)) {
                 GUIView.popUpWindow("Error", "The return type is invalid");
             // check if the method exists
             } else {

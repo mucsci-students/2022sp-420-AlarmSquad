@@ -209,7 +209,7 @@ public class CLIController {
                                         if((methodToAddParam = searchForMethod(classToAddParam)) == null) break;
                                         if((paramName = searchForParamName(methodToAddParam)) == null) break;
 
-                                        String paramType = getAttType("");
+                                        String paramType = getAttType("parameter");
                                         Parameter param = new Parameter(paramName, paramType);
                                         methodToAddParam.addParameter(param);
                                     }
@@ -476,8 +476,8 @@ public class CLIController {
                                         if((param = searchForParam(methodToChangeParam)) == null) break;
 
                                         String oldParamName = param.getAttName();
-                                        String newParamName = getAttName("");
-                                        String newParamType = getAttType("");
+                                        String newParamName = getAttName("parameter");
+                                        String newParamType = getAttType("parameter");
 
                                         param = new Parameter(newParamName, newParamType);
                                         methodToChangeParam.changeParameter(oldParamName, param);
@@ -645,7 +645,7 @@ public class CLIController {
     public static String getAttType(String attType) {
         if (attType.equals("method")) {
             System.out.print("Enter " + attType + " return type: ");
-            String attToGet = scan.next().trim();
+            String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
             if (UMLModel.isNotValidReturnType(attToGet)) {
                 System.out.println("\"" + attToGet + "\" is not a valid return type");
                 return null;
@@ -653,7 +653,7 @@ public class CLIController {
             return attToGet;
         }
         System.out.print("Enter " + attType + " type: ");
-        String attToGet = scan.next().trim();
+        String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
         if (UMLModel.isNotValidType(attToGet)) {
             System.out.println("\"" + attToGet + "\" is not a valid type");
             return null;
@@ -698,7 +698,7 @@ public class CLIController {
 
     public static <E> boolean ifDoesntExist(E obj, String type, String name) {
         if (obj == null) {
-            System.out.printf("%s %s does not exist", type, name);
+            System.out.printf("%s %s does not exist\n", type, name);
             return true;
         }
         return false;
@@ -797,14 +797,14 @@ public class CLIController {
     }
 
     public static Parameter searchForParam(Method method) {
-        String paramName = getAttName("param");
+        String paramName = getAttName("parameter");
         Parameter param = method.findParameter(paramName);
         if (ifDoesntExist(param, "Parameter", paramName)) return null;
         return param;
     }
 
     public static String searchForParamName(Method method) {
-        String paramName = getAttName("");
+        String paramName = getAttName("parameter");
         Parameter param = method.findParameter(paramName);
         if (ifExists(param, "Parameter", paramName)) return null;
         return paramName;
@@ -900,7 +900,7 @@ public class CLIController {
         // if there are classes to list, list them
         if (UMLModel.getClassList().size() != 0) {
             // Loops through classList and calls listClass on all elements
-            System.out.println("\n--------------------");
+            System.out.print("\n--------------------");
             if (UMLModel.getClassList().size() == 1) {
                 listClass(UMLModel.getClassList().get(0).getClassName());
             } else {
