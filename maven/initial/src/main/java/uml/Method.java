@@ -41,10 +41,10 @@ public class Method extends Attribute {
      */
     public Parameter findParameter(String paramToFind) {
         // iterates through the arraylist
-        for (int i = 0; i < paramList.size(); ++i) {
+        for (Parameter parameter : paramList) {
             // if the name matches, return class
-            if (paramToFind.equals(paramList.get(i).getAttName())) {
-                return paramList.get(i);
+            if (paramToFind.equals(parameter.getAttName())) {
+                return parameter;
             }
         }
         return null;

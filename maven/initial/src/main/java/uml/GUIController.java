@@ -1,6 +1,9 @@
 package uml;
 
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
 
 public class GUIController {
 
@@ -66,6 +69,9 @@ public class GUIController {
                     UMLClass newClass = new UMLClass(className);
                     UMLModel.addClass(newClass);
                     stage.close();
+                    // Draw the new box for the class
+                    GUIView.drawClassBox(className);
+
                     // if the class does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Class already exists");
@@ -142,6 +148,7 @@ public class GUIController {
                     Method newMethod = new Method(methodName, returnType);
                     UMLModel.findClass(className).addMethod(newMethod);
                     stage.close();
+                    GUIView.drawMethodBox(UMLModel.findClass(className).getMethodList(), className);
                     // if the method does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
@@ -405,6 +412,32 @@ public class GUIController {
     public static void changeRelTypeAction(String oldReltype, String newRelType, Stage stage){
 
     }
+
+    public static double getXGridPosition() {
+        int pos = UMLModel.getClassList().size();
+        switch (pos) {
+            case 1, 6, 11 -> {return 25;}
+            case 2, 7, 12 -> {return 225;}
+            case 3, 8, 13 -> {return 425;}
+            case 4, 9, 14 -> {return 625;}
+            case 5, 10, 15 -> {return 825;}
+        }
+
+        return 0;
+    }
+
+    public static double getYGridPosition() {
+        int pos = UMLModel.getClassList().size();
+
+        switch (pos) {
+            case 1, 2, 3, 4, 5 -> {return 40;}
+            case 6, 7, 8, 9, 10 -> {return 240;}
+            case 11, 12, 13, 14, 15 -> {return 440;}
+        }
+
+        return 0;
+    }
+
 
     /**
      * Exits the current window if called
