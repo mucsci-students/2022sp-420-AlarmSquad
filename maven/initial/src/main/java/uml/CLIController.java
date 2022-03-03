@@ -458,41 +458,49 @@ public class CLIController {
                                 }
                             }
                             case "rel" -> {
+                                // prompt user for source
                                 System.out.print("Enter source name: ");
                                 String srcName = scan.next().trim();
+                                // if source exists continue
                                 if(UMLModel.findClass(srcName) != (null)){
+                                    // prompt user for destination
                                     System.out.print("Enter destination name: ");
                                     String destName = scan.next().trim();
+                                    // if destination exists, continue
                                     if(UMLModel.findClass(destName) != (null)){
+                                        // if the relationship does not exist
                                         if(!UMLModel.isRelated(srcName, destName)){
                                             System.out.println("Relationship does not exist");
                                             break;
                                         }
-                                        System.out.print("Enter old relationship type");
+                                        // prompt user for old type
+                                        System.out.print("Enter old relationship type: ");
                                         String oldRelType = scan.next().trim();
+                                        // check old type
                                         if(!UMLModel.findRelType(srcName, destName).equals(oldRelType)){
                                             System.out.println("Relationship type does not exist for: "
                                                     + srcName + " and " + destName);
-                                            break;
                                         }
+                                        // prompt for new type
                                         else {
-                                            System.out.print("Enter new relationship type");
+                                            System.out.print("Enter new relationship type: ");
                                             String newRelType = scan.next().trim();
-                                            // TODO finish up change relationship type
-                                            if(UMLModel.checkType(newRelType)){
-
+                                            // check type validity
+                                            if(!UMLModel.checkType(newRelType)){
+                                                System.out.println("Invalid relationship type");
+                                            }
+                                            // change the type
+                                            else {
+                                                UMLModel.changeRelType(srcName, destName, newRelType);
+                                                System.out.print("Relationship type changed\n");
                                             }
                                         }
                                     }
                                 }
                             }
-                            case "parameter" -> {
-
-
-                            }
                         }
                     }
-
+                    // list case for class, classes, or relationships
                     case "list", "l" -> {
                         switch (inputList.get(1)) {
                             case "classes" -> {
@@ -509,6 +517,9 @@ public class CLIController {
                                     System.out.println("\n--------------------");
                                     listClass(classToDisplayName);
                                     System.out.println("--------------------\n");
+                                }
+                                else{
+                                    System.out.println("Class does not exist");
                                 }
                             }
                             case "rel" -> {
@@ -628,16 +639,6 @@ public class CLIController {
             return true;
         }
         return false;
-    }
-
-    public static void addAttribute(UMLClass classToAddAtt, String attType) {
-        // Get name of attribute user wants to add and
-        // ensure it is valid and not a duplicate
-        String attName = getAttName(attType);
-        if (UMLModel.isNotValidInput(attName)) {
-            System.out.println("\"" + attName + "\" is not a valid identifier\n");
-            return;
-        }
     }
 
     public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
