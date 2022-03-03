@@ -3,14 +3,26 @@ package uml;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
@@ -21,6 +33,13 @@ public class GUIView extends Application {
 
     // create the menu bar
     private MenuBar menuBar = new MenuBar();
+    // initialize the root
+    static Group superRoot = new Group();
+
+    static double boxWidth = 100;
+    static double boxHeight = 20;
+
+    static ArrayList<StackPane> classPaneList = new ArrayList<>();
 
     /**
      * Starts the initial window for the diagram
@@ -29,22 +48,22 @@ public class GUIView extends Application {
      */
     @Override
     public void start(Stage stage) {
-        // initialize the root
-        Group root = new Group();
+
         // add the menu to the root
-        root.getChildren().add(createDiagramMenu());
+        superRoot.getChildren().add(createDiagramMenu());
         // initialize the window, and set the color
-        Scene window = new Scene(root, Color.DIMGRAY);
+        Scene window = new Scene(superRoot, Color.DIMGRAY);
         // set the title, height, and width of the window
         stage.setTitle("UML Editor");
-        stage.setWidth(1000);
-        stage.setHeight(600);
+        stage.setWidth(950);
+        stage.setHeight(640);
         stage.setResizable(false);
         // set the stage and show it
         stage.setScene(window);
         stage.setAlwaysOnTop(false);
         menuBar.prefWidthProperty().bind(stage.widthProperty());
         stage.show();
+        stage.setResizable(false);
     }
 
     /**
@@ -918,6 +937,64 @@ public class GUIView extends Application {
         stage.setScene(window);
         stage.show();
     }
+
+    public static void drawClassBox(String className) {
+        Rectangle titleBox = new Rectangle((boxWidth), (boxHeight));
+        titleBox.setFill(Color.WHITESMOKE);
+        titleBox.setStroke(Color.BLACK);
+        Text classTitle = new Text(className);
+        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
+        StackPane classStack = new StackPane();
+        classStack.getChildren().addAll(titleBox, classTitle);
+        classStack.setLayoutX(GUIController.getXGridPosition());
+        classStack.setLayoutY(GUIController.getYGridPosition());
+        superRoot.getChildren().add(classStack);
+        classPaneList.add(classStack);
+    }
+
+    public static void drawFieldBox(String fieldName) {
+        Rectangle fieldBox = new Rectangle((boxWidth), (boxHeight));
+        fieldBox.setFill(Color.WHITESMOKE);
+        fieldBox.setStroke(Color.BLACK);
+        Text classTitle = new Text(fieldName);
+        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
+        StackPane classStack = new StackPane();
+        classStack.getChildren().addAll(fieldBox, classTitle);
+        classStack.setLayoutX(GUIController.getXGridPosition());
+        classStack.setLayoutY(GUIController.getYGridPosition());
+        superRoot.getChildren().add(classStack);
+    }
+
+    public static void drawMethodBox(ArrayList<Method> methList, String className) {
+
+        double methBoxWidth = 0;
+        double methBoxHeight = 0;
+
+        StackPane methPane = new StackPane();
+
+        for (StackPane pane : classPaneList) {
+            for (int i = 0; i < pane.getChildren().size(); ++i) {
+                if (pane.getChildren().get(i).getClass().getName().equals(className)) {
+                    for (Method meth : methList) {
+                        methBoxWidth += 100;
+                        methBoxHeight += 20;
+                        Text methName = new Text(meth.getAttName());
+                        pane.getChildren().add(methName);
+                    }
+                }
+            }
+
+            Rectangle methBox = new Rectangle((methBoxWidth), (methBoxHeight));
+            methBox.setFill(Color.WHITESMOKE);
+            methBox.setStroke(Color.BLACK);
+
+            methPane.getChildren().add(methBox);
+            methPane.setLayoutX(GUIController.getXGridPosition());
+            methPane.setLayoutY(GUIController.getYGridPosition());
+            superRoot.getChildren().add(methPane);
+        }
+    }
+
 
     //***************************************//
     //*********** GUI View Main *************//

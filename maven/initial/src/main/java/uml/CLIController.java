@@ -46,43 +46,42 @@ public class CLIController {
             try {
                 // Check first word user inputted and act accordingly
                 switch (inputList.get(0)) {
+                        // If the user enters a blank line, prompt again
+                        case "" -> System.out.print(prompt);
 
-                    // If the user enters a blank line, prompt again
-                    case "" -> System.out.print(prompt);
-
-                    // Quit program
-                    case "exit" -> {
-                        return;
-                    }
-
-                    // Clear screen
-                    case "clear" -> {
-                        clearScreen();
-                        System.out.print(prompt);
-                    }
-
-                    case "save" -> {
-                        System.out.print("Save file name: ");
-                        String saveFileName = scan.next();
-                        JSON.save(saveFileName);
-                        System.out.println("Diagram has been saved to \"" + saveFileName + ".json\"");
-                    }
-
-                    case "load" -> {
-                        if (JSON.ifDirIsEmpty()) {
-                            System.out.println("No save files found");
-                            System.out.print(prompt);
-                        } else {
-                            System.out.print("Load file name: ");
-                            String loadFileName = scan.next();
-                            JSON.load(loadFileName);
+                        // Quit program
+                        case "exit" -> {
+                            return;
                         }
-                    }
 
-                    case "help" -> {
-                        displayHelp();
-                        System.out.print(prompt);
-                    }
+                        // Clear screen
+                        case "clear" -> {
+                            clearScreen();
+                            System.out.print(prompt);
+                        }
+
+                        case "save" -> {
+                            System.out.print("Save file name: ");
+                            String saveFileName = scan.next();
+                            JSON.save(saveFileName);
+                            System.out.println("Diagram has been saved to \"" + saveFileName + ".json\"");
+                        }
+
+                        case "load" -> {
+                            if (JSON.ifDirIsEmpty()) {
+                                System.out.println("No save files found");
+                                System.out.print(prompt);
+                            } else {
+                                System.out.print("Load file name: ");
+                                String loadFileName = scan.next();
+                                JSON.load(loadFileName);
+                            }
+                        }
+
+                        case "help" -> {
+                            displayHelp();
+                            System.out.print(prompt);
+                        }
 
                     case "add", "a" -> {
                         switch (inputList.get(1)) {
@@ -221,6 +220,11 @@ public class CLIController {
                                     }
                                 }
                             }
+                            // If the user's command is not valid
+                            default -> {
+                                System.out.println("Please enter a valid command");
+                                System.out.print(prompt);
+                            }
                         }
                     }
 
@@ -330,6 +334,11 @@ public class CLIController {
                                     }
                                 }
                             }
+                            // If the user's command is not valid
+                            default -> {
+                                System.out.println("Please enter a valid command");
+                                System.out.print(prompt);
+                            }
                         }
                     }
 
@@ -361,6 +370,11 @@ public class CLIController {
                                     System.out.println("The class \"" + oldClassName +
                                             "\" has been renamed to \"" + oldUMLClass.getClassName() + "\"");
                                 }
+                            }
+                            // If the user's command is not valid
+                            default -> {
+                                System.out.println("Please enter a valid command");
+                                System.out.print(prompt);
                             }
                         }
                     }
@@ -514,6 +528,11 @@ public class CLIController {
 
                             case "parameter" -> {
                             }
+                            // If the user's command is not valid
+                            default -> {
+                                System.out.println("Please enter a valid command");
+                                System.out.print(prompt);
+                            }
                         }
                     }
                     // list case for class, classes, or relationships
@@ -563,6 +582,11 @@ public class CLIController {
                                 System.out.println("\n--------------------\n");
                                 System.out.print(prompt);
                             }
+                            // If the user's command is not valid
+                            default -> {
+                                System.out.println("Please enter a valid command");
+                                System.out.print(prompt);
+                            }
                         }
                     }
 
@@ -574,6 +598,7 @@ public class CLIController {
                 }
             } catch (Exception e) {
                 System.out.println("Please enter a valid command");
+                System.out.print(prompt);
             }
         }
     }
@@ -686,6 +711,7 @@ public class CLIController {
         }
         return false;
     }
+
 
     public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
         System.out.print("type \"-f\" to " + operation + " a field, or \"-m\" to " +
