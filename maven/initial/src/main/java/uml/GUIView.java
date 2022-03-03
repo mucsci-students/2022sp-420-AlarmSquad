@@ -815,7 +815,8 @@ public class GUIView extends Application {
         newRelTypeName.setPrefColumnCount(16);
         // create a button to add the class with the inputted name
         Button rename = new Button("Change");
-        rename.setOnAction(event -> GUIController.changeRelTypeAction(oldRelTypeName.getText(), newRelTypeName.getText(), stage));
+        rename.setOnAction(event -> GUIController.changeRelTypeAction(srcName.getText(),
+                        destName.getText(), oldRelTypeName.getText(), newRelTypeName.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));

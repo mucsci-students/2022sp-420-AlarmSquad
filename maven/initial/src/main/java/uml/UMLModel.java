@@ -137,13 +137,27 @@ public class UMLModel {
      * @return false if none are correct, true otherwise
      */
     public static boolean checkType(String relType){
-        if(!relType.equalsIgnoreCase("aggregation") ||
-                !relType.equalsIgnoreCase("composition") ||
-                !relType.equalsIgnoreCase("inheritance") ||
-                !relType.equalsIgnoreCase("realization")){
-            return false;
+        return switch (relType){
+            case "aggregation", "composition", "inheritance", "realization" -> true;
+            default -> false;
+        };
+    }
+
+    /**
+     * Changes the type of an existing relationship
+     *
+     * @param src the source name
+     * @param dest the destination name
+     * @param newRelType the new relationship type
+     */
+    public static void changeRelType(String src, String dest, String newRelType){
+        // finds the relationship and changes the type
+        for(Relationship r : relationshipList){
+            if(r.getSource().getClassName().equals(src) &&
+                    r.getDestination().getClassName().equals(dest)){
+                r.setRelType(newRelType);
+            }
         }
-        return true;
     }
 
     /**
@@ -204,9 +218,19 @@ public class UMLModel {
      */
     public static boolean isNotValidType(String input) {
         return switch (input) {
-            case "string", "int", "double", "float", "char", "boolean", "short", "long", "void" -> false;
+            case "string", "int", "double", "float", "char", "boolean", "short", "long" -> false;
             default -> true;
         };
+    }
+
+    /**
+     * Takes a string and checks if it is a valid field type
+     *
+     * @param input the string to check
+     * @return false if valid, otherwise true
+     */
+    public static boolean isNotValidReturnType(String input) {
+        return (isNotValidType(input) && !input.equals("void"));
     }
 
     /**

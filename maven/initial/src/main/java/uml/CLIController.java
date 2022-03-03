@@ -189,8 +189,6 @@ public class CLIController {
                                                     if (classToAddAtt.getAttList(attType).stream()
                                                             .noneMatch(attObj -> attObj.getAttName().equals(attName))) {
                                                         addAttribute(classToAddAtt, attType, attName);
-                                                        System.out.println("Added " + attType + " " + attName + " to class "
-                                                                + classToAddAttName);
                                                     }
                                                     // If attribute user entered already exists in class, inform user and break
                                                     else {
@@ -399,9 +397,15 @@ public class CLIController {
                                                             "\" already exists in class \"" + classWithFieldName + "\"\n");
                                                     break;
                                                 }
-                                                newField.setAttName(newFieldName);
-                                                System.out.println(oldFieldName + " in class " + classWithFieldName +
-                                                        " renamed to " + newField.getAttName());
+                                                //get fieldtype
+                                                String newFieldType = getAttType(newFieldName);
+                                                if(newFieldType == null){
+                                                    break;
+                                                }
+                                                //make a new field
+                                                Field changedField = new Field(newFieldName, newFieldType);
+                                                //replace orignal field
+                                                UMLClassWithField.changeField(oldFieldName, changedField);
                                             }
                                         }
                                     }
@@ -420,7 +424,7 @@ public class CLIController {
                                             String oldMethodName = scan.next().trim();
 
                                             // Ensure attribute exists
-                                            Attribute newField = UMLClassWithMethod.findField(oldMethodName);
+                                            Attribute newField = UMLClassWithMethod.findMethod(oldMethodName);
                                             if (newField != null) {
                                                 // Rename attribute with user's new name
                                                 System.out.print("Enter new name for " + oldMethodName + ": ");
@@ -429,14 +433,23 @@ public class CLIController {
                                                     System.out.println("\"" + newMethodName + "\" is not a valid identifier\n");
                                                     break;
                                                 }
-                                                if (UMLClassWithMethod.findField(newMethodName) != null) {
+                                                if (UMLClassWithMethod.findMethodNoPrint(newMethodName) != null) {
                                                     System.out.println("Method \"" + newMethodName +
                                                             "\" already exists in class \"" + classWithMethodName + "\"\n");
                                                     break;
                                                 }
-                                                newField.setAttName(newMethodName);
-                                                System.out.println(oldMethodName + " in class " + classWithMethodName +
-                                                        " renamed to " + newField.getAttName());
+                                                //get methodtype
+                                                String newMethodReturnType = getAttReturnType(newMethodName);
+                                                if(newMethodReturnType == null){
+                                                    break;
+                                                }
+                                                if (!newMethodName.endsWith("()"))
+                                                    newMethodName += "()";
+                                                //make a new method
+                                                Method changedMethod = new Method(newMethodName, newMethodReturnType);
+                                                //replace orginal method
+                                                UMLClassWithMethod.changeMethod(oldMethodName, changedMethod);
+
                                             }
                                         }
                                     }
@@ -458,39 +471,52 @@ public class CLIController {
                                 }
                             }
                             case "rel" -> {
+                                // prompt user for source
                                 System.out.print("Enter source name: ");
                                 String srcName = scan.next().trim();
+                                // if source exists continue
                                 if(UMLModel.findClass(srcName) != (null)){
+                                    // prompt user for destination
                                     System.out.print("Enter destination name: ");
                                     String destName = scan.next().trim();
+                                    // if destination exists, continue
                                     if(UMLModel.findClass(destName) != (null)){
+                                        // if the relationship does not exist
                                         if(!UMLModel.isRelated(srcName, destName)){
                                             System.out.println("Relationship does not exist");
                                             break;
                                         }
-                                        System.out.print("Enter old relationship type");
+                                        // prompt user for old type
+                                        System.out.print("Enter old relationship type: ");
                                         String oldRelType = scan.next().trim();
+                                        // check old type
                                         if(!UMLModel.findRelType(srcName, destName).equals(oldRelType)){
                                             System.out.println("Relationship type does not exist for: "
                                                     + srcName + " and " + destName);
-                                            break;
                                         }
+                                        // prompt for new type
                                         else {
-                                            System.out.print("Enter new relationship type");
+                                            System.out.print("Enter new relationship type: ");
                                             String newRelType = scan.next().trim();
-                                            // TODO finish up change relationship type
-                                            if(UMLModel.checkType(newRelType)){
-
+                                            // check type validity
+                                            if(!UMLModel.checkType(newRelType)){
+                                                System.out.println("Invalid relationship type");
+                                            }
+                                            // change the type
+                                            else {
+                                                UMLModel.changeRelType(srcName, destName, newRelType);
+                                                System.out.print("Relationship type changed\n");
                                             }
                                         }
                                     }
                                 }
                             }
+
                             case "parameter" -> {
                             }
                         }
                     }
-
+                    // list case for class, classes, or relationships
                     case "list", "l" -> {
                         switch (inputList.get(1)) {
                             case "classes" -> {
@@ -507,6 +533,9 @@ public class CLIController {
                                     System.out.println("\n--------------------");
                                     listClass(classToDisplayName);
                                     System.out.println("--------------------\n");
+                                }
+                                else{
+                                    System.out.println("Class does not exist");
                                 }
                             }
                             case "rel" -> {
@@ -589,11 +618,41 @@ public class CLIController {
      * @return the user's given type for the attribute
      */
     public static String getAttType(String attType) {
+        if (attType.equals("method")) {
+            System.out.print("Enter " + attType + " return type: ");
+            String attToGet = scan.next().trim();
+            if (UMLModel.isNotValidReturnType(attToGet)) {
+                System.out.println("\"" + attToGet + "\" is not a valid return type");
+                return null;
+            }
+            return attToGet;
+        }
+        System.out.print("Enter " + attType + " type: ");
+        String attToGet = scan.next().trim();
+        if (UMLModel.isNotValidType(attToGet)) {
+            System.out.println("\"" + attToGet + "\" is not a valid type");
+            return null;
+        }
+        return attToGet;
+    }
+
+    /**
+     * Prompts the user for the type of an attribute
+     *
+     * @param attType the type of attribute to be defined
+     * @return the user's given type for the attribute
+     */
+    public static String getAttReturnType(String attType) {
         if (attType.equals("method"))
             attType += " return";
 
         System.out.print("Enter " + attType + " type: ");
-        return scan.next().trim();
+        String attToGet = scan.next().trim();
+        if (UMLModel.isNotValidReturnType(attToGet)) {
+            System.out.println("\"" + attToGet + "\" is not a valid return type");
+            return null;
+        }
+        return attToGet;
     }
 
     /**
@@ -628,16 +687,6 @@ public class CLIController {
         return false;
     }
 
-    public static void addAttribute(UMLClass classToAddAtt, String attType) {
-        // Get name of attribute user wants to add and
-        // ensure it is valid and not a duplicate
-        String attName = getAttName(attType);
-        if (UMLModel.isNotValidInput(attName)) {
-            System.out.println("\"" + attName + "\" is not a valid identifier\n");
-            return;
-        }
-    }
-
     public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
         System.out.print("type \"-f\" to " + operation + " a field, or \"-m\" to " +
                 operation + " a method: ");
@@ -660,8 +709,7 @@ public class CLIController {
         // If attribute is a field, get its type.
         // Ensure type is valid
         String type = getAttType(attType);
-        if (UMLModel.isNotValidType(type)) {
-            System.out.println("\"" + type + "\" is not a valid return type\n");
+        if (type == null) {
             return;
         }
         // If user wants to add a method, get its return type and

@@ -53,4 +53,11 @@ public class Relationship {
      */
     public String getRelType() { return this.relType; }
 
+    /**
+     * Sets the type of the relationship
+     *
+     * @return the new relationship type
+     */
+    public void setRelType(String newReltype) { this.relType = newReltype; }
+
 }
