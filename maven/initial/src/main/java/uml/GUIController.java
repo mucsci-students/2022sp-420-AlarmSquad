@@ -402,8 +402,52 @@ public class GUIController {
 
     }
 
-    public static void changeRelTypeAction(String oldReltype, String newRelType, Stage stage){
-
+    /**
+     * Takes in the source class, destination class, old relationship type,
+     * new relationship type and the working stage to change an existing
+     * relationship type to a new type
+     *
+     * @param src the name of the source class
+     * @param dest the name of the destination class
+     * @param oldReltype the old relationship type
+     * @param newRelType the new relationship type
+     * @param stage the working stage
+     */
+    public static void changeRelTypeAction(String src, String dest, String oldReltype, String newRelType, Stage stage){
+        // if any strings are empty, display error message
+        if(oldReltype.isEmpty() || newRelType.isEmpty()){
+            GUIView.popUpWindow("Error", "All fields are required");
+        }
+        // if source class does not exist, display error message
+        else if(UMLModel.findClass(src) == null){
+            GUIView.popUpWindow("Error", "Class does not exist");
+        }
+        // if dest class does not exist, display error message
+        else if(UMLModel.findClass(dest) == null){
+            GUIView.popUpWindow("Error", "Class does not exist");
+        }
+        // if the source and destination are not related, display error message
+        else if(!UMLModel.isRelated(src, dest)){
+            GUIView.popUpWindow("Error", "Classes not related");
+        }
+        // if the old relationship type does not match the type from the relation
+        // display error message
+        else if(!UMLModel.findRelType(src, dest).equals(oldReltype)){
+            GUIView.popUpWindow("Error", "Type not present");
+        }
+        // if the new relationship type is not a valid type, display error message
+        else if(!UMLModel.checkType(newRelType)){
+            GUIView.popUpWindow("Error", "Type not valid");
+        }
+        // if the old type and the new type are not the same, change the type
+        else if(!oldReltype.equals(newRelType)){
+            UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);
+            stage.close();
+        }
+        // else display error message
+        else {
+            GUIView.popUpWindow("Error", "Type are the same");
+        }
     }
 
     /**
