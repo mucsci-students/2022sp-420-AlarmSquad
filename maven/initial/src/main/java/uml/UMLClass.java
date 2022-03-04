@@ -183,5 +183,56 @@ public class UMLClass {
         return null;
     }
 
+    /**
+     * Iterates through methodList, returns with .get()
+     *
+     * @param methodToFind name of method to find in UMLClass
+     * @return method if found, null if not found does not have print statement
+     */
+    public Method findMethodNoPrint(String methodToFind) {
+        // iterates through the arraylist
+        for (Method method : methodList) {
+            // if the name matches, return class
+            if (methodToFind.equals(method.getAttName())) {
+                return method;
+            }
+        }
+        return null;
+    }
 
+    /**
+     * Iterates through fieldList, returns with .get()
+     *
+     * @param fieldToFind
+     * @return field if found, null if not found
+     */
+    public Field changeField(String fieldToFind, Field fieldToChange) {
+        // iterates through the arraylist
+        for (int i = 0; i < fieldList.size(); ++i) {
+            // if the name matches, return class
+            if (fieldToFind.equals(fieldList.get(i).getAttName())) {
+                fieldList.set(i, fieldToChange);
+                return fieldToChange;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Iterates through methodList, returns with .get()
+     *
+     * @param methodToFind
+     * @return method if found, null if not found
+     */
+    public Method changeMethod(String methodToFind, Method methodToChange) {
+        // iterates through the arraylist
+        for (int i = 0; i < methodList.size(); ++i) {
+            // if the name matches, return class
+            if (methodToFind.equals(methodList.get(i).getAttName())) {
+                methodList.set(i, methodToChange);
+                return methodToChange;
+            }
+        }
+        return null;
+    }
 }

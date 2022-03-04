@@ -43,13 +43,12 @@ public class JSON {
             JSONObject classToBeSaved = new JSONObject();
             // add name to JSON
             classToBeSaved.put("className", UMLClassObj.getClassName());
+
             // make new JSONArray
             JSONArray fieldList = new JSONArray();
             JSONArray methList = new JSONArray();
-            // iterate through the Class object's field and method lists
-            //TODO
-            // MAKE THIS SAVE FIELDS AND METHODS
 
+            // iterate through the Class object's field and method lists
             for (Field fieldObj : UMLClassObj.getFieldList()) {
                JSONObject fieldToBeSaved = new JSONObject();
                fieldToBeSaved.put("name", fieldObj.getAttName());
@@ -62,6 +61,17 @@ public class JSON {
                 JSONObject methToBeSaved = new JSONObject();
                 methToBeSaved.put("name", methObj.getAttName());
                 methToBeSaved.put("returnType", methObj.getReturnType());
+
+                // iterate through the method object's parameters
+                JSONArray paramList = new JSONArray();
+                for (Parameter paramObj : methObj.returnList()) {
+                    JSONObject paramToBeSaved = new JSONObject();
+                    paramToBeSaved.put("name", paramObj.getAttName());
+                    paramToBeSaved.put("type", paramObj.getFieldType());
+                    // put each parameter in the JSONArray
+                    paramList.add(paramToBeSaved);
+                }
+                methToBeSaved.put("parameters", paramList);
                 // put each method in the JSONArray
                 methList.add(methToBeSaved);
             }
@@ -128,7 +138,6 @@ public class JSON {
                 return;
             }
 
-
             // wipe both lists
             UMLModel.clearClassList();
             UMLModel.clearRelationshipList();
@@ -177,6 +186,19 @@ public class JSON {
                     String methType = (String) currentMeth.get("returnType");
                     // make new method
                     Method newMeth = new Method(methName, methType);
+                    // array of parameters in the method
+                    JSONArray paramArray = (JSONArray) currentMeth.get("parameters");
+                    // iterator for iterating parameters
+                    Iterator<JSONObject> paramIter = paramArray.iterator();
+                    // loop through the paramList
+                    while (paramIter.hasNext()) {
+                        JSONObject currentParam = paramIter.next();
+                        String paramName = (String) currentParam.get("name");
+                        String paramType = (String) currentParam.get("type");
+                        // make new parameter
+                        Parameter newParam = new Parameter(paramName, paramType);
+                        newMeth.addParameter(newParam);
+                    }
                     // add method to class
                     newUMLClass.addMethod(newMeth);
                 }
