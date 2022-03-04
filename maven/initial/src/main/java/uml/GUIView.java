@@ -39,7 +39,7 @@ public class GUIView extends Application {
     static double boxWidth = 100;
     static double boxHeight = 20;
 
-    static ArrayList<StackPane> classPaneList = new ArrayList<>();
+    private static ArrayList<StackPane> classPaneList = new ArrayList<>();
 
     /**
      * Starts the initial window for the diagram
@@ -828,17 +828,9 @@ public class GUIView extends Application {
     }
 
     public static void drawClassBox(String className) {
-        Rectangle titleBox = new Rectangle((boxWidth), (boxHeight));
-        titleBox.setFill(Color.WHITESMOKE);
-        titleBox.setStroke(Color.BLACK);
-        Text classTitle = new Text(className);
-        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
-        StackPane classStack = new StackPane();
-        classStack.getChildren().addAll(titleBox, classTitle);
-        classStack.setLayoutX(GUIController.getXGridPosition());
-        classStack.setLayoutY(GUIController.getYGridPosition());
-        superRoot.getChildren().add(classStack);
-        classPaneList.add(classStack);
+        ClassBox classBox = new ClassBox(className);
+        superRoot.getChildren().add(ClassBox.getClassPane());
+        classPaneList.add(ClassBox.getClassPane());
     }
 
     public static void drawFieldBox(String fieldName) {
