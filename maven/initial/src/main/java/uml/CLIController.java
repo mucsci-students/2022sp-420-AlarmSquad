@@ -689,10 +689,6 @@ public class CLIController {
     public static String getAttName(String attType) {
         System.out.print("Enter " + attType + " name: ");
         String attName = scan.next().trim();
-        // If user doesn't end method name with "()",
-        // add it to end of their input
-        if (attType.equals("method") && !attName.endsWith("()"))
-            attName += "()";
         return attName;
     }
 
@@ -741,9 +737,6 @@ public class CLIController {
         // If user wants to add a method, get its return type and
         // ensure it is valid. Then return updated class with added method.
         if (attType.equalsIgnoreCase("method")) {
-            // Ensure methods end with parenthesis
-            if (!attName.endsWith("()"))
-                attName += "()";
             Method method = new Method(attName, type);
             classToAddAtt.addMethod(method);
         }
@@ -860,37 +853,35 @@ public class CLIController {
         // prints the name of the class
         System.out.println("Class name: " + copyClass.getClassName());
         // prints all the field in a set
-        System.out.print("Fields [");
+        System.out.print("Fields :");
         for (int i = 0; i < copyFieldList.size(); ++i) {
             Field field = copyFieldList.get(i);
             if (i == 0) {
-                System.out.printf(" (%s, %s)", field.getAttName(), field.getFieldType());
+                System.out.printf(" [%s %s]", field.getFieldType(), field.getAttName());
             } else {
-                System.out.printf(", (%s, %s)", field.getAttName(), field.getFieldType());
+                System.out.printf("\n\t\t [%s %s]", field.getFieldType(), field.getAttName());
             }
         }
-        System.out.println(" ]");
         // prints all the methods in a set
-        System.out.print("Methods");
-        System.out.print("[ ");
+        System.out.print("\nMethods");
+        System.out.print(": ");
         for (int i = 0; i < copyMethList.size(); ++i) {
             Method method = copyMethList.get(i);
             if (i == 0) {
-                System.out.printf("%s{ ", method.getAttName());
+                System.out.printf("[%s %s (",method.getReturnType(), method.getAttName());
             } else {
-                System.out.print(", " + copyMethList.get(i).getAttName() + "{ ");
+                System.out.print("\t\t [" + method.getReturnType() + " " + copyMethList.get(i).getAttName() + " (");
             }
             for (int j = 0; j < copyMethList.get(i).returnList().size(); ++j) {
                 Parameter param = copyMethList.get(i).returnList().get(j);
                 if (j == 0) {
-                    System.out.printf("(%s, %s)", param.getAttName(), param.getFieldType());
+                    System.out.printf("%s %s", param.getFieldType(), param.getAttName());
                 } else {
-                    System.out.printf(",(%s, %s)", param.getAttName(), param.getFieldType());
+                    System.out.printf(", %s %s", param.getFieldType(), param.getAttName());
                 }
             }
-            System.out.printf(" }, %s", method.getReturnType());
+            System.out.print(")]\n");
         }
-        System.out.println(" ]");
     }
 
     /**
@@ -900,7 +891,7 @@ public class CLIController {
         // if there are classes to list, list them
         if (UMLModel.getClassList().size() != 0) {
             // Loops through classList and calls listClass on all elements
-            System.out.print("\n--------------------\n");
+            System.out.print("\n--------------------");
             if (UMLModel.getClassList().size() == 1) {
                 listClass(UMLModel.getClassList().get(0).getClassName());
             } else {
