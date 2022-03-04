@@ -71,7 +71,6 @@ public class GUIController {
                     stage.close();
                     // Draw the new box for the class
                     GUIView.drawClassBox(className);
-
                     // if the class does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Class already exists");
@@ -186,6 +185,7 @@ public class GUIController {
                     UMLClass dest = UMLModel.findClass(destName);
                     Relationship newRel = new Relationship(src, dest, relType);
                     UMLModel.addRel(newRel);
+                    GUIView.drawLine();
                     stage.close();
                 // if the relationship does exist, pop an error up
                 } else {
@@ -540,31 +540,6 @@ public class GUIController {
         else {
             GUIView.popUpWindow("Error", "Type are the same");
         }
-    }
-
-    public static double getXGridPosition() {
-        int pos = UMLModel.getClassList().size();
-        switch (pos) {
-            case 1, 6, 11 -> {return 25;}
-            case 2, 7, 12 -> {return 225;}
-            case 3, 8, 13 -> {return 425;}
-            case 4, 9, 14 -> {return 625;}
-            case 5, 10, 15 -> {return 825;}
-        }
-
-        return 0;
-    }
-
-    public static double getYGridPosition() {
-        int pos = UMLModel.getClassList().size();
-
-        switch (pos) {
-            case 1, 2, 3, 4, 5 -> {return 40;}
-            case 6, 7, 8, 9, 10 -> {return 240;}
-            case 11, 12, 13, 14, 15 -> {return 440;}
-        }
-
-        return 0;
     }
 
 

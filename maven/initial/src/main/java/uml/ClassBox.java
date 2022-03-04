@@ -14,10 +14,18 @@ public class ClassBox {
     static private double boxHeight = 20;
     private static StackPane classPane;
 
-
-    public static StackPane getClassPane() {
-        return classPane;
+    public ClassBox(String className) {
+        this.classBoxName = className;
+        classPane = new StackPane();
+        Rectangle titleBox = new Rectangle((boxWidth), (boxHeight));
+        titleBox.setFill(Color.WHITESMOKE);
+        titleBox.setStroke(Color.BLACK);
+        Text classTitle = new Text(className);
+        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
+        classPane.getChildren().addAll(titleBox, classTitle);
     }
+
+    public static StackPane getClassPane() { return classPane; }
 
     public static void setClassPane(StackPane classPane) {
         ClassBox.classPane = classPane;
@@ -47,17 +55,5 @@ public class ClassBox {
         ClassBox.boxHeight = boxHeight;
     }
 
-    public ClassBox(String className) {
-        this.classBoxName = className;
-
-        Rectangle titleBox = new Rectangle((boxWidth), (boxHeight));
-        titleBox.setFill(Color.WHITESMOKE);
-        titleBox.setStroke(Color.BLACK);
-        Text classTitle = new Text(className);
-        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
-        classPane.getChildren().addAll(titleBox, classTitle);
-        classPane.setLayoutX(GUIController.getXGridPosition());
-        classPane.setLayoutY(GUIController.getYGridPosition());
-    }
 
 }

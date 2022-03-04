@@ -15,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -22,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -36,10 +38,16 @@ public class GUIView extends Application {
     // initialize the root
     static Group superRoot = new Group();
 
+    static final double DIAGRAM_WIDTH = 950;
+    static final double DIAGRAM_HEIGHT = 640;
+
     static double boxWidth = 100;
     static double boxHeight = 20;
 
-    private static ArrayList<StackPane> classPaneList = new ArrayList<>();
+    static double startDragX;
+    static double startDragY;
+
+    static ArrayList<StackPane> classPaneList = new ArrayList<>();
 
     /**
      * Starts the initial window for the diagram
@@ -55,8 +63,8 @@ public class GUIView extends Application {
         Scene window = new Scene(superRoot, Color.DIMGRAY);
         // set the title, height, and width of the window
         stage.setTitle("UML Editor");
-        stage.setWidth(950);
-        stage.setHeight(640);
+        stage.setWidth(DIAGRAM_WIDTH);
+        stage.setHeight(DIAGRAM_HEIGHT);
         stage.setResizable(false);
         // set the stage and show it
         stage.setScene(window);
@@ -938,10 +946,33 @@ public class GUIView extends Application {
         stage.show();
     }
 
+    public static void drawLine(){
+        if(classPaneList.size() > 1) {
+            Line line = new Line(classPaneList.get(0).getTranslateX(), classPaneList.get(0).getTranslateY(),
+                    classPaneList.get(1).getTranslateX(), classPaneList.get(1).getTranslateY());
+            line.setStrokeWidth(5);
+            line.setStroke(Color.GREEN);
+            superRoot.getChildren().add(line);
+
+            line.startXProperty().bind(classPaneList.get(0).translateXProperty());
+            line.startYProperty().bind(classPaneList.get(0).translateYProperty());
+            line.endXProperty().bind(classPaneList.get(1).translateXProperty());
+            line.endYProperty().bind(classPaneList.get(1).translateYProperty());
+        }
+    }
+
     public static void drawClassBox(String className) {
         ClassBox classBox = new ClassBox(className);
         superRoot.getChildren().add(ClassBox.getClassPane());
         classPaneList.add(ClassBox.getClassPane());
+        classBox.getClassPane().setOnMouseDragEntered(event -> {
+            startDragX = event.getSceneX();
+            startDragY = event.getSceneY();
+        });
+        classBox.getClassPane().setOnMouseDragged(event -> {
+            classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);
+            classBox.getClassPane().setTranslateY(event.getSceneY() - startDragY);
+        });
     }
 
     public static void drawFieldBox(String fieldName) {
@@ -952,8 +983,6 @@ public class GUIView extends Application {
         classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
         StackPane classStack = new StackPane();
         classStack.getChildren().addAll(fieldBox, classTitle);
-        classStack.setLayoutX(GUIController.getXGridPosition());
-        classStack.setLayoutY(GUIController.getYGridPosition());
         superRoot.getChildren().add(classStack);
     }
 
@@ -981,8 +1010,6 @@ public class GUIView extends Application {
             methBox.setStroke(Color.BLACK);
 
             methPane.getChildren().add(methBox);
-            methPane.setLayoutX(GUIController.getXGridPosition());
-            methPane.setLayoutY(GUIController.getYGridPosition());
             superRoot.getChildren().add(methPane);
         }
     }
