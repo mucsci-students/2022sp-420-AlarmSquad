@@ -10,12 +10,12 @@ import javafx.scene.text.Text;
 public class ClassBox {
 
     private String classBoxName;
-    static private double boxWidth = 100;
-    static private double boxHeight = 20;
-    private static StackPane classPane;
+    private double boxWidth = 100;
+    private double boxHeight = 20;
+    private StackPane classPane;
 
     public ClassBox(String className) {
-        this.classBoxName = className;
+        classBoxName = className;
         classPane = new StackPane();
         Rectangle titleBox = new Rectangle((boxWidth), (boxHeight));
         titleBox.setFill(Color.WHITESMOKE);
@@ -25,35 +25,33 @@ public class ClassBox {
         classPane.getChildren().addAll(titleBox, classTitle);
     }
 
-    public static StackPane getClassPane() { return classPane; }
+    public StackPane getClassPane() { return this.classPane; }
 
-    public static void setClassPane(StackPane classPane) {
-        ClassBox.classPane = classPane;
+    public void setClassPane(StackPane classPane) {
+        this.classPane = classPane;
     }
 
     public String getClassBoxName() {
-        return classBoxName;
+        return this.classBoxName;
     }
 
     public void setClassBoxName(String classBoxName) {
         this.classBoxName = classBoxName;
     }
 
-    public static double getBoxWidth() {
-        return boxWidth;
+    public double getBoxWidth() {
+        return this.boxWidth;
     }
 
-    public static void setBoxWidth(double boxWidth) {
-        ClassBox.boxWidth = boxWidth;
+    public void setBoxWidth(double boxWidth) {
+        this.boxWidth = boxWidth;
     }
 
-    public static double getBoxHeight() {
-        return boxHeight;
+    public double getBoxHeight() {
+        return this.boxHeight;
     }
 
-    public static void setBoxHeight(double boxHeight) {
-        ClassBox.boxHeight = boxHeight;
+    public void setBoxHeight(double boxHeight) {
+        this.boxHeight = boxHeight;
     }
-
-
 }

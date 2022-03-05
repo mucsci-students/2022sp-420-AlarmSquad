@@ -34,7 +34,7 @@ import java.util.ArrayList;
 public class GUIView extends Application {
 
     // create the menu bar
-    private MenuBar menuBar = new MenuBar();
+    private final MenuBar menuBar = new MenuBar();
     // initialize the root
     static Group superRoot = new Group();
 
@@ -963,8 +963,9 @@ public class GUIView extends Application {
 
     public static void drawClassBox(String className) {
         ClassBox classBox = new ClassBox(className);
-        superRoot.getChildren().add(ClassBox.getClassPane());
-        classPaneList.add(ClassBox.getClassPane());
+        superRoot.getChildren().add(classBox.getClassPane());
+        classPaneList.add(classBox.getClassPane());
+
         classBox.getClassPane().setOnMouseDragEntered(event -> {
             startDragX = event.getSceneX();
             startDragY = event.getSceneY();
