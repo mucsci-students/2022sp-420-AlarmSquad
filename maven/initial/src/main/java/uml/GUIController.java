@@ -337,7 +337,8 @@ public class GUIController {
         // delete the relationship, update the view and close
         } else {
             Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
-                                                                UMLModel.findRelType(srcName, destName));
+                    UMLModel.findRelType(srcName, destName));
+            GUIView.deleteRelLine(GUIView.findClassBox(srcName), GUIView.findClassBox(destName));
             UMLModel.deleteRel(relToDelete);
             stage.close();
         }
@@ -533,6 +534,10 @@ public class GUIController {
         }
         // if the old type and the new type are not the same, change the type
         else if(!oldReltype.equals(newRelType)){
+            // update the view
+            GUIView.deleteRelLine(GUIView.findClassBox(src), GUIView.findClassBox(dest));
+            relTypeLine(src, dest, newRelType);
+            //
             UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);
             stage.close();
         }
@@ -571,6 +576,10 @@ public class GUIController {
         else if(reltype.equals("realization")){
             GUIView.drawLine(src, dest, Color.RED);
         }
+    }
+
+    public static void checkLineColor(){
+
     }
 
     public static void main(String[] args) {

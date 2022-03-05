@@ -3,7 +3,6 @@ package uml;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,15 +14,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -48,6 +44,7 @@ public class GUIView extends Application {
     static double startDragY;
 
     static ArrayList<ClassBox> classBoxList = new ArrayList<>();
+    static ArrayList<RelLine> lineList = new ArrayList<RelLine>();
 
     /**
      * Starts the initial window for the diagram
@@ -946,9 +943,17 @@ public class GUIView extends Application {
         stage.show();
     }
 
+    /**
+     * Takes in the source and destination class names and a line color
+     *
+     * @param src the source class name
+     * @param dest the destination class name
+     * @param color the line color
+     */
     public static void drawLine(String src, String dest, Color color){
         ClassBox source = null;
         ClassBox destination = null;
+        // search through the class box list for the source and destination classes
         for(ClassBox box : classBoxList){
             if(box.getClassBoxName().equals(src)){
                 source = box;
@@ -957,32 +962,34 @@ public class GUIView extends Application {
                 destination = box;
             }
         }
+
         assert source != null;
         assert destination != null;
-        //source.getClassPane().setTranslateX(source.getBoxWidth() / 2);
-        //destination.getClassPane().setTranslateX(destination.getBoxWidth() / 2);
-        Line line = new Line(source.getClassPane().getTranslateX(), source.getClassPane().getTranslateY(),
-                destination.getClassPane().getTranslateX(), destination.getClassPane().getTranslateY());
-        line.setStrokeWidth(5);
-        line.setStroke(color);
-        superRoot.getChildren().add(0, line);
-
-        line.startXProperty().bind(source.getClassPane().translateXProperty());
-        line.startYProperty().bind(source.getClassPane().translateYProperty());
-        line.endXProperty().bind(destination.getClassPane().translateXProperty());
-        line.endYProperty().bind(destination.getClassPane().translateYProperty());
-
+        // draw a new line that connects to the source and destination class boxes
+        RelLine newRelLine = new RelLine(source, destination, color);
+        // add the new line to the line list and the super root
+        lineList.add(newRelLine);
+        superRoot.getChildren().add(0, newRelLine.getLine());
     }
 
+    /**
+     * Takes in a class name and draws a new class box object
+     *
+     * @param className the name of the class
+     */
     public static void drawClassBox(String className) {
+        // create a class box object, add it to the class box list and the super root
         ClassBox classBox = new ClassBox(className);
         superRoot.getChildren().add(classBox.getClassPane());
         classBoxList.add(classBox);
 
+        // when the box is clicked on begin drag with mouse
         classBox.getClassPane().setOnMouseDragEntered(event -> {
             startDragX = event.getSceneX();
             startDragY = event.getSceneY();
         });
+
+        // keep box under mouse as the mouse continues to drag
         classBox.getClassPane().setOnMouseDragged(event -> {
             classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);
             classBox.getClassPane().setTranslateY(event.getSceneY() - startDragY);
@@ -1016,6 +1023,41 @@ public class GUIView extends Application {
 
     }
 
+    /**
+     * Takes in a class name from the classlist, searches through the
+     * class box list for a class box object with the same name as className
+     *
+     * @param className the name of the class
+     * @return the classbox object with the same class name
+     */
+    public static ClassBox findClassBox(String className){
+        ClassBox classbox = null;
+        for(ClassBox box : classBoxList) {
+            if (box.getClassBoxName().equals(className)) {
+                classbox = box;
+            }
+        }
+        return classbox;
+    }
+
+    /**
+     * Takes in a source class box object and a destination class
+     * box object, searches through the list of relationship lines
+     * and deletes the line that matches the source and destination
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     */
+    public static void deleteRelLine (ClassBox src, ClassBox dest){
+        for(int i = 0; i < lineList.size(); ++i){
+            if(lineList.get(i).getCBSrc().equals(src)){
+                if(lineList.get(i).getCBDest().equals(dest)){
+                    superRoot.getChildren().remove(lineList.get(i).getLine());
+                    lineList.remove(lineList.get(i));
+                }
+            }
+        }
+    }
 
     //***************************************//
     //*********** GUI View Main *************//
