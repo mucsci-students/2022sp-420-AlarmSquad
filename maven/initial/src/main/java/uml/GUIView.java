@@ -47,7 +47,7 @@ public class GUIView extends Application {
     static double startDragX;
     static double startDragY;
 
-    static ArrayList<StackPane> classPaneList = new ArrayList<>();
+    static ArrayList<ClassBox> classBoxList = new ArrayList<>();
 
     /**
      * Starts the initial window for the diagram
@@ -946,25 +946,38 @@ public class GUIView extends Application {
         stage.show();
     }
 
-    public static void drawLine(){
-        if(classPaneList.size() > 1) {
-            Line line = new Line(classPaneList.get(0).getTranslateX(), classPaneList.get(0).getTranslateY(),
-                    classPaneList.get(1).getTranslateX(), classPaneList.get(1).getTranslateY());
-            line.setStrokeWidth(5);
-            line.setStroke(Color.GREEN);
-            superRoot.getChildren().add(line);
-
-            line.startXProperty().bind(classPaneList.get(0).translateXProperty());
-            line.startYProperty().bind(classPaneList.get(0).translateYProperty());
-            line.endXProperty().bind(classPaneList.get(1).translateXProperty());
-            line.endYProperty().bind(classPaneList.get(1).translateYProperty());
+    public static void drawLine(String src, String dest, Color color){
+        ClassBox source = null;
+        ClassBox destination = null;
+        for(ClassBox box : classBoxList){
+            if(box.getClassBoxName().equals(src)){
+                source = box;
+            }
+            if(box.getClassBoxName().equals(dest)){
+                destination = box;
+            }
         }
+        assert source != null;
+        assert destination != null;
+        //source.getClassPane().setTranslateX(source.getBoxWidth() / 2);
+        //destination.getClassPane().setTranslateX(destination.getBoxWidth() / 2);
+        Line line = new Line(source.getClassPane().getTranslateX(), source.getClassPane().getTranslateY(),
+                destination.getClassPane().getTranslateX(), destination.getClassPane().getTranslateY());
+        line.setStrokeWidth(5);
+        line.setStroke(color);
+        superRoot.getChildren().add(0, line);
+
+        line.startXProperty().bind(source.getClassPane().translateXProperty());
+        line.startYProperty().bind(source.getClassPane().translateYProperty());
+        line.endXProperty().bind(destination.getClassPane().translateXProperty());
+        line.endYProperty().bind(destination.getClassPane().translateYProperty());
+
     }
 
     public static void drawClassBox(String className) {
         ClassBox classBox = new ClassBox(className);
         superRoot.getChildren().add(classBox.getClassPane());
-        classPaneList.add(classBox.getClassPane());
+        classBoxList.add(classBox);
 
         classBox.getClassPane().setOnMouseDragEntered(event -> {
             startDragX = event.getSceneX();
@@ -994,25 +1007,13 @@ public class GUIView extends Application {
 
         StackPane methPane = new StackPane();
 
-        for (StackPane pane : classPaneList) {
-            for (int i = 0; i < pane.getChildren().size(); ++i) {
-                if (pane.getChildren().get(i).getClass().getName().equals(className)) {
-                    for (Method meth : methList) {
-                        methBoxWidth += 100;
-                        methBoxHeight += 20;
-                        Text methName = new Text(meth.getAttName());
-                        pane.getChildren().add(methName);
-                    }
-                }
-            }
+        Rectangle methBox = new Rectangle((methBoxWidth), (methBoxHeight));
+        methBox.setFill(Color.WHITESMOKE);
+        methBox.setStroke(Color.BLACK);
 
-            Rectangle methBox = new Rectangle((methBoxWidth), (methBoxHeight));
-            methBox.setFill(Color.WHITESMOKE);
-            methBox.setStroke(Color.BLACK);
+        methPane.getChildren().add(methBox);
+        superRoot.getChildren().add(methPane);
 
-            methPane.getChildren().add(methBox);
-            superRoot.getChildren().add(methPane);
-        }
     }
 
 

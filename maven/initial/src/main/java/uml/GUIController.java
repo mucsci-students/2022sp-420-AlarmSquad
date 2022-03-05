@@ -185,7 +185,7 @@ public class GUIController {
                     UMLClass dest = UMLModel.findClass(destName);
                     Relationship newRel = new Relationship(src, dest, relType);
                     UMLModel.addRel(newRel);
-                    GUIView.drawLine();
+                    relTypeLine(srcName, destName, UMLModel.findRelType(srcName, destName));
                     stage.close();
                 // if the relationship does exist, pop an error up
                 } else {
@@ -542,7 +542,6 @@ public class GUIController {
         }
     }
 
-
     /**
      * Exits the current window if called
      *
@@ -558,6 +557,21 @@ public class GUIController {
      * End of view action methods
      *
      ******************************************************************/
+
+    public static void relTypeLine(String src, String dest, String reltype){
+        if(reltype.equals("aggregation")){
+            GUIView.drawLine(src, dest, Color.GREEN);
+        }
+        else if(reltype.equals("composition")){
+            GUIView.drawLine(src, dest, Color.YELLOW);
+        }
+        else if(reltype.equals("inheritance")){
+            GUIView.drawLine(src, dest, Color.BLUE);
+        }
+        else if(reltype.equals("realization")){
+            GUIView.drawLine(src, dest, Color.RED);
+        }
+    }
 
     public static void main(String[] args) {
         GUIView.main(args);
