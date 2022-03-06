@@ -1,1 +1,0 @@
-{"relationshipList":[{"destination":"d","relType":"inheritance","source":"c"}],"classList":[{"className":"c","methodList":[],"fieldList":[{"name":"cf","type":"int"}]},{"className":"d","methodList":[{"name":"dm","parameters":[],"returnType":"void"}],"fieldList":[]}]}
