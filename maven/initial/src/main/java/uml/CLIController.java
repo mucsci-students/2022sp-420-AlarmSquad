@@ -872,8 +872,8 @@ public class CLIController {
             } else {
                 System.out.print("\t\t [" + method.getReturnType() + " " + copyMethList.get(i).getAttName() + " (");
             }
-            for (int j = 0; j < copyMethList.get(i).returnList().size(); ++j) {
-                Parameter param = copyMethList.get(i).returnList().get(j);
+            for (int j = 0; j < copyMethList.get(i).getParamList().size(); ++j) {
+                Parameter param = copyMethList.get(i).getParamList().get(j);
                 if (j == 0) {
                     System.out.printf("%s %s", param.getFieldType(), param.getAttName());
                 } else {

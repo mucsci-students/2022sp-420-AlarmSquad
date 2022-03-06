@@ -68,7 +68,7 @@ public class Method extends Attribute {
         return null;
     }
 
-    public ArrayList<Parameter> returnList () {
+    public ArrayList<Parameter> getParamList() {
         return paramList;
     }
 
