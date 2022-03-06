@@ -348,6 +348,7 @@ public class GUIController {
         } else {
             Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
                     UMLModel.findRelType(srcName, destName));
+
             GUIView.deleteRelLine(GUIView.findClassBox(srcName), GUIView.findClassBox(destName));
             UMLModel.deleteRel(relToDelete);
             stage.close();
@@ -591,10 +592,20 @@ public class GUIController {
      * @param relList the list of relationships in the diagram
      */
     public static void uploadDiagram(ArrayList<UMLClass> classList, ArrayList<Relationship> relList) {
+        int classListSize = 0;
+
         for (UMLClass classObj : classList) {
+
+            // formats the class boxes
+            classListSize += 1;
+            int multiplier = (((int) classListSize - 1) / (int) 8);
+            int yOffset = 20 + (multiplier * 200);
+            int xOffset = (-85) + (((classListSize - 1) % 8) * 115);
+
             int fieldListSize = 0;
             int methodListSize = 0;
-            GUIView.drawClassBox(classObj.getClassName());
+
+            GUIView.drawClassBox(classObj.getClassName(), xOffset, yOffset);
             for (Field fieldObj : classObj.getFieldList()) {
                 fieldListSize += 1;
                 GUIView.drawFieldBox(fieldListSize, methodListSize,
