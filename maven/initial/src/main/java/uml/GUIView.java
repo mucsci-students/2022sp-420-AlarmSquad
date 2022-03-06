@@ -961,6 +961,8 @@ public class GUIView extends Application {
 
         assert source != null;
         assert destination != null;
+        //source.getClassPane().setTranslateX(source.getBoxWidth() / 2);
+        //destination.getClassPane().setTranslateX(destination.getBoxWidth() / 2);
         // draw a new line that connects to the source and destination class boxes
         RelLine newRelLine = new RelLine(source, destination, color);
         // add the new line to the line list and the super root
@@ -973,12 +975,14 @@ public class GUIView extends Application {
      *
      * @param className the name of the class
      */
-    public static void drawClassBox(String className) {
+    public static void drawClassBox(String className, int xOffset, int yOffset)  {
         // create a class box object, add it to the class box list and the super root
         ClassBox classBox = new ClassBox(className);
         superRoot.getChildren().add(classBox.getClassPane());
         classBoxList.add(classBox);
 
+        classBox.getClassPane().setTranslateX(classBox.getBoxWidth() + xOffset);
+        classBox.getClassPane().setTranslateY(classBox.getBoxHeight() + yOffset);
         // when the box is clicked on begin drag with mouse
         classBox.getClassPane().setOnMouseDragEntered(event -> {
             startDragX = event.getSceneX();

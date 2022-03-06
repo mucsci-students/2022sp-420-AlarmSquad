@@ -72,8 +72,12 @@ public class GUIController {
                     UMLClass newClass = new UMLClass(className);
                     UMLModel.addClass(newClass);
                     stage.close();
+                    int multiplier = (((int) UMLModel.getClassList().size() - 1) / (int) 8);
+                    int yOffset = 20 + (multiplier * 200);
+                    int xOffset = (-85) + (((UMLModel.getClassList().size() - 1) % 8) * 115);
+
                     // Draw the new box for the class
-                    GUIView.drawClassBox(className);
+                    GUIView.drawClassBox(className, xOffset, yOffset);
                     // if the class does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Class already exists");
