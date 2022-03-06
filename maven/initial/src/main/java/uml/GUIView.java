@@ -11,12 +11,8 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -996,31 +992,18 @@ public class GUIView extends Application {
         });
     }
 
-    public static void drawFieldBox(String fieldName) {
-        Rectangle fieldBox = new Rectangle((boxWidth), (boxHeight));
-        fieldBox.setFill(Color.WHITESMOKE);
-        fieldBox.setStroke(Color.BLACK);
-        Text classTitle = new Text(fieldName);
-        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
-        StackPane classStack = new StackPane();
-        classStack.getChildren().addAll(fieldBox, classTitle);
-        superRoot.getChildren().add(classStack);
+    public static void drawFieldBox(int fieldListSize, int methListSize, Field field, String className) {
+        String fieldName = field.getAttName();
+        ClassBox box = findClassBox(className);
+        box.setBoxHeight(box.getBoxHeight() + 15);
+        box.addText(field, fieldListSize, methListSize);
     }
 
-    public static void drawMethodBox(ArrayList<Method> methList, String className) {
-
-        double methBoxWidth = 0;
-        double methBoxHeight = 0;
-
-        StackPane methPane = new StackPane();
-
-        Rectangle methBox = new Rectangle((methBoxWidth), (methBoxHeight));
-        methBox.setFill(Color.WHITESMOKE);
-        methBox.setStroke(Color.BLACK);
-
-        methPane.getChildren().add(methBox);
-        superRoot.getChildren().add(methPane);
-
+    public static void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
+        String methName = meth.getAttName();
+        ClassBox box = findClassBox(className);
+        box.setBoxHeight(box.getBoxHeight() + 15);
+        box.addText(meth, fieldListSize, methListSize);
     }
 
     /**

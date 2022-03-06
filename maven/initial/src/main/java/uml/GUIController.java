@@ -109,6 +109,8 @@ public class GUIController {
                     Field newField = new Field(fieldName, fieldType);
                     UMLModel.findClass(className).addField(newField);
                     stage.close();
+                    GUIView.drawFieldBox(UMLModel.findClass(className).getFieldList().size(),
+                            UMLModel.findClass(className).getMethodList().size(), newField, className);
                 // if the field does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
@@ -138,7 +140,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(methodName)) {
                 GUIView.popUpWindow("Error", "The method name is invalid");
             // if the return type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidType(returnType)) {
+            } else if (UMLModel.isNotValidReturnType(returnType)) {
                 GUIView.popUpWindow("Error", "The return type is invalid");
             // check if the method exists
             } else {
@@ -147,7 +149,8 @@ public class GUIController {
                     Method newMethod = new Method(methodName, returnType);
                     UMLModel.findClass(className).addMethod(newMethod);
                     stage.close();
-                    GUIView.drawMethodBox(UMLModel.findClass(className).getMethodList(), className);
+                    GUIView.drawMethodBox(UMLModel.findClass(className).getFieldList().size(),
+                            UMLModel.findClass(className).getMethodList().size(), newMethod, className);
                     // if the method does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
@@ -564,17 +567,11 @@ public class GUIController {
      ******************************************************************/
 
     public static void relTypeLine(String src, String dest, String reltype){
-        if(reltype.equals("aggregation")){
-            GUIView.drawLine(src, dest, Color.GREEN);
-        }
-        else if(reltype.equals("composition")){
-            GUIView.drawLine(src, dest, Color.YELLOW);
-        }
-        else if(reltype.equals("inheritance")){
-            GUIView.drawLine(src, dest, Color.BLUE);
-        }
-        else if(reltype.equals("realization")){
-            GUIView.drawLine(src, dest, Color.RED);
+        switch (reltype) {
+            case "aggregation" -> GUIView.drawLine(src, dest, Color.GREEN);
+            case "composition" -> GUIView.drawLine(src, dest, Color.YELLOW);
+            case "inheritance" -> GUIView.drawLine(src, dest, Color.BLUE);
+            case "realization" -> GUIView.drawLine(src, dest, Color.RED);
         }
     }
 
