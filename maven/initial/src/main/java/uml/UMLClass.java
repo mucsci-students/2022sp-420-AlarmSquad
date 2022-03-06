@@ -159,8 +159,6 @@ public class UMLClass {
                 return field;
             }
         }
-        // otherwise, tell the user it does not exist and return null
-        System.out.println("Field \"" + fieldToFind + "\" not found in class " + getClassName());
         return null;
     }
 
@@ -178,8 +176,6 @@ public class UMLClass {
                 return method;
             }
         }
-        // otherwise, tell the user it does not exist and return null
-        System.out.println("Method \"" + methodToFind + "\" not found in class " + getClassName());
         return null;
     }
 

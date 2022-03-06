@@ -3,7 +3,6 @@ package uml;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,16 +11,11 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
 
 /**
@@ -32,14 +26,21 @@ import java.util.ArrayList;
 public class GUIView extends Application {
 
     // create the menu bar
-    private MenuBar menuBar = new MenuBar();
+    private final MenuBar menuBar = new MenuBar();
     // initialize the root
     static Group superRoot = new Group();
+
+    static final double DIAGRAM_WIDTH = 950;
+    static final double DIAGRAM_HEIGHT = 640;
 
     static double boxWidth = 100;
     static double boxHeight = 20;
 
-    static ArrayList<StackPane> classPaneList = new ArrayList<>();
+    static double startDragX;
+    static double startDragY;
+
+    static ArrayList<ClassBox> classBoxList = new ArrayList<>();
+    static ArrayList<RelLine> lineList = new ArrayList<RelLine>();
 
     /**
      * Starts the initial window for the diagram
@@ -55,8 +56,8 @@ public class GUIView extends Application {
         Scene window = new Scene(superRoot, Color.DIMGRAY);
         // set the title, height, and width of the window
         stage.setTitle("UML Editor");
-        stage.setWidth(950);
-        stage.setHeight(640);
+        stage.setWidth(DIAGRAM_WIDTH);
+        stage.setHeight(DIAGRAM_HEIGHT);
         stage.setResizable(false);
         // set the stage and show it
         stage.setScene(window);
@@ -938,63 +939,108 @@ public class GUIView extends Application {
         stage.show();
     }
 
+    /**
+     * Takes in the source and destination class names and a line color
+     *
+     * @param src the source class name
+     * @param dest the destination class name
+     * @param color the line color
+     */
+    public static void drawLine(String src, String dest, Color color){
+        ClassBox source = null;
+        ClassBox destination = null;
+        // search through the class box list for the source and destination classes
+        for(ClassBox box : classBoxList){
+            if(box.getClassBoxName().equals(src)){
+                source = box;
+            }
+            if(box.getClassBoxName().equals(dest)){
+                destination = box;
+            }
+        }
+
+        assert source != null;
+        assert destination != null;
+        // draw a new line that connects to the source and destination class boxes
+        RelLine newRelLine = new RelLine(source, destination, color);
+        // add the new line to the line list and the super root
+        lineList.add(newRelLine);
+        superRoot.getChildren().add(0, newRelLine.getLine());
+    }
+
+    /**
+     * Takes in a class name and draws a new class box object
+     *
+     * @param className the name of the class
+     */
     public static void drawClassBox(String className) {
-        Rectangle titleBox = new Rectangle((boxWidth), (boxHeight));
-        titleBox.setFill(Color.WHITESMOKE);
-        titleBox.setStroke(Color.BLACK);
-        Text classTitle = new Text(className);
-        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
-        StackPane classStack = new StackPane();
-        classStack.getChildren().addAll(titleBox, classTitle);
-        classStack.setLayoutX(GUIController.getXGridPosition());
-        classStack.setLayoutY(GUIController.getYGridPosition());
-        superRoot.getChildren().add(classStack);
-        classPaneList.add(classStack);
+        // create a class box object, add it to the class box list and the super root
+        ClassBox classBox = new ClassBox(className);
+        superRoot.getChildren().add(classBox.getClassPane());
+        classBoxList.add(classBox);
+
+        // when the box is clicked on begin drag with mouse
+        classBox.getClassPane().setOnMouseDragEntered(event -> {
+            startDragX = event.getSceneX();
+            startDragY = event.getSceneY();
+        });
+
+        // keep box under mouse as the mouse continues to drag
+        classBox.getClassPane().setOnMouseDragged(event -> {
+            classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);
+            classBox.getClassPane().setTranslateY(event.getSceneY() - startDragY);
+        });
     }
 
-    public static void drawFieldBox(String fieldName) {
-        Rectangle fieldBox = new Rectangle((boxWidth), (boxHeight));
-        fieldBox.setFill(Color.WHITESMOKE);
-        fieldBox.setStroke(Color.BLACK);
-        Text classTitle = new Text(fieldName);
-        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));
-        StackPane classStack = new StackPane();
-        classStack.getChildren().addAll(fieldBox, classTitle);
-        classStack.setLayoutX(GUIController.getXGridPosition());
-        classStack.setLayoutY(GUIController.getYGridPosition());
-        superRoot.getChildren().add(classStack);
+    public static void drawFieldBox(int fieldListSize, int methListSize, Field field, String className) {
+        String fieldName = field.getAttName();
+        ClassBox box = findClassBox(className);
+        box.setBoxHeight(box.getBoxHeight() + 15);
+        box.addText(field, fieldListSize, methListSize);
     }
 
-    public static void drawMethodBox(ArrayList<Method> methList, String className) {
+    public static void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
+        String methName = meth.getAttName();
+        ClassBox box = findClassBox(className);
+        box.setBoxHeight(box.getBoxHeight() + 15);
+        box.addText(meth, fieldListSize, methListSize);
+    }
 
-        double methBoxWidth = 0;
-        double methBoxHeight = 0;
+    /**
+     * Takes in a class name from the classlist, searches through the
+     * class box list for a class box object with the same name as className
+     *
+     * @param className the name of the class
+     * @return the classbox object with the same class name
+     */
+    public static ClassBox findClassBox(String className){
+        ClassBox classbox = null;
+        for(ClassBox box : classBoxList) {
+            if (box.getClassBoxName().equals(className)) {
+                classbox = box;
+            }
+        }
+        return classbox;
+    }
 
-        StackPane methPane = new StackPane();
-
-        for (StackPane pane : classPaneList) {
-            for (int i = 0; i < pane.getChildren().size(); ++i) {
-                if (pane.getChildren().get(i).getClass().getName().equals(className)) {
-                    for (Method meth : methList) {
-                        methBoxWidth += 100;
-                        methBoxHeight += 20;
-                        Text methName = new Text(meth.getAttName());
-                        pane.getChildren().add(methName);
-                    }
+    /**
+     * Takes in a source class box object and a destination class
+     * box object, searches through the list of relationship lines
+     * and deletes the line that matches the source and destination
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     */
+    public static void deleteRelLine (ClassBox src, ClassBox dest){
+        for(int i = 0; i < lineList.size(); ++i){
+            if(lineList.get(i).getCBSrc().equals(src)){
+                if(lineList.get(i).getCBDest().equals(dest)){
+                    superRoot.getChildren().remove(lineList.get(i).getLine());
+                    lineList.remove(lineList.get(i));
                 }
             }
-
-            Rectangle methBox = new Rectangle((methBoxWidth), (methBoxHeight));
-            methBox.setFill(Color.WHITESMOKE);
-            methBox.setStroke(Color.BLACK);
-
-            methPane.getChildren().add(methBox);
-            methPane.setLayoutX(GUIController.getXGridPosition());
-            methPane.setLayoutY(GUIController.getYGridPosition());
-            superRoot.getChildren().add(methPane);
         }
     }
-
 
     //***************************************//
     //*********** GUI View Main *************//

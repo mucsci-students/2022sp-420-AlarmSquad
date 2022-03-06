@@ -71,7 +71,6 @@ public class GUIController {
                     stage.close();
                     // Draw the new box for the class
                     GUIView.drawClassBox(className);
-
                     // if the class does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Class already exists");
@@ -110,6 +109,8 @@ public class GUIController {
                     Field newField = new Field(fieldName, fieldType);
                     UMLModel.findClass(className).addField(newField);
                     stage.close();
+                    GUIView.drawFieldBox(UMLModel.findClass(className).getFieldList().size(),
+                            UMLModel.findClass(className).getMethodList().size(), newField, className);
                 // if the field does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
@@ -148,7 +149,8 @@ public class GUIController {
                     Method newMethod = new Method(methodName, returnType);
                     UMLModel.findClass(className).addMethod(newMethod);
                     stage.close();
-                    GUIView.drawMethodBox(UMLModel.findClass(className).getMethodList(), className);
+                    GUIView.drawMethodBox(UMLModel.findClass(className).getFieldList().size(),
+                            UMLModel.findClass(className).getMethodList().size(), newMethod, className);
                     // if the method does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
@@ -186,6 +188,7 @@ public class GUIController {
                     UMLClass dest = UMLModel.findClass(destName);
                     Relationship newRel = new Relationship(src, dest, relType);
                     UMLModel.addRel(newRel);
+                    relTypeLine(srcName, destName, UMLModel.findRelType(srcName, destName));
                     stage.close();
                 // if the relationship does exist, pop an error up
                 } else {
@@ -337,7 +340,8 @@ public class GUIController {
         // delete the relationship, update the view and close
         } else {
             Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
-                                                                UMLModel.findRelType(srcName, destName));
+                    UMLModel.findRelType(srcName, destName));
+            GUIView.deleteRelLine(GUIView.findClassBox(srcName), GUIView.findClassBox(destName));
             UMLModel.deleteRel(relToDelete);
             stage.close();
         }
@@ -533,6 +537,10 @@ public class GUIController {
         }
         // if the old type and the new type are not the same, change the type
         else if(!oldReltype.equals(newRelType)){
+            // update the view
+            GUIView.deleteRelLine(GUIView.findClassBox(src), GUIView.findClassBox(dest));
+            relTypeLine(src, dest, newRelType);
+            //
             UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);
             stage.close();
         }
@@ -541,32 +549,6 @@ public class GUIController {
             GUIView.popUpWindow("Error", "Type are the same");
         }
     }
-
-    public static double getXGridPosition() {
-        int pos = UMLModel.getClassList().size();
-        switch (pos) {
-            case 1, 6, 11 -> {return 25;}
-            case 2, 7, 12 -> {return 225;}
-            case 3, 8, 13 -> {return 425;}
-            case 4, 9, 14 -> {return 625;}
-            case 5, 10, 15 -> {return 825;}
-        }
-
-        return 0;
-    }
-
-    public static double getYGridPosition() {
-        int pos = UMLModel.getClassList().size();
-
-        switch (pos) {
-            case 1, 2, 3, 4, 5 -> {return 40;}
-            case 6, 7, 8, 9, 10 -> {return 240;}
-            case 11, 12, 13, 14, 15 -> {return 440;}
-        }
-
-        return 0;
-    }
-
 
     /**
      * Exits the current window if called
@@ -583,6 +565,19 @@ public class GUIController {
      * End of view action methods
      *
      ******************************************************************/
+
+    public static void relTypeLine(String src, String dest, String reltype){
+        switch (reltype) {
+            case "aggregation" -> GUIView.drawLine(src, dest, Color.GREEN);
+            case "composition" -> GUIView.drawLine(src, dest, Color.YELLOW);
+            case "inheritance" -> GUIView.drawLine(src, dest, Color.BLUE);
+            case "realization" -> GUIView.drawLine(src, dest, Color.RED);
+        }
+    }
+
+    public static void checkLineColor(){
+
+    }
 
     public static void main(String[] args) {
         GUIView.main(args);
