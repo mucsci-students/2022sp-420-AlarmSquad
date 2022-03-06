@@ -1,8 +1,9 @@
 package uml;
 
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 
 public class GUIController {
@@ -43,6 +44,8 @@ public class GUIController {
             // otherwise, load the file and exit the window
         } else {
             JSON.load(fileName);
+            clearDiagram();
+            uploadDiagram(UMLModel.getClassList(), UMLModel.getRelationshipList());
             stage.close();
         }
     }
@@ -153,7 +156,7 @@ public class GUIController {
                             UMLModel.findClass(className).getMethodList().size(), newMethod, className);
                     // if the method does exist, pop an error up
                 } else {
-                    GUIView.popUpWindow("Error", "Field already exists");
+                    GUIView.popUpWindow("Error", "Method already exists");
                 }
             }
         }
@@ -188,7 +191,7 @@ public class GUIController {
                     UMLClass dest = UMLModel.findClass(destName);
                     Relationship newRel = new Relationship(src, dest, relType);
                     UMLModel.addRel(newRel);
-                    relTypeLine(srcName, destName, UMLModel.findRelType(srcName, destName));
+                    drawRelLine(srcName, destName, UMLModel.findRelType(srcName, destName));
                     stage.close();
                 // if the relationship does exist, pop an error up
                 } else {
@@ -539,7 +542,7 @@ public class GUIController {
         else if(!oldReltype.equals(newRelType)){
             // update the view
             GUIView.deleteRelLine(GUIView.findClassBox(src), GUIView.findClassBox(dest));
-            relTypeLine(src, dest, newRelType);
+            drawRelLine(src, dest, newRelType);
             //
             UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);
             stage.close();
@@ -566,7 +569,46 @@ public class GUIController {
      *
      ******************************************************************/
 
-    public static void relTypeLine(String src, String dest, String reltype){
+    public static void clearDiagram() {
+        for (ClassBox cbObj : GUIView.classBoxList) {
+            GUIView.superRoot.getChildren().remove(cbObj.getClassPane());
+        }
+        for (RelLine relLineObj : GUIView.lineList) {
+            GUIView.superRoot.getChildren().remove(relLineObj.getLine());
+        }
+        GUIView.classBoxList.clear();
+        GUIView.lineList.clear();
+    }
+
+    /**
+     * Takes in all the data from the model and draws an entirely new diagram
+     *
+     * @param classList the list of classes in the diagram
+     * @param relList the list of relationships in the diagram
+     */
+    public static void uploadDiagram(ArrayList<UMLClass> classList, ArrayList<Relationship> relList) {
+        for (UMLClass classObj : classList) {
+            int fieldListSize = 0;
+            int methodListSize = 0;
+            GUIView.drawClassBox(classObj.getClassName());
+            for (Field fieldObj : classObj.getFieldList()) {
+                fieldListSize += 1;
+                GUIView.drawFieldBox(fieldListSize, methodListSize,
+                        fieldObj, classObj.getClassName());
+            }
+            for (Method methodObj : classObj.getMethodList()) {
+                methodListSize += 1;
+                GUIView.drawMethodBox(fieldListSize, methodListSize,
+                        methodObj, classObj.getClassName());
+            }
+        }
+        for (Relationship relObj : relList) {
+            drawRelLine(relObj.getSource().getClassName(),
+                    relObj.getDestination().getClassName(), relObj.getRelType());
+        }
+    }
+
+    public static void drawRelLine(String src, String dest, String reltype){
         switch (reltype) {
             case "aggregation" -> GUIView.drawLine(src, dest, Color.GREEN);
             case "composition" -> GUIView.drawLine(src, dest, Color.YELLOW);
