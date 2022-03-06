@@ -243,6 +243,9 @@ public class GUIController {
                     Parameter newParam = new Parameter(paramName, paramType);
                     UMLModel.findClass(className).findMethod(methodName).addParameter(newParam);
                     stage.close();
+                    GUIView.findClassBox(className).addText(UMLModel.findClass(className).findMethod(methodName),
+                            UMLModel.findClass(className).getFieldList().size(),
+                            UMLModel.findClass(className).getMethodList().size(), true);
                 // if the method does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
@@ -656,6 +659,10 @@ public class GUIController {
                 methodListSize += 1;
                 GUIView.drawMethodBox(fieldListSize, methodListSize,
                         methodObj, classObj.getClassName());
+                GUIView.findClassBox(classObj.getClassName()).addText(UMLModel.findClass(
+                        classObj.getClassName()).findMethod(methodObj.getAttName()),
+                        UMLModel.findClass(classObj.getClassName()).getFieldList().size(),
+                        UMLModel.findClass(classObj.getClassName()).getMethodList().size(), true);
             }
         }
         for (Relationship relObj : relList) {

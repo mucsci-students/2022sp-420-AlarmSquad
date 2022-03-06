@@ -80,7 +80,7 @@ public class ClassBox {
      * @param numOfFields number of fields currently in the class
      * @param numOfMeths number of methods currently in the class
      */
-    public <E> void addText(E att, int numOfFields, int numOfMeths) {
+    public <E> void addText(E att, int numOfFields, int numOfMeths, boolean isParam) {
 
         // Clear the flow each time a method or field is added,
         // thus clearing the classbox of all objects.
@@ -124,27 +124,46 @@ public class ClassBox {
         // on a new line in the classbox, and add "+ " to front of the name, and "()" to the back
         // for formatting
         else {
-            attName = ("\n+ " + ((Method) att).getAttName() + "()");
+            attName = ("\n+ " + ((Method) att).getAttName() + "(");
 
-            // If this is the first method ever being added to the class associated with this
-            // classbox, then initialize the methTextList, and increase the size of the
-            // classbox for formatting. Attributes are added to their classes BEFORE the drawing of the box,
-            // so the number of methods in a class will only == 1 inside this method when this is the first
-            // method being added to a class.
-            if (numOfMeths == 1) {
-                methTextList = new ArrayList<>();
-                setBoxHeight(boxHeight + 15);
+            String paramText = "";
 
-                // If fields will also need to be placed in the classbox, extra padding
-                // is needed to accommodate the additional separator line between the field list and
-                // the method list.
-                if (numOfFields != 0)
-                    setBoxHeight(boxHeight + 10);
+            ArrayList<Parameter> paramList = ((Method) att).getParamList();
+
+            if (paramList.size() >= 1) {
+                paramText += paramList.get(0).getAttName() + " : " + paramList.get(0).getFieldType();
+                for (int i = 1; i < paramList.size(); ++i) {
+                    paramText += ", " + paramList.get(i).getAttName() + " : " + paramList.get(i).getFieldType();
+                }
             }
-            // Add the method to the methTextList
-            Text text = new Text(attName);
-            methTextList.add(text);
-        }
+            attName += paramText + ")";
+
+            if (isParam) {
+                String name = ((Method) att).getAttName();
+                methTextList.removeIf(textObj -> textObj.getText().startsWith("\n+ " + name));
+            }
+
+                // If this is the first method ever being added to the class associated with this
+                // classbox, then initialize the methTextList, and increase the size of the
+                // classbox for formatting. Attributes are added to their classes BEFORE the drawing of the box,
+                // so the number of methods in a class will only == 1 inside this method when this is the first
+                // method being added to a class.
+                if (numOfMeths == 1) {
+                    methTextList = new ArrayList<>();
+                    if (!isParam) {
+                        setBoxHeight(boxHeight + 15);
+                    }
+
+                    // If fields will also need to be placed in the classbox, extra padding
+                    // is needed to accommodate the additional separator line between the field list and
+                    // the method list.
+                    if (numOfFields != 0)
+                        setBoxHeight(boxHeight + 10);
+                }
+                // Add the method to the methTextList
+                Text text = new Text(attName);
+                methTextList.add(text);
+            }
 
         // Draw a separating line between the title of the class, and the attribute list(s)
         // that are about to be added

@@ -999,13 +999,13 @@ public class GUIView extends Application {
     public static void drawFieldBox(int fieldListSize, int methListSize, Field field, String className) {
         ClassBox box = findClassBox(className);
         box.setBoxHeight(box.getBoxHeight() + 15);
-        box.addText(field, fieldListSize, methListSize);
+        box.addText(field, fieldListSize, methListSize, false);
     }
 
     public static void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
         ClassBox box = findClassBox(className);
         box.setBoxHeight(box.getBoxHeight() + 15);
-        box.addText(meth, fieldListSize, methListSize);
+        box.addText(meth, fieldListSize, methListSize, false);
     }
 
     /**

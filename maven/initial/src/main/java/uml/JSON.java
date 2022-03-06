@@ -63,7 +63,7 @@ public class JSON {
 
                 // iterate through the method object's parameters
                 JSONArray paramList = new JSONArray();
-                for (Parameter paramObj : methObj.returnList()) {
+                for (Parameter paramObj : methObj.getParamList()) {
                     JSONObject paramToBeSaved = new JSONObject();
                     paramToBeSaved.put("name", paramObj.getAttName());
                     paramToBeSaved.put("type", paramObj.getFieldType());
