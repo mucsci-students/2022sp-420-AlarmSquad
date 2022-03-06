@@ -50,6 +50,10 @@ public class GUIController {
         }
     }
 
+    //***************************************//
+    //************ Add Actions **************//
+    //***************************************//
+
     /**
      * Creates and adds a class to the classList if the given string is nonempty,
      * pops an error up otherwise
@@ -247,6 +251,10 @@ public class GUIController {
         }
     }
 
+    //***************************************//
+    //*********** Delete Actions ************//
+    //***************************************//
+
     /**
      * Deletes a class to the classList if the given string is nonempty and the class exists,
      * pops an error up otherwise
@@ -265,8 +273,32 @@ public class GUIController {
             // if the class does exist, delete it and close
             } else {
                 UMLClass classToDelete = UMLModel.findClass(className);
-                UMLModel.deleteClass(classToDelete);
+                // update the view
                 stage.close();
+                // for each relationship object in the relationship list
+                for(Relationship r : UMLModel.getRelationshipList()){
+                    // if the className is the name of the source in a relationship
+                    if(r.getSource().getClassName().equals(className)){
+                        // delete the relationship line in the diagram
+                        GUIView.deleteRelLine(GUIView.findClassBox(className),
+                                GUIView.findClassBox(r.getDestination().getClassName()));
+                    }
+                    // if className is the name of the destination in a relationship
+                    if(r.getDestination().getClassName().equals(className)){
+                        // delete the relationship line in the diagram
+                        GUIView.deleteRelLine(GUIView.findClassBox(r.getSource().getClassName()),
+                                GUIView.findClassBox(className));
+                    }
+                    else{
+                        break;
+                    }
+                }
+                // delete the classbox from the view
+                GUIView.deleteClassBox(className);
+
+                // update the model
+                UMLModel.updateRelationshipList(className);
+                UMLModel.deleteClass(classToDelete);
             }
         }
     }
@@ -354,6 +386,10 @@ public class GUIController {
             stage.close();
         }
     }
+
+    //***************************************//
+    //********** Rename Actions *************//
+    //***************************************//
 
     /**
      * Renames a class to a given string in the classList if the given string is nonempty and the class exists,
@@ -558,6 +594,13 @@ public class GUIController {
         }
     }
 
+
+    /******************************************************************
+     *
+     * End of view action methods
+     *
+     ******************************************************************/
+
     /**
      * Exits the current window if called
      *
@@ -568,12 +611,10 @@ public class GUIController {
         stage.close();
     }
 
-    /******************************************************************
+    /**
+     * Clear the diagram of all classboxes and relationship lines
      *
-     * End of view action methods
-     *
-     ******************************************************************/
-
+     */
     public static void clearDiagram() {
         for (ClassBox cbObj : GUIView.classBoxList) {
             GUIView.superRoot.getChildren().remove(cbObj.getClassPane());
@@ -623,6 +664,14 @@ public class GUIController {
         }
     }
 
+    /**
+     * Takes in a source name, destination name and relType and draws a line with a different color
+     * corresponding to the relType
+     *
+     * @param src the source class name
+     * @param dest the destination class name
+     * @param reltype the relType
+     */
     public static void drawRelLine(String src, String dest, String reltype){
         switch (reltype) {
             case "aggregation" -> GUIView.drawLine(src, dest, Color.GREEN);
@@ -632,10 +681,12 @@ public class GUIController {
         }
     }
 
-    public static void checkLineColor(){
 
-    }
-
+    /**
+     * main
+     *
+     * @param args main arguments
+     */
     public static void main(String[] args) {
         GUIView.main(args);
     }

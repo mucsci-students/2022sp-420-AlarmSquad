@@ -1044,6 +1044,21 @@ public class GUIView extends Application {
         }
     }
 
+    /**
+     * Takes in a class box name(class name) and removes it from the super root
+     * and class box list(removes the class from the view)
+     *
+     * @param classBoxName the name of the class box(name of class)
+     */
+    public static void deleteClassBox (String classBoxName){
+        for (ClassBox cbObj : GUIView.classBoxList) {
+            if(cbObj.getClassBoxName().equals(classBoxName)) {
+                GUIView.superRoot.getChildren().remove(cbObj.getClassPane());
+            }
+        }
+        classBoxList.remove(findClassBox(classBoxName));
+    }
+
     //***************************************//
     //*********** GUI View Main *************//
     //***************************************//
