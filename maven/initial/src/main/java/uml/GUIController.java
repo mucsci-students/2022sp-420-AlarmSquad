@@ -332,6 +332,18 @@ public class GUIController {
             } else {
                 Field fieldToDelete = UMLModel.findClass(className).findField(fieldName);
                 UMLModel.findClass(className).deleteField(fieldToDelete);
+
+                // go through fieldList in ClassBox, remove the field from the fieldList, then
+                // remove field from flow
+                for (int i = 0; i < GUIView.findClassBox(className).getFieldTextList().size(); ++i) {
+                    if (GUIView.findClassBox(className).getFieldTextList().get(i).getText().
+                            startsWith("\n- " + fieldName)) {
+                        GUIView.findClassBox(className).getFlow().getChildren().remove(
+                                GUIView.findClassBox(className).getFieldTextList().get(i));
+                        GUIView.findClassBox(className).getFieldTextList().remove(i);
+                    }
+                }
+
                 stage.close();
             }
         }
@@ -354,13 +366,25 @@ public class GUIController {
             if (UMLModel.findClass(className) == null) {
                 GUIView.popUpWindow("Error", "Class does not exist");
             // if the method does not exist, pop an error up
-            } else if (UMLModel.findClass(className).findField(methodName) == null) {
+            } else if (UMLModel.findClass(className).findMethod(methodName) == null) {
                 GUIView.popUpWindow("Error", "Method does not exist");
             // if the method does exist, delete it and close
             } else {
                 Method methodToDelete = UMLModel.findClass(className).findMethod(methodName);
 
                 UMLModel.findClass(className).deleteMethod(methodToDelete);
+
+                // go through fieldList in ClassBox, remove the field from the fieldList, then
+                // remove field from flow
+                for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
+                    if (GUIView.findClassBox(className).getMethTextList().get(i).getText().
+                            startsWith("\n+ " + methodName)) {
+                        GUIView.findClassBox(className).getFlow().getChildren().remove(
+                                GUIView.findClassBox(className).getMethTextList().get(i));
+                        GUIView.findClassBox(className).getMethTextList().remove(i);
+                    }
+                }
+
                 stage.close();
             }
         }
