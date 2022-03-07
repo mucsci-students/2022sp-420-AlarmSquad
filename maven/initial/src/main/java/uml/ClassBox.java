@@ -37,6 +37,8 @@ public class ClassBox {
         classPane.getChildren().add(1, flow);
     }
 
+
+    // Getters and Setters
     public StackPane getClassPane() {
         return this.classPane;
     }
@@ -45,12 +47,28 @@ public class ClassBox {
         this.classPane = classPane;
     }
 
+    public TextFlow getFlow(){
+        return this.flow;
+    }
+
+    public void setFlow(TextFlow flow) {
+        this.flow = flow;
+    }
+
     public String getClassBoxName() {
         return this.classBoxName;
     }
 
     public void setClassBoxName(String classBoxName) {
         this.classBoxName = classBoxName;
+    }
+
+    public Text getClassTitle() {
+        return classTitle;
+    }
+
+    public void setClassTitle(Text classTitle) {
+        this.classTitle = classTitle;
     }
 
     public double getBoxWidth() {
@@ -69,6 +87,22 @@ public class ClassBox {
     public void setBoxHeight(double boxHeight) {
         this.titleBox.setHeight(boxHeight);
         this.boxHeight = boxHeight;
+    }
+
+    public ArrayList<Text> getFieldTextList() {
+        return fieldTextList;
+    }
+
+    public void setFieldTextList(ArrayList<Text> fieldTextList) {
+        this.fieldTextList = fieldTextList;
+    }
+
+    public ArrayList<Text> getMethTextList() {
+        return methTextList;
+    }
+
+    public void setMethTextList(ArrayList<Text> methTextList) {
+        this.methTextList = methTextList;
     }
 
     /**

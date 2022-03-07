@@ -1,6 +1,9 @@
 package uml;
 
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -356,6 +359,7 @@ public class GUIController {
             // if the method does exist, delete it and close
             } else {
                 Method methodToDelete = UMLModel.findClass(className).findMethod(methodName);
+
                 UMLModel.findClass(className).deleteMethod(methodToDelete);
                 stage.close();
             }
@@ -384,7 +388,9 @@ public class GUIController {
             Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
                     UMLModel.findRelType(srcName, destName));
 
+            // update view
             GUIView.deleteRelLine(GUIView.findClassBox(srcName), GUIView.findClassBox(destName));
+            // update model
             UMLModel.deleteRel(relToDelete);
             stage.close();
         }
@@ -416,8 +422,18 @@ public class GUIController {
             } else {
                 // if the class name is not already in use, rename the field
                 if (UMLModel.findClass(newClassName) == null) {
+
+                    // update model
                     UMLModel.findClass(className).setClassName(newClassName);
+                    // update view
                     stage.close();
+                    GUIView.findClassBox(className).getFlow().getChildren().remove(0);
+                    Text newTextName = new Text(newClassName);
+                    newTextName.setFont(Font.font(newTextName.getFont().getName(), FontWeight.BOLD, 12));
+                    GUIView.findClassBox(className).getFlow().getChildren().add(0, newTextName);
+                    GUIView.findClassBox(className).setClassTitle(newTextName);
+                    GUIView.findClassBox(className).setClassBoxName(newClassName);
+
                 // otherwise, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "The field name is already in use");
@@ -435,7 +451,8 @@ public class GUIController {
      * @param newFieldName the new name for the field
      * @param stage the working stage
      */
-    public static void renameFieldAction(String className, String fieldName, String newFieldName, Stage stage) {
+    public static void renameFieldAction(String className, String fieldName, String fieldType,
+                                         String newFieldName, Stage stage) {
         // if any strings are empty, pop an error up
         if (className.isEmpty() || fieldName.isEmpty() || newFieldName.isEmpty()) {
             GUIView.popUpWindow("Error", "All fields are required");
@@ -449,13 +466,22 @@ public class GUIController {
                 // if the field name is not a valid string, pop an error up
             } else if (UMLModel.isNotValidInput(newFieldName)) {
                 GUIView.popUpWindow("Error", "The field name is invalid");
-            } else {
+                // if the field exists and the type matches, rename the field
+            } else if(UMLModel.findClass(className).findField(fieldName).getFieldType().equals(fieldType)){
+
                 // if the field name is not already in use, rename the field
                 if (UMLModel.findClass(className).findField(newFieldName) == null) {
+                    // update model
                     UMLModel.findClass(className).findField(fieldName).setAttName(newFieldName);
+
+                    // update view
                     stage.close();
+                    UMLModel.findClass(className).findField(fieldName);
+                    GUIView.findClassBox(className).getFieldTextList();
+
                     // otherwise, pop an error up
-                } else {
+                }
+                else {
                     GUIView.popUpWindow("Error", "The field name is already in use");
                 }
             }
