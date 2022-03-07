@@ -451,7 +451,7 @@ public class GUIController {
      * @param newFieldName the new name for the field
      * @param stage the working stage
      */
-    public static void renameFieldAction(String className, String fieldName, String fieldType,
+    public static void renameFieldAction(String className, String fieldName,
                                          String newFieldName, Stage stage) {
         // if any strings are empty, pop an error up
         if (className.isEmpty() || fieldName.isEmpty() || newFieldName.isEmpty()) {
@@ -467,26 +467,41 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(newFieldName)) {
                 GUIView.popUpWindow("Error", "The field name is invalid");
                 // if the field exists and the type matches, rename the field
-            } else if(UMLModel.findClass(className).findField(fieldName).getFieldType().equals(fieldType)){
+            }
 
-                // if the field name is not already in use, rename the field
-                if (UMLModel.findClass(className).findField(newFieldName) == null) {
-                    // update model
-                    UMLModel.findClass(className).findField(fieldName).setAttName(newFieldName);
+            // if the field name is not already in use, rename the field
+            if (UMLModel.findClass(className).findField(newFieldName) == null) {
+                // update model
+                UMLModel.findClass(className).findField(fieldName).setAttName(newFieldName);
 
-                    // update view
-                    stage.close();
-                    UMLModel.findClass(className).findField(fieldName);
-                    GUIView.findClassBox(className).getFieldTextList();
+                // update view
+                stage.close();
 
-                    // otherwise, pop an error up
+                // go through fieldList in ClassBox, edit text of field in that fieldlist, remove the
+                // old text, add the new, renamed field at the bottom
+                for (int i = 0; i < GUIView.findClassBox(className).getFieldTextList().size(); ++i) {
+                    if (GUIView.findClassBox(className).getFieldTextList().get(i).getText().
+                            startsWith("\n- " + fieldName)) {
+                        GUIView.findClassBox(className).getFieldTextList().get(i).getText().
+                                replace("\n- " + fieldName, "\n- " + newFieldName);
+
+                        GUIView.findClassBox(className).getFieldTextList().remove(i);
+
+                        GUIView.findClassBox(className).addText(UMLModel.findClass(className).findField(newFieldName),
+                                UMLModel.findClass(className).getFieldList().size(),
+                                UMLModel.findClass(className).getMethodList().size(), true);
+
+                    }
                 }
-                else {
-                    GUIView.popUpWindow("Error", "The field name is already in use");
-                }
+
+
+                // otherwise, pop an error up
+            } else {
+                GUIView.popUpWindow("Error", "The field name is already in use");
             }
         }
     }
+
 
     /**
      * Renames a method to a given string in a class if the given string is nonempty and the class and method exist,
@@ -516,6 +531,24 @@ public class GUIController {
                 if (UMLModel.findClass(className).findMethod(newMethodName) == null) {
                     UMLModel.findClass(className).findMethod(methodName).setAttName(newMethodName);
                     stage.close();
+
+                    // go through methlist in ClassBox, edit text of method in that methlist, remove the
+                    // old method, add the new, renamed method at the bottom
+                    for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
+                        if (GUIView.findClassBox(className).getMethTextList().get(i).getText().
+                                startsWith("\n+ " + methodName)) {
+                            GUIView.findClassBox(className).getMethTextList().get(i).getText().
+                                    replace("\n+ " + methodName, "\n+ " + newMethodName);
+
+                            GUIView.findClassBox(className).getMethTextList().remove(i);
+
+                            GUIView.findClassBox(className).addText(UMLModel.findClass(className).findMethod(newMethodName),
+                                    UMLModel.findClass(className).getFieldList().size(),
+                                    UMLModel.findClass(className).getMethodList().size(), true);
+
+                        }
+                    }
+
                 // otherwise, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "The method name is already in use");
