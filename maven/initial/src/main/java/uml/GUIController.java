@@ -194,7 +194,7 @@ public class GUIController {
             } else if (UMLModel.findClass(destName) == null) {
                 GUIView.popUpWindow("Error", "Destination does not exist");
             // check if the relationship exists
-            } else {
+            } else if (UMLModel.checkType(relType)){
                 // if the relationship does not exist, add it and close
                 if (UMLModel.findRelationship(srcName, destName, relType) == null &&
                         !UMLModel.isRelated(srcName, destName)) {
@@ -208,6 +208,9 @@ public class GUIController {
                 } else {
                     GUIView.popUpWindow("Error", "Relationship already exists");
                 }
+            }
+            else {
+                GUIView.popUpWindow("Error", "Relationship type " + relType + " does not exist");
             }
         }
     }
