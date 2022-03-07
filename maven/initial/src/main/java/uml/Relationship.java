@@ -2,85 +2,62 @@ package uml;
 
 /**
  * A class for the relationship object between two UML Class objects
- * 
+ *
  * @authors
  */
 public class Relationship {
 
-    // The id of the relationship
-    private String id;
     // The source of the relationship
-    private Class source;
+    private final UMLClass source;
     // The destination of the relationship
-    private Class destination;
+    private final UMLClass destination;
+    // The type of the relationship
+    private String relType;
 
 
     /**
      * Default constructor
-     * 
      * @param source      the source of the relationship
      * @param destination the destination of the relationship
-     */
+     * @param relType     the type of the relationship
+     * */
 
-    public Relationship(Class source, Class destination) {
-        this.id = source.getClassName() + destination.getClassName();
+    public Relationship(UMLClass source, UMLClass destination, String relType) {
         this.source = source;
         this.destination = destination;
-    }
-
-    /**
-     * Sets the id of the relationship
-     * 
-     * @param id the new id of the relationship
-     */
-    public void setID(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Gets the id of the relationship
-     * 
-     * @return the id of the relationship
-     */
-    public String getID() {
-        return this.id;
-    }
-
-    /**
-     * Sets the source of the relationship
-     * 
-     * @param source the new source of the relationship
-     */
-    public void setSource(Class source) {
-        this.source = source;
+        this.relType = relType;
     }
 
     /**
      * Gets the source of the relationship
-     * 
+     *
      * @return the source of the relationship
      */
-    public Class getSource() {
+    public UMLClass getSource() {
         return this.source;
     }
 
     /**
-     * Sets the destination of the relationship
-     * 
-     * @param destination the new destination of the relationship
-     */
-    public void setDestination(Class destination) {
-        this.destination = destination;
-    }
-
-    /**
      * Gets the destination of the relationship
-     * 
+     *
      * @return the destination of the relationship
      */
-    public Class getDestination() {
+    public UMLClass getDestination() {
         return this.destination;
     }
 
-    
+    /**
+     * Gets the type of the relationship
+     *
+     * @return the relationship type
+     */
+    public String getRelType() { return this.relType; }
+
+    /**
+     * Sets the type of the relationship
+     *
+     * @return the new relationship type
+     */
+    public void setRelType(String newReltype) { this.relType = newReltype; }
+
 }
