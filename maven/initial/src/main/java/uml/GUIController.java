@@ -619,10 +619,26 @@ public class GUIController {
             } else {
                 // if the parameter name is not already in use, change the parameter
                 if (UMLModel.findClass(className).findMethod(methodName).findParameter(newParamName) == null) {
+
                     UMLModel.findClass(className).findMethod(methodName).findParameter(paramName).setAttName(newParamName);
                     UMLModel.findClass(className).findMethod(methodName).findParameter(newParamName)
                             .setFieldType(newParamType);
+
                     stage.close();
+                    // go through methlist in ClassBox, edit text of method in that methlist, remove the
+                    // old method, add the new, renamed method at the bottom
+                    for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
+                        if (GUIView.findClassBox(className).getMethTextList().get(i).getText().
+                                startsWith("\n+ " + methodName)) {
+
+                            GUIView.findClassBox(className).getMethTextList().remove(i);
+
+                            GUIView.findClassBox(className).addText(UMLModel.findClass(className).findMethod(methodName),
+                                    UMLModel.findClass(className).getFieldList().size(),
+                                    UMLModel.findClass(className).getMethodList().size(), true);
+
+                        }
+                    }
                     // otherwise, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "The parameter name is already in use");

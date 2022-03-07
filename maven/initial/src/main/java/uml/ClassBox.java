@@ -131,7 +131,7 @@ public class ClassBox {
         if (att instanceof Field) {
             // If att is a Field, add a newline to the front of it's name to put it
             // on a new line in the classbox, and add "- " to the front of the name for formatting
-            attName = ("\n- " + ((Field) att).getAttName());
+            attName = ("\n- " + ((Field) att).getAttName() + " : " + ((Field) att).getFieldType());
 
             // If this is the first field ever being added to the class associated with this
             // classbox, then initialize the fieldTextList, and increase the size of the
@@ -172,7 +172,11 @@ public class ClassBox {
                     paramText += ", " + paramList.get(i).getAttName() + " : " + paramList.get(i).getFieldType();
                 }
             }
+
             attName += paramText + ")";
+            if(!((Method) att).getReturnType().equals("void")){
+                 attName += " : " + ((Method) att).getReturnType();
+            }
 
             if (dontAddPadding) {
                 String name = ((Method) att).getAttName();
