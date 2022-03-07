@@ -22,8 +22,8 @@ public class UMLClass {
      */
     public UMLClass(String className) {
         this.className = className;
-        this.fieldList = new ArrayList<Field>();
-        this.methodList = new ArrayList<Method>();
+        this.fieldList = new ArrayList<>();
+        this.methodList = new ArrayList<>();
     }
 
     /**
@@ -65,7 +65,7 @@ public class UMLClass {
      *
      * @param attToFind attribute to find in a UMLClass.
      *                  Either a field or method
-     * @param attType
+     * @param attType name of type of attribute to find. Either "method" or "field".
      * @return found attribute, either field or method, or null if no
      * attribute is found with passed String
      */
@@ -199,7 +199,7 @@ public class UMLClass {
     /**
      * Iterates through fieldList, returns with .get()
      *
-     * @param fieldToFind
+     * @param fieldToFind name of field to find
      * @return field if found, null if not found
      */
     public Field changeField(String fieldToFind, Field fieldToChange) {

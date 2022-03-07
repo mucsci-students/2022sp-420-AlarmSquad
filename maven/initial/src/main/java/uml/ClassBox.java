@@ -114,7 +114,7 @@ public class ClassBox {
      * @param numOfFields number of fields currently in the class
      * @param numOfMeths number of methods currently in the class
      */
-    public <E> void addText(E att, int numOfFields, int numOfMeths, boolean isParam) {
+    public <E> void addText(E att, int numOfFields, int numOfMeths, boolean dontAddPadding) {
 
         // Clear the flow each time a method or field is added,
         // thus clearing the classbox of all objects.
@@ -140,7 +140,9 @@ public class ClassBox {
             // field being added to a class.
             if (numOfFields == 1) {
                 fieldTextList = new ArrayList<>();
-                setBoxHeight(boxHeight + 15);
+                if (!dontAddPadding) {
+                    setBoxHeight(boxHeight + 15);
+                }
 
                 // If methods will also need to be placed in the classbox, extra padding
                 // is needed to accommodate the additional separator line between the field list and
@@ -172,7 +174,7 @@ public class ClassBox {
             }
             attName += paramText + ")";
 
-            if (isParam) {
+            if (dontAddPadding) {
                 String name = ((Method) att).getAttName();
                 methTextList.removeIf(textObj -> textObj.getText().startsWith("\n+ " + name));
             }
@@ -184,14 +186,14 @@ public class ClassBox {
                 // method being added to a class.
                 if (numOfMeths == 1) {
                     methTextList = new ArrayList<>();
-                    if (!isParam) {
+                    if (!dontAddPadding) {
                         setBoxHeight(boxHeight + 15);
                     }
 
                     // If fields will also need to be placed in the classbox, extra padding
                     // is needed to accommodate the additional separator line between the field list and
                     // the method list.
-                    if (numOfFields != 0)
+                    if (!dontAddPadding && numOfFields != 0)
                         setBoxHeight(boxHeight + 10);
                 }
                 // Add the method to the methTextList
