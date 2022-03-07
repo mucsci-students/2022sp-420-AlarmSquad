@@ -667,19 +667,25 @@ public class GUIView extends Application {
         Label fieldLabel = new Label("Old field name: ");
         // create a label for the text box for the new field name
         Label nameLabel = new Label("New field name: ");
+        // create a label for the text box for the field type
+        Label fieldTypeText = new Label("Field type: ");
         // create the text box for the class with the field
         TextField givenClass = new TextField();
         givenClass.setPrefColumnCount(14);
         // create the text box for the field to be renamed
         TextField fieldToRename = new TextField();
         fieldToRename.setPrefColumnCount(14);
+        // create the text box for the field type
+        TextField fieldType = new TextField();
+        fieldType.setPrefColumnCount(14);
         // create the text box for the new field name
         TextField newFieldName = new TextField();
         newFieldName.setPrefColumnCount(14);
         // create a button to add the field with the inputted name
         Button rename = new Button("Rename");
         rename.setOnAction(event -> GUIController.renameFieldAction(givenClass.getText(),
-                                    fieldToRename.getText(), newFieldName.getText(), stage));
+                                    fieldToRename.getText(), fieldType.getText(),
+                                    newFieldName.getText(), stage));
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -688,12 +694,14 @@ public class GUIView extends Application {
         GridPane pane = new GridPane();
         pane.add(givenClassLabel, 0, 0);
         pane.add(fieldLabel, 0, 1);
-        pane.add(nameLabel, 0, 2);
+        pane.add(fieldTypeText, 0, 2);
+        pane.add(nameLabel, 0, 3);
         pane.add(givenClass, 1, 0);
         pane.add(fieldToRename, 1, 1);
-        pane.add(newFieldName, 1, 2);
-        pane.add(rename, 0, 3);
-        pane.add(cancel, 1, 3);
+        pane.add(fieldType, 1, 2);
+        pane.add(newFieldName, 1, 3);
+        pane.add(rename, 0, 4);
+        pane.add(cancel, 1, 4);
 
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Rename Field", 190, 300);
