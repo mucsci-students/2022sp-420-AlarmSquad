@@ -272,7 +272,7 @@ public class UMLModel {
     }
 
 
-    // TODO change how we describe the "commands"(buttons) instead of CLI commands
+    // TODO input delete parameter
     /**
      * Gets the text for the help menu in a GUI format
      *

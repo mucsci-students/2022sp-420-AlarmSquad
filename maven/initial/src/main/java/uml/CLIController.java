@@ -39,8 +39,6 @@ public class CLIController {
             input should be in form [command] <type> <flag>
              */
 
-            //TODO
-            // SEE IF TABS/NEWLINES MESS THINGS UP INSIDE
             ArrayList<String> inputList = new ArrayList<>(Arrays.asList(input.split(" ")));
 
             try {
