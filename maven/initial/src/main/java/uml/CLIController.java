@@ -2,22 +2,20 @@ package uml;
 
 import java.io.IOException;
 import java.util.*;
+@SuppressWarnings("DanglingJavadoc")
 
 /**
  * The controller for the CLI version of the UML Diagram
  *
- * @authors AlarmSquad
+ * Authors: AlarmSquad
  */
-@SuppressWarnings("DanglingJavadoc")
 public class CLIController {
 
     // Creates a new scanner
     private static final Scanner scan = new Scanner(System.in);
 
-
     // Interprets user input
     public static void main(String[] args) {
-
         clearScreen();
 
         // intro to CLI for user
@@ -31,14 +29,9 @@ public class CLIController {
 
         // Enters the command loop
         while (true) {
-
             // Takes in the next line of user input
             String input = scan.nextLine().trim();
-
-            /*
-            input should be in form [command] <type> <flag>
-             */
-
+            // user input
             ArrayList<String> inputList = new ArrayList<>(Arrays.asList(input.split(" ")));
 
             try {
@@ -47,42 +40,53 @@ public class CLIController {
                         // If the user enters a blank line, prompt again
                         case "" -> System.out.print(prompt);
 
+                    //***************************************//
+                    //********* Terminal Commands ***********//
+                    //***************************************//
+
                         // Quit program
                         case "exit" -> {
                             return;
                         }
-
-                        // Clear screen
+                        // clear screen
                         case "clear" -> {
                             clearScreen();
                             System.out.print(prompt);
                         }
-
+                        // save case
                         case "save" -> {
                             System.out.print("Save file name: ");
                             String saveFileName = scan.next();
                             JSON.save(saveFileName);
                             System.out.println("Diagram has been saved to \"" + saveFileName + ".json\"");
                         }
-
+                        // load case
                         case "load" -> {
+                            // if no files exist
                             if (JSON.ifDirIsEmpty()) {
                                 System.out.println("No save files found");
                                 System.out.print(prompt);
-                            } else {
+                            }
+                            // load the file
+                            else {
                                 System.out.print("Load file name: ");
                                 String loadFileName = scan.next();
                                 JSON.load(loadFileName);
                             }
                         }
-
+                        // help case
                         case "help" -> {
-                            displayHelp();
+                            System.out.println(UMLModel.getCLIHelpMenu());
                             System.out.print(prompt);
                         }
 
+                    //***************************************//
+                    //************** Add cases **************//
+                    //***************************************//
+
                     case "add", "a" -> {
                         switch (inputList.get(1)) {
+                            // add class
                             case "class" -> {
                                 // Get user defined name for Class, then adds new Class to the classList
                                 String className = getClassName("add", "");
@@ -93,7 +97,7 @@ public class CLIController {
                                 }
 
                                 // Checks for duplicates
-                                if (UMLModel.getClassList().stream().anyMatch(o -> o.getClassName().equals(className))) {
+                                if(UMLModel.getClassList().stream().anyMatch(o -> o.getClassName().equals(className))){
                                     System.out.printf("Class %s already exists\n", className);
                                 } else {
                                     // Adds class to class list then prompts confirmation to use
@@ -102,19 +106,20 @@ public class CLIController {
                                     System.out.println("Added class \"" + className + "\"");
                                 }
                             }
+                            // add relationship
                             case "rel" -> {
                                 // If user inputted "a rel" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    if (!addRelFlag(inputList, "add"))
+                                    if (!addRelFlag(inputList, "add")) {
                                         // If user tried to input an invalid flag, break
-                                        //if (inputList.size() == 2)
                                         break;
+                                    }
                                 }
                                 switch (inputList.get(2)) {
-
+                                    // relationship type flags
                                     case "-a", "-c", "-i", "-r" -> {
                                         String relType = flagToString(inputList.get(2));
-
+                                        // if a flag was not given by user input
                                         if (!relType.equals("")) {
                                             System.out.print("Enter source class name: ");
                                             String sourceName = scan.next().trim();
@@ -125,17 +130,17 @@ public class CLIController {
                                                 // If destination class is valid and exists add
                                                 // relationship to relationship array list
                                                 if (UMLModel.findClass(destinationName) != (null)) {
-                                                    //TODO make a new test to test this situation of adding a new relationship
-                                                    // for two classes that already have a relationship in the same order or src->dest
-                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType) != null ||
-                                                        UMLModel.isRelated(sourceName, destinationName)) {
+                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType)
+                                                            != null || UMLModel.isRelated(sourceName, destinationName)){
                                                         System.out.println("Relationship already exists between " +
                                                                 sourceName + " and " + destinationName + " with "
-                                                                + UMLModel.findRelType(sourceName,destinationName) + " type");
+                                                                + UMLModel.findRelType(sourceName,destinationName) +
+                                                                " type");
                                                         break;
                                                     }
-                                                    Relationship newRelationship = new Relationship(UMLModel.findClass(sourceName),
-                                                            UMLModel.findClass(destinationName), relType);
+                                                    Relationship newRelationship =
+                                                            new Relationship(UMLModel.findClass(sourceName),
+                                                                    UMLModel.findClass(destinationName), relType);
                                                     UMLModel.addRel(newRelationship);
                                                     System.out.println("Relationship added between " + sourceName
                                                             + " and " + destinationName + " with " + relType + " type");
@@ -158,15 +163,17 @@ public class CLIController {
                                     }
                                 }
                             }
+                            // add attribute
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    if (addAttFlag(inputList, "add"))
+                                    if (addAttFlag(inputList, "add")) {
                                         // If user tried to input an invalid flag, break
                                         break;
+                                    }
                                 }
                                 switch (inputList.get(2)) {
-
+                                    // add field or method
                                     case "-f", "-m" -> {
                                         // Convert flag to "field" or "method".
                                         // Needed for method calls later on
@@ -184,13 +191,15 @@ public class CLIController {
                                                 if (!UMLModel.isNotValidInput(attName)) {
                                                     // If attribute doesn't already exist in class, add it to class
                                                     if (classToAddAtt.getAttList(attType).stream()
-                                                            .noneMatch(attObj -> attObj.getAttName().equals(attName))) {
+                                                            .noneMatch(attObj -> attObj.getAttName().equals(attName))){
                                                         addAttribute(classToAddAtt, attType, attName);
                                                     }
-                                                    // If attribute user entered already exists in class, inform user and break
+                                                    // If attribute user entered already exists in class, inform user
+                                                    // and break
                                                     else {
                                                         System.out.println(attType + " " + attName +
-                                                                " already exists in class " + classToAddAtt.getClassName());
+                                                                " already exists in class " +
+                                                                classToAddAtt.getClassName());
                                                     }
                                                 }
                                                 // If class user entered does not exist, inform user and break
@@ -199,14 +208,20 @@ public class CLIController {
                                             }
                                         }
                                     }
+                                    // add parameter
                                     case "-p" -> {
                                         UMLClass classToAddParam;
                                         Method methodToAddParam;
                                         String paramName;
-                                        if((classToAddParam = searchForClass("add", "parameter")) == null) break;
-                                        if((methodToAddParam = searchForMethod(classToAddParam)) == null) break;
-                                        if((paramName = searchForParamName(methodToAddParam)) == null) break;
-
+                                        if((classToAddParam = findClass("add", "parameter")) == null) {
+                                            break;
+                                        }
+                                        if((methodToAddParam = findMethod(classToAddParam)) == null) {
+                                            break;
+                                        }
+                                        if((paramName = findParamName(methodToAddParam)) == null) {
+                                            break;
+                                        }
                                         String paramType = getAttType("parameter");
                                         Parameter param = new Parameter(paramName, paramType);
                                         methodToAddParam.addParameter(param);
@@ -226,6 +241,10 @@ public class CLIController {
                         }
                     }
 
+                    //***************************************//
+                    //************ Delete cases *************//
+                    //***************************************//
+
                     case "delete", "d" -> {
                         switch (inputList.get(1)) {
                             // delete class of the user's choice from the class list
@@ -239,28 +258,25 @@ public class CLIController {
                                     UMLModel.setClassList(deleteClass(classDeleteInput));
                                 }
                             }
-
+                            // delete relationship
                             case "rel" -> {
-
                                 System.out.print("Enter relationship source name: ");
                                 String sourceToFind = scan.next().trim();
                                 UMLClass src = UMLModel.findClass(sourceToFind);
-
                                 if (src != null) {
                                     // If source name was found, proceed to find dest name
                                     System.out.print("Enter relationship destination name: ");
                                     String destToFind = scan.next().trim();
                                     UMLClass dest = UMLModel.findClass(destToFind);
                                     if (dest != null) {
-
                                         // Find the type of relationship
                                         String relType = UMLModel.findRelType(sourceToFind, destToFind);
                                         // Find the relationship
                                         Relationship r = UMLModel.findRelationship(sourceToFind, destToFind, relType);
                                         if (r != null) {
                                             System.out.print("Delete relationship between \"" +
-                                                    r.getSource().getClassName() + "\" and \"" + r.getDestination().getClassName()
-                                                    + "\"? (y/n): ");
+                                                    r.getSource().getClassName() + "\" and \"" +
+                                                    r.getDestination().getClassName() + "\"? (y/n): ");
                                             String rAnswer = scan.next().trim();
                                             // If the user wants to delete the relationship, proceed to do so
                                             if (rAnswer.equalsIgnoreCase("y")) {
@@ -275,14 +291,16 @@ public class CLIController {
                                     }
                                 }
                             }
-
+                            // delete attribute
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one.
                                 if (inputList.size() == 2) {
-                                    if (addAttFlag(inputList, "delete"))
+                                    if (addAttFlag(inputList, "delete")) {
                                         // If user inputs invalid flag, break
                                         break;
+                                    }
                                 }
+                                // delete field or method
                                 switch (inputList.get(2)) {
                                     case "-f", "-m" -> {
                                         // Convert -f flag to the string "field",
@@ -305,14 +323,20 @@ public class CLIController {
                                             }
                                         }
                                     }
+                                    // delete parameter
                                     case "-p" -> {
                                         UMLClass classToDeleteParam;
                                         Method methodToDeleteParam;
                                         Parameter param;
-                                        if((classToDeleteParam = searchForClass("delete", "parameter")) == null) break;
-                                        if((methodToDeleteParam = searchForMethod(classToDeleteParam)) == null) break;
-                                        if((param = searchForParam(methodToDeleteParam)) == null) break;
-
+                                        if((classToDeleteParam = findClass("delete", "parameter")) == null) {
+                                            break;
+                                        }
+                                        if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {
+                                            break;
+                                        }
+                                        if((param = findParam(methodToDeleteParam)) == null) {
+                                            break;
+                                        }
                                         String paramName = param.getAttName();
                                         System.out.printf("Delete parameter \"%s\"? (y/n): ", paramName);
                                         String answer = scan.next().trim();
@@ -340,17 +364,18 @@ public class CLIController {
                         }
                     }
 
-                    // rename class will rename a class of the user's choice
+                    //***************************************//
+                    //************ Rename cases *************//
+                    //***************************************//
+
                     case "rename", "r" -> {
                         switch (inputList.get(1)) {
                             case "class" -> {
                                 // Get user input of Class name to be renamed
                                 System.out.print("Enter class to rename: ");
                                 String oldClassName = scan.next().trim();
-
                                 // If Class exists, set Class name to user inputted name
                                 UMLClass oldUMLClass = UMLModel.findClass(oldClassName);
-
                                 // Prompt user to rename a class name
                                 if (oldUMLClass != null) {
                                     System.out.print("Enter new name for class " + oldUMLClass.getClassName() + ": ");
@@ -376,16 +401,22 @@ public class CLIController {
                             }
                         }
                     }
+
+                    //***************************************//
+                    //************ Change cases *************//
+                    //***************************************//
+
                     case "c", "change" -> {
                         switch (inputList.get(1)) {
+                            // change attribute
                             case "att" -> {
                                 switch (inputList.get(2)) {
+                                    // change field
                                     case "-f" -> {
                                         // Show user classes and attributes before asking for input
                                         listClasses();
                                         System.out.print("Enter class that contains field: ");
                                         String classWithFieldName = scan.next().trim();
-
                                         // Ensure class exists
                                         UMLClass UMLClassWithField = UMLModel.findClass(classWithFieldName);
                                         if (UMLClassWithField != null) {
@@ -393,7 +424,6 @@ public class CLIController {
                                             listClass(classWithFieldName);
                                             System.out.print("Enter field to be renamed: ");
                                             String oldFieldName = scan.next().trim();
-
                                             // Ensure attribute exists
                                             Attribute newField = UMLClassWithField.findField(oldFieldName);
                                             if (newField != null) {
@@ -401,12 +431,14 @@ public class CLIController {
                                                 System.out.print("Enter new name for " + oldFieldName + ": ");
                                                 String newFieldName = scan.next().trim();
                                                 if (UMLModel.isNotValidInput(newFieldName)) {
-                                                    System.out.println("\"" + newFieldName + "\" is not a valid identifier\n");
+                                                    System.out.println("\"" + newFieldName +
+                                                            "\" is not a valid identifier\n");
                                                     break;
                                                 }
                                                 if (UMLClassWithField.findField(newFieldName) != null) {
                                                     System.out.println("Field \"" + newFieldName +
-                                                            "\" already exists in class \"" + classWithFieldName + "\"\n");
+                                                            "\" already exists in class \"" + classWithFieldName +
+                                                            "\"\n");
                                                     break;
                                                 }
                                                 //get fieldtype
@@ -421,12 +453,12 @@ public class CLIController {
                                             }
                                         }
                                     }
+                                    // change method
                                     case "-m" -> {
                                         // Show user classes and attributes before asking for input
                                         listClasses();
                                         System.out.print("Enter class that contains method: ");
                                         String classWithMethodName = scan.next().trim();
-
                                         // Ensure class exists
                                         UMLClass UMLClassWithMethod = UMLModel.findClass(classWithMethodName);
                                         if (UMLClassWithMethod != null) {
@@ -434,7 +466,6 @@ public class CLIController {
                                             listClass(classWithMethodName);
                                             System.out.print("Enter method to be renamed: ");
                                             String oldMethodName = scan.next().trim();
-
                                             // Ensure attribute exists
                                             Attribute newField = UMLClassWithMethod.findMethod(oldMethodName);
                                             if (newField != null) {
@@ -442,21 +473,24 @@ public class CLIController {
                                                 System.out.print("Enter new name for " + oldMethodName + ": ");
                                                 String newMethodName = scan.next().trim();
                                                 if (UMLModel.isNotValidInput(newMethodName)) {
-                                                    System.out.println("\"" + newMethodName + "\" is not a valid identifier\n");
+                                                    System.out.println("\"" + newMethodName +
+                                                            "\" is not a valid identifier\n");
                                                     break;
                                                 }
                                                 if (UMLClassWithMethod.findMethodNoPrint(newMethodName) != null) {
                                                     System.out.println("Method \"" + newMethodName +
-                                                            "\" already exists in class \"" + classWithMethodName + "\"\n");
+                                                            "\" already exists in class \"" + classWithMethodName +
+                                                            "\"\n");
                                                     break;
                                                 }
                                                 //get methodtype
                                                 String newMethodReturnType = getAttReturnType(newMethodName);
-                                                if(newMethodReturnType == null){
+                                                if (newMethodReturnType == null) {
                                                     break;
                                                 }
-                                                if (!newMethodName.endsWith("()"))
+                                                if (!newMethodName.endsWith("()")){
                                                     newMethodName += "()";
+                                                }
                                                 //make a new method
                                                 Method changedMethod = new Method(newMethodName, newMethodReturnType);
                                                 //replace orginal method
@@ -465,23 +499,29 @@ public class CLIController {
                                             }
                                         }
                                     }
+                                    // change parameter
                                     case "-p" -> {
                                         UMLClass classToChangeParam;
                                         Method methodToChangeParam;
                                         Parameter param;
-                                        if((classToChangeParam = searchForClass("change", "parameter")) == null) break;
-                                        if((methodToChangeParam = searchForMethod(classToChangeParam)) == null) break;
-                                        if((param = searchForParam(methodToChangeParam)) == null) break;
-
+                                        if((classToChangeParam = findClass("change", "parameter")) == null) {
+                                            break;
+                                        }
+                                        if((methodToChangeParam = findMethod(classToChangeParam)) == null) {
+                                            break;
+                                        }
+                                        if((param = findParam(methodToChangeParam)) == null) {
+                                            break;
+                                        }
                                         String oldParamName = param.getAttName();
                                         String newParamName = getAttName("parameter");
                                         String newParamType = getAttType("parameter");
-
                                         param = new Parameter(newParamName, newParamType);
                                         methodToChangeParam.changeParameter(oldParamName, param);
                                     }
                                 }
                             }
+                            // change relationship types
                             case "rel" -> {
                                 // prompt user for source
                                 System.out.print("Enter source name: ");
@@ -502,7 +542,7 @@ public class CLIController {
                                         System.out.print("Enter old relationship type: ");
                                         String oldRelType = scan.next().trim();
                                         // check old type
-                                        if(!UMLModel.findRelType(srcName, destName).equals(oldRelType)){
+                                        if(!Objects.equals(UMLModel.findRelType(srcName, destName), oldRelType)){
                                             System.out.println("Relationship type does not exist for: "
                                                     + srcName + " and " + destName);
                                         }
@@ -523,9 +563,6 @@ public class CLIController {
                                     }
                                 }
                             }
-
-                            case "parameter" -> {
-                            }
                             // If the user's command is not valid
                             default -> {
                                 System.out.println("Please enter a valid command");
@@ -533,28 +570,34 @@ public class CLIController {
                             }
                         }
                     }
-                    // list case for class, classes, or relationships
+
+                    //***************************************//
+                    //************* List cases **************//
+                    //***************************************//
+
                     case "list", "l" -> {
                         switch (inputList.get(1)) {
+                            // many classes
                             case "classes" -> {
                                 listClasses();
                                 System.out.print(prompt);
                             }
+                            // one class
                             case "class" -> {
                                 // Get user to input desired class
                                 System.out.print("Enter class name: ");
                                 String classToDisplayName = scan.next().trim();
-
                                 // print class name
                                 if (UMLModel.findClass(classToDisplayName) != null) {
                                     System.out.println("\n--------------------");
                                     listClass(classToDisplayName);
-                                    System.out.println("--------------------\n");
+                                    System.out.println("\n--------------------\n");
                                 }
                                 else{
                                     System.out.println("Class does not exist");
                                 }
                             }
+                            // list relationships
                             case "rel" -> {
                                 // Ensure there are relationships to list. If not, break
                                 if (UMLModel.getRelationshipList().size() == 0) {
@@ -562,20 +605,26 @@ public class CLIController {
                                     System.out.print(prompt);
                                     break;
                                 }
-
                                 // List relationships spaced out by new lines and arrows
                                 // designating which class is the source and destination
                                 System.out.println("\n--------------------");
+                                // if there is only one relationship, print it
                                 if (UMLModel.getRelationshipList().size() >= 1) {
                                     System.out.print(UMLModel.getRelationshipList().get(0).getSource().getClassName());
-                                    System.out.print(" [" + UMLModel.getRelationshipList().get(0).getRelType() + "] -> ");
-                                    System.out.print(UMLModel.getRelationshipList().get(0).getDestination().getClassName());
+                                    System.out.print(" [" + UMLModel.getRelationshipList().get(0).getRelType() +
+                                            "] -> ");
+                                    System.out.print(UMLModel.getRelationshipList().get(0).getDestination().
+                                            getClassName());
                                 }
+                                // iterates through relationship list and prints the relationship
                                 for (int i = 1; i < UMLModel.getRelationshipList().size(); ++i) {
                                     System.out.println();
-                                    System.out.print("\n" + UMLModel.getRelationshipList().get(i).getSource().getClassName());
-                                    System.out.print(" [" + UMLModel.getRelationshipList().get(i).getRelType() + "] -> ");
-                                    System.out.print(UMLModel.getRelationshipList().get(i).getDestination().getClassName());
+                                    System.out.print("\n" + UMLModel.getRelationshipList().get(i).getSource()
+                                            .getClassName());
+                                    System.out.print(" [" + UMLModel.getRelationshipList().get(i).getRelType() +
+                                            "] -> ");
+                                    System.out.print(UMLModel.getRelationshipList().get(i).getDestination().
+                                            getClassName());
                                 }
                                 System.out.println("\n--------------------\n");
                                 System.out.print(prompt);
@@ -587,13 +636,13 @@ public class CLIController {
                             }
                         }
                     }
-
                     // If the user's command is not valid
                     default -> {
                         System.out.println("Please enter a valid command");
                         System.out.print(prompt);
                     }
                 }
+                // catches invalid command
             } catch (Exception e) {
                 System.out.println("Please enter a valid command");
                 System.out.print(prompt);
@@ -602,24 +651,15 @@ public class CLIController {
     }
 
 
-/******************************************************************
- *
- * Programmer defined Helper Methods
- *
- ******************************************************************/
+    /***************************
+     *
+     * Helper Methods
+     *
+     ***************************/
 
-    private static void clearScreen() {
-        // Clears Screen in java
-        try {
-            if (System.getProperty("os.name").contains("Windows"))
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            else
-                Runtime.getRuntime().exec("clear");
-        } catch (IOException | InterruptedException ex) {
-            System.out.println("couldn't clear screen");
-        }
-
-    }
+    //***************************************//
+    //*************** Class *****************//
+    //***************************************//
 
     /**
      * Prompts the user for the name of a class to perform an operation on
@@ -632,279 +672,6 @@ public class CLIController {
         // Get user input of Class name
         System.out.print("Enter class name to " + operation + " " + attType + ": ");
         return scan.next().trim();
-    }
-
-    /**
-     * Prompts the user for the type of an attribute
-     *
-     * @param attType the type of attribute to be defined
-     * @return the user's given type for the attribute
-     */
-    public static String getAttType(String attType) {
-        if (attType.equals("method")) {
-            System.out.print("Enter " + attType + " return type: ");
-            String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-            if (UMLModel.isNotValidReturnType(attToGet)) {
-                System.out.println("\"" + attToGet + "\" is not a valid return type");
-                return null;
-            }
-            return attToGet;
-        }
-        System.out.print("Enter " + attType + " type: ");
-        String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-        if (UMLModel.isNotValidType(attToGet)) {
-            System.out.println("\"" + attToGet + "\" is not a valid type");
-            return null;
-        }
-        return attToGet;
-    }
-
-    /**
-     * Prompts the user for the type of an attribute
-     *
-     * @param attType the type of attribute to be defined
-     * @return the user's given type for the attribute
-     */
-    public static String getAttReturnType(String attType) {
-        if (attType.equals("method"))
-            attType += " return";
-
-        System.out.print("Enter " + attType + " type: ");
-        String attToGet = scan.next().trim();
-        if (UMLModel.isNotValidReturnType(attToGet)) {
-            System.out.println("\"" + attToGet + "\" is not a valid return type");
-            return null;
-        }
-        return attToGet;
-    }
-
-    /**
-     * Prompts the user for the name of an attribute with the given type
-     *
-     * @param attType the type of the attribute to be named
-     * @return the user's given name for the attribute
-     */
-    public static String getAttName(String attType) {
-        System.out.print("Enter " + attType + " name: ");
-        String attName = scan.next().trim();
-        return attName;
-    }
-
-    public static <E> boolean ifDoesntExist(E obj, String type, String name) {
-        if (obj == null) {
-            System.out.printf("%s %s does not exist\n", type, name);
-            return true;
-        }
-        return false;
-    }
-
-    public static <E> boolean ifExists(E obj, String type, String name) {
-        if (obj != null) {
-            System.out.printf("%s %s already exists", type, name);
-            return true;
-        }
-        return false;
-    }
-
-
-    public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
-        System.out.print("type \"-f\" to " + operation + " a field, or \"-m\" to " +
-                operation + " a method: ");
-        String attFlag = scan.next().trim();
-
-        switch (attFlag) {
-            case "-f", "-m" -> {
-                userInputList.add(attFlag);
-                return false;
-            }
-            default -> {
-                System.out.println("Invalid flag, no attribute added");
-                return true;
-            }
-        }
-    }
-
-    public static void addAttribute(UMLClass classToAddAtt, String attType, String attName) {
-        // If attribute is a method, get its return type.
-        // If attribute is a field, get its type.
-        // Ensure type is valid
-        String type = getAttType(attType);
-        if (type == null) {
-            return;
-        }
-        // If user wants to add a method, get its return type and
-        // ensure it is valid. Then return updated class with added method.
-        if (attType.equalsIgnoreCase("method")) {
-            Method method = new Method(attName, type);
-            classToAddAtt.addMethod(method);
-        }
-        // If user wants to add a field, get its type and
-        // ensure it is valid. Then return updated class with added field.
-        else if (attType.equalsIgnoreCase("field")) {
-            Field field = new Field(attName, type);
-            classToAddAtt.addField(field);
-        }
-    }
-
-    public static void delAttribute(UMLClass classWithAttToDel, String attType) {
-        // Get name of field or method user wants to delete
-        System.out.print("Enter " + attType + " to delete: ");
-        String attToDel = scan.next().trim();
-
-        // Ensure attribute exists
-        Attribute deletedAtt = classWithAttToDel.findAtt(attToDel, attType);
-        if (deletedAtt != null) {
-            // Confirm  user wants to delete attribute
-            System.out.print("Delete " + attType + " \"" + attToDel + "\"? (y/n): ");
-            String answer = scan.next().trim();
-            // If the user wants to delete an attribute, proceed to do so
-            if (answer.equalsIgnoreCase("y")) {
-                classWithAttToDel.deleteAttribute(deletedAtt);
-                System.out.print(attType + " \"" + attToDel + "\" has been deleted \n");
-            }
-            // If user types n, confirm and return
-            else {
-                System.out.println(attType + " \"" + attToDel + "\" has NOT been deleted");
-            }
-            // If attribute doesn't exist in class, inform user and return
-        } else {
-            System.out.println("Attribute does not exist");
-        }
-    }
-
-    public static UMLClass searchForClass(String op, String type) {
-        String className = getClassName(op, type);
-        UMLClass umlClass = UMLModel.findClass(className);
-        if (ifDoesntExist(umlClass, "Class", className)) return null;
-        return umlClass;
-    }
-
-
-    public static Method searchForMethod(UMLClass umlClass) {
-        String methodName = getAttName("method");
-        Method method = umlClass.findMethod(methodName);
-        if (ifDoesntExist(method, "Method", methodName)) return null;
-        return method;
-    }
-
-    public static Parameter searchForParam(Method method) {
-        String paramName = getAttName("parameter");
-        Parameter param = method.findParameter(paramName);
-        if (ifDoesntExist(param, "Parameter", paramName)) return null;
-        return param;
-    }
-
-    public static String searchForParamName(Method method) {
-        String paramName = getAttName("parameter");
-        Parameter param = method.findParameter(paramName);
-        if (ifExists(param, "Parameter", paramName)) return null;
-        return paramName;
-    }
-
-    // User adds a type to a relationship with no type that they provided
-    public static boolean addRelFlag(ArrayList<String> userInputList, String operation) {
-        System.out.print("type \"-a\" for aggregation, \n\"-c\" for composition, \n" +
-                "\"-i\" for inheritance, \nor \"-r\" for realization to " + operation + " that relationship type: ");
-        String relFlag = scan.next().trim();
-
-        switch (relFlag) {
-            case "-a", "-c", "-i", "-r" -> {
-                userInputList.add(relFlag);
-                return true;
-            }
-            default -> {
-                System.out.println("Invalid flag, no relationship added");
-                return false;
-            }
-        }
-    }
-
-    /**
-     * @param flag the flag of the attribute to add,
-     *             either -f for field or -m for method
-     */
-    public static String flagToString(String flag) {
-
-        return switch (flag) {
-            case "-f" -> "field";
-            case "-m" -> "method";
-            case "-p" -> "parameter";
-            case "-a" -> "aggregation";
-            case "-c" -> "composition";
-            case "-i" -> "inheritance";
-            case "-r" -> "realization";
-            default -> "";
-        };
-    }
-
-    /**
-     * List all the contents of a specific class in a nice way
-     *
-     * @param className the name of the class to list
-     */
-    public static void listClass(String className) {
-        // copy class and attribute lists for more readable
-        // code and operations later
-        UMLClass copyClass = UMLModel.findClass(className);
-        ArrayList<Field> copyFieldList = Objects.requireNonNull(copyClass).getFieldList();
-        ArrayList<Method> copyMethList = Objects.requireNonNull(copyClass).getMethodList();
-        // prints the name of the class
-        System.out.println("Class name: " + copyClass.getClassName());
-        // prints all the field in a set
-        System.out.print("Fields :");
-        for (int i = 0; i < copyFieldList.size(); ++i) {
-            Field field = copyFieldList.get(i);
-            if (i == 0) {
-                System.out.printf(" [%s %s]", field.getFieldType(), field.getAttName());
-            } else {
-                System.out.printf("\n\t\t [%s %s]", field.getFieldType(), field.getAttName());
-            }
-        }
-        // prints all the methods in a set
-        System.out.print("\nMethods");
-        System.out.print(": ");
-        for (int i = 0; i < copyMethList.size(); ++i) {
-            Method method = copyMethList.get(i);
-            if (i == 0) {
-                System.out.printf("[%s %s (",method.getReturnType(), method.getAttName());
-            } else {
-                System.out.print("\t\t [" + method.getReturnType() + " " + copyMethList.get(i).getAttName() + " (");
-            }
-            for (int j = 0; j < copyMethList.get(i).getParamList().size(); ++j) {
-                Parameter param = copyMethList.get(i).getParamList().get(j);
-                if (j == 0) {
-                    System.out.printf("%s %s", param.getFieldType(), param.getAttName());
-                } else {
-                    System.out.printf(", %s %s", param.getFieldType(), param.getAttName());
-                }
-            }
-            System.out.print(")]\n");
-        }
-    }
-
-    /**
-     * List all the contents of all classes in the diagram in a nice way
-     */
-    public static void listClasses() {
-        // if there are classes to list, list them
-        if (UMLModel.getClassList().size() != 0) {
-            // Loops through classList and calls listClass on all elements
-            System.out.print("\n--------------------");
-            if (UMLModel.getClassList().size() == 1) {
-                listClass(UMLModel.getClassList().get(0).getClassName());
-            } else {
-                // Loops through classList and calls listClass on all elements
-                for (UMLClass aUMLClass : UMLModel.getClassList()) {
-                    System.out.println();
-                    listClass(aUMLClass.getClassName());
-                }
-            }
-            System.out.println("--------------------\n");
-        }
-        // if there are no classes to list, prompt user that there are no classes
-        else {
-            System.out.println("There are no classes to list");
-        }
     }
 
     /**
@@ -953,9 +720,375 @@ public class CLIController {
     }
 
     /**
-     * Display list of commands and their accompanying descriptions
+     * List all the contents of a specific class in a nice way
+     *
+     * @param className the name of the class to list
      */
-    public static void displayHelp() {
-        System.out.println(UMLModel.getCLIHelpMenu());
+    public static void listClass(String className) {
+        // copy class and attribute lists for more readable
+        UMLClass copyClass = UMLModel.findClass(className);
+        ArrayList<Field> copyFieldList = Objects.requireNonNull(copyClass).getFieldList();
+        ArrayList<Method> copyMethList = Objects.requireNonNull(copyClass).getMethodList();
+        // prints the name of a class
+        System.out.println("Class name: " + copyClass.getClassName());
+        // prints all the fields in a class
+        System.out.print("Fields :");
+        for (int i = 0; i < copyFieldList.size(); ++i) {
+            Field field = copyFieldList.get(i);
+            if (i == 0) {
+                System.out.printf(" [%s %s]", field.getFieldType(), field.getAttName());
+            } else {
+                System.out.printf("\n\t\t [%s %s]", field.getFieldType(), field.getAttName());
+            }
+        }
+        // prints all the methods in class
+        System.out.print("\nMethods");
+        System.out.print(": ");
+        for (int i = 0; i < copyMethList.size(); ++i) {
+            Method method = copyMethList.get(i);
+            if (i == 0) {
+                System.out.printf("[%s %s (",method.getReturnType(), method.getAttName());
+            } else {
+                System.out.print("\t\t [" + method.getReturnType() + " " + copyMethList.get(i).getAttName() + " (");
+            }
+            // prints all the parameters of a method
+            for (int j = 0; j < copyMethList.get(i).getParamList().size(); ++j) {
+                Parameter param = copyMethList.get(i).getParamList().get(j);
+                if (j == 0) {
+                    System.out.printf("%s %s", param.getFieldType(), param.getAttName());
+                } else {
+                    System.out.printf(", %s %s", param.getFieldType(), param.getAttName());
+                }
+            }
+            System.out.print(")]");
+        }
+    }
+
+    /**
+     * List all the contents of all classes in the diagram in a nice way
+     */
+    public static void listClasses() {
+        // if there are classes to list, list them
+        if (UMLModel.getClassList().size() != 0) {
+            // Loops through classList and calls listClass on all elements
+            System.out.print("\n--------------------\n");
+            if (UMLModel.getClassList().size() == 1) {
+                listClass(UMLModel.getClassList().get(0).getClassName());
+            } else {
+                // Loops through classList and calls listClass on all elements
+                for (UMLClass aUMLClass : UMLModel.getClassList()) {
+                    System.out.println();
+                    listClass(aUMLClass.getClassName());
+                    System.out.print("\n");
+                }
+            }
+            System.out.println("\n--------------------\n");
+        }
+        // if there are no classes to list, prompt user that there are no classes
+        else {
+            System.out.println("There are no classes to list");
+        }
+    }
+
+    //***************************************//
+    //****** Fields/Methods/Parameters ******//
+    //***************************************//
+
+    /**
+     * Prompts the user for the name of an attribute with the given type
+     *
+     * @param attType the type of the attribute to be named
+     * @return the user's given name for the attribute
+     */
+    public static String getAttName(String attType) {
+        System.out.print("Enter " + attType + " name: ");
+        return scan.next().trim();
+    }
+
+    /**
+     * Prompts the user for the type of an attribute
+     *
+     * @param attType the type of attribute to be defined
+     * @return the user's given type for the attribute
+     */
+    public static String getAttType(String attType) {
+        if (attType.equals("method")) {
+            System.out.print("Enter " + attType + " return type: ");
+            String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
+            if (UMLModel.isNotValidReturnType(attToGet)) {
+                System.out.println("\"" + attToGet + "\" is not a valid return type");
+                return null;
+            }
+            return attToGet;
+        }
+        System.out.print("Enter " + attType + " type: ");
+        String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
+        if (UMLModel.isNotValidType(attToGet)) {
+            System.out.println("\"" + attToGet + "\" is not a valid type");
+            return null;
+        }
+        return attToGet;
+    }
+
+    /**
+     * Prompts the user for the type of an attribute
+     *
+     * @param attType the type of attribute to be defined
+     * @return the user's given type for the attribute
+     */
+    public static String getAttReturnType(String attType) {
+        if (attType.equals("method")) {
+            attType += " return";
+        }
+        System.out.print("Enter " + attType + " type: ");
+        String attToGet = scan.next().trim();
+        if (UMLModel.isNotValidReturnType(attToGet)) {
+            System.out.println("\"" + attToGet + "\" is not a valid return type");
+            return null;
+        }
+        return attToGet;
+    }
+
+    /**
+     * Takes in an attribute object, its type and name
+     * Checks if an attribute object exists
+     *
+     * @param obj the attribute object
+     * @param type the type of the attribute
+     * @param name the name of the attribute
+     * @param <E> the class type(generic)
+     * @return true if the object does not exist, false otherwise
+     */
+    public static <E> boolean ifDoesntExist(E obj, String type, String name) {
+        if (obj == null) {
+            System.out.printf("%s %s does not exist\n", type, name);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Takes in an attribute object, its type and name
+     * Checks for duplicates
+     *
+     * @param obj the attribute object
+     * @param type the attribute type
+     * @param name the name
+     * @param <E> the class type
+     * @return true if dups exist, false otherwise
+     */
+    public static <E> boolean ifExists(E obj, String type, String name) {
+        if (obj != null) {
+            System.out.printf("%s %s already exists", type, name);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Takes in a class object, the attribute type and name
+     * Adds a new attribute, either field, method or parameter, to the class given
+     *
+     * @param classToAddAtt the class object
+     * @param attType the type of attribute(field, method, parameter)
+     * @param attName the name of the attribute
+     */
+    public static void addAttribute(UMLClass classToAddAtt, String attType, String attName) {
+        // If attribute is a method, get its return type.
+        // If attribute is a field, get its type.
+        // Ensure type is valid
+        String type = getAttType(attType);
+        if (type == null) {
+            return;
+        }
+        // If user wants to add a method, get its return type and
+        // ensure it is valid. Then return updated class with added method.
+        if (attType.equalsIgnoreCase("method")) {
+            Method method = new Method(attName, type);
+            classToAddAtt.addMethod(method);
+        }
+        // If user wants to add a field, get its type and
+        // ensure it is valid. Then return updated class with added field.
+        else if (attType.equalsIgnoreCase("field")) {
+            Field field = new Field(attName, type);
+            classToAddAtt.addField(field);
+        }
+    }
+
+    /**
+     * Takes in a class object and the attribute type
+     * Removes an attribute and its parts from the class
+     *
+     * @param classWithAttToDel the class object
+     * @param attType the attribute type
+     */
+    public static void delAttribute(UMLClass classWithAttToDel, String attType) {
+        // Get name of field or method user wants to delete
+        System.out.print("Enter " + attType + " to delete: ");
+        String attToDel = scan.next().trim();
+        // Ensure attribute exists
+        Attribute deletedAtt = classWithAttToDel.findAtt(attToDel, attType);
+        if (deletedAtt != null) {
+            // Confirm  user wants to delete attribute
+            System.out.print("Delete " + attType + " \"" + attToDel + "\"? (y/n): ");
+            String answer = scan.next().trim();
+            // If the user wants to delete an attribute, proceed to do so
+            if (answer.equalsIgnoreCase("y")) {
+                classWithAttToDel.deleteAttribute(deletedAtt);
+                System.out.print(attType + " \"" + attToDel + "\" has been deleted \n");
+            }
+            // If user types n, confirm and return
+            else {
+                System.out.println(attType + " \"" + attToDel + "\" has NOT been deleted");
+            }
+            // If attribute doesn't exist in class, inform user and return
+        } else {
+            System.out.println("Attribute does not exist");
+        }
+    }
+
+    /**
+     * Takes in a class object and the attribute type
+     * Finds the class associated with a certain attribute
+     *
+     * @param op the class object
+     * @param type the type of attribute
+     * @return the class found
+     */
+    public static UMLClass findClass(String op, String type) {
+        String className = getClassName(op, type);
+        UMLClass umlClass = UMLModel.findClass(className);
+        if (ifDoesntExist(umlClass, "Class", className)) { return null; }
+        return umlClass;
+    }
+
+    /**
+     * Takes in a class
+     * Finds the method associated with the class given
+     *
+     * @param umlClass the class objcet
+     * @return the method object
+     */
+    public static Method findMethod(UMLClass umlClass) {
+        String methodName = getAttName("method");
+        Method method = umlClass.findMethod(methodName);
+        if (ifDoesntExist(method, "Method", methodName)) { return null; }
+        return method;
+    }
+
+    /**
+     * Takes in a method object
+     * Finds the parameter object associated with the method given
+     *
+     * @param method the method object
+     * @return the parameter object
+     */
+    public static Parameter findParam(Method method) {
+        String paramName = getAttName("parameter");
+        Parameter param = method.findParameter(paramName);
+        if (ifDoesntExist(param, "Parameter", paramName)) { return null; }
+        return param;
+    }
+
+    /**
+     * Takes in a method object
+     * Finds the parameter name of a parameter associated with the method object given
+     *
+     * @param method the method object
+     * @return the parameter name
+     */
+    public static String findParamName(Method method) {
+        String paramName = getAttName("parameter");
+        Parameter param = method.findParameter(paramName);
+        if (ifExists(param, "Parameter", paramName)) { return null; }
+        return paramName;
+    }
+
+    //***************************************//
+    //*************** Flags *****************//
+    //***************************************//
+
+    /**
+     * Takes in user input and operation
+     * gives options to the user for a type of attribute to add
+     *
+     * @param userInputList user input
+     * @param operation user command
+     * @return true if flag is invalid, false otherwise
+     */
+    public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
+        System.out.print("type \"-f\" to " + operation + " a field, or \"-m\" to " +
+                operation + " a method: ");
+        String attFlag = scan.next().trim();
+        switch (attFlag) {
+            case "-f", "-m" -> {
+                userInputList.add(attFlag);
+                return false;
+            }
+            default -> {
+                System.out.println("Invalid flag, no attribute added");
+                return true;
+            }
+        }
+    }
+
+    /**
+     * Takes in the user input and operation to give the user an option for a
+     * relationship type flag to choose a type
+     *
+     * @param userInputList user input
+     * @param operation the command
+     * @return returns true if the correct flag is returned, false otherwise
+     */
+    public static boolean addRelFlag(ArrayList<String> userInputList, String operation) {
+        System.out.print("type \"-a\" for aggregation, \n\"-c\" for composition, \n" +
+                "\"-i\" for inheritance, \nor \"-r\" for realization to " + operation + " that relationship type: ");
+        String relFlag = scan.next().trim();
+        switch (relFlag) {
+            case "-a", "-c", "-i", "-r" -> {
+                userInputList.add(relFlag);
+                return true;
+            }
+            default -> {
+                System.out.println("Invalid flag, no relationship added");
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Takes a flag string from a command and returns the string
+     * that the flag represents
+     *
+     * @param flag the flag of the command
+     */
+    public static String flagToString(String flag) {
+        return switch (flag) {
+            case "-f" -> "field";
+            case "-m" -> "method";
+            case "-p" -> "parameter";
+            case "-a" -> "aggregation";
+            case "-c" -> "composition";
+            case "-i" -> "inheritance";
+            case "-r" -> "realization";
+            default -> "";
+        };
+    }
+
+    //***************************************//
+    //**************** MSC. *****************//
+    //***************************************//
+
+    // clears the screen
+    private static void clearScreen() {
+        // Clears Screen
+        try {
+            if (System.getProperty("os.name").contains("Windows"))
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            else
+                Runtime.getRuntime().exec("clear");
+        } catch (IOException | InterruptedException ex) {
+            System.out.println("couldn't clear screen");
+        }
     }
 }
