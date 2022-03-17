@@ -1,56 +1,51 @@
 package uml;
 
-import javax.management.relation.Relation;
 import java.util.ArrayList;
 
+// The project model; holds information on the project data
 public class UMLModel {
     // The arraylist of classes the diagram has
-    private static ArrayList<UMLClass> UMLClassList = new ArrayList<UMLClass>();
+    private static ArrayList<UMLClass> UMLClassList = new ArrayList<>();
     // The arraylist of relationships the diagram has
-    private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
+    private static ArrayList<Relationship> relationshipList = new ArrayList<>();
 
-    public static ArrayList<UMLClass> getClassList() {
-        return UMLClassList;
-    }
-
+    // getter for class list
+    public static ArrayList<UMLClass> getClassList() { return UMLClassList; }
+    // setter for class list
     public static void setClassList(ArrayList<UMLClass> UMLClassList) {
         UMLModel.UMLClassList = UMLClassList;
     }
-
+    // getter for relationship list
     public static ArrayList<Relationship> getRelationshipList() {
         return relationshipList;
     }
-
+    // setter for relationship list
     public static void setRelationshipList(ArrayList<Relationship> relationshipList) {
         UMLModel.relationshipList = relationshipList;
     }
 
+    // add a class to the class list
     public static void addClass(UMLClass newUMLClass) {
         UMLClassList.add(newUMLClass);
     }
-
+    // remove a class from the class list
     public static void deleteClass(UMLClass delUMLClass) {
         UMLClassList.remove(delUMLClass);
     }
-
-    public static void addRel(Relationship newRel) {
-        relationshipList.add(newRel);
-    }
-
-    public static void deleteRel(Relationship delRel) {
-        relationshipList.remove(delRel);
-    }
-
-    /**
-     * Clears the classList
-     */
+    // clear the entire class list
     public static void clearClassList() {
         UMLClassList.clear();
     }
 
-    /**
-     * Clears the relationshipList
-     */
+    // add a relationship to the rel list
+    public static void addRel(Relationship newRel) {
+        relationshipList.add(newRel);
+    }
+    // remove a relationship from the rel list
+    public static void deleteRel(Relationship delRel) {
+        relationshipList.remove(delRel);
+    }
+    // clear the entire rel list
     public static void clearRelationshipList() {
         relationshipList.clear();
     }
@@ -70,6 +65,10 @@ public class UMLModel {
         }
         return null;
     }
+
+    //***************************************//
+    //************ Relationship *************//
+    //***************************************//
 
     /**
      * Iterate through arraylist and return the relationship if relationship with
@@ -164,7 +163,7 @@ public class UMLModel {
      * If a class has been deleted, also delete any relationships associated
      * with that class
      *
-     * @param className
+     * @param className the name of the class associated with any relationship
      * @return updated relationship list
      */
     public static ArrayList<Relationship> updateRelationshipList(String className) {
@@ -172,6 +171,10 @@ public class UMLModel {
                 rel.getDestination().getClassName().equals(className));
         return relationshipList;
     }
+
+    //***************************************//
+    //******** User Input Correction ********//
+    //***************************************//
 
     /**
      * Takes a string and checks if it is a valid identifier
@@ -239,7 +242,7 @@ public class UMLModel {
      * @return the help menu
      */
     public static String getCLIHelpMenu() {
-        String helpMenu = """
+        return """
                    Commands		       Description
                 --------------	    -----------------
                 add/a class			Add a new class
@@ -268,7 +271,6 @@ public class UMLModel {
                 clear			    Clear the command history
                 help			    Display list of commands
                 exit			    Exit the application""";
-        return helpMenu;
     }
 
 
@@ -279,7 +281,7 @@ public class UMLModel {
      * @return the help menu
      */
     public static String getGUIHelpMenu() {
-        String helpMenu = """
+        return """
                  Commands\t\t\t\t\t\t\t\t\t   Description
                 --------------\t\t\t\t\t\t\t\t\t-----------------
                 Edit>Add>Add Class\t\t\t\t\t\t\tAdd a new class
@@ -299,6 +301,5 @@ public class UMLModel {
                 File>Load\t\t\t\t\t\t\t\t\t\tLoad a previously saved UML diagram
                 Help>Show Commands\t\t\t\t\t\t\tDisplay list of commands
                 [X]\t\t\t\t\t\t\t\t\t\t\tExit the application""";
-        return helpMenu;
     }
 }

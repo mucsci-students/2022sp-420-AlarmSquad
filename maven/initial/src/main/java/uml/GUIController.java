@@ -5,10 +5,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
 
-
+@SuppressWarnings("DanglingJavadoc")
 public class GUIController {
 
     /******************************************************************
@@ -82,7 +81,6 @@ public class GUIController {
                     int multiplier = (((int) UMLModel.getClassList().size() - 1) / (int) 8);
                     int yOffset = 20 + (multiplier * 200);
                     int xOffset = (-85) + (((UMLModel.getClassList().size() - 1) % 8) * 115);
-
                     // Draw the new box for the class
                     GUIView.drawClassBox(className, xOffset, yOffset);
                     // if the class does exist, pop an error up
@@ -304,7 +302,6 @@ public class GUIController {
                 }
                 // delete the classbox from the view
                 GUIView.deleteClassBox(className);
-
                 // update the model
                 UMLModel.updateRelationshipList(className);
                 UMLModel.deleteClass(classToDelete);
@@ -335,7 +332,6 @@ public class GUIController {
             } else {
                 Field fieldToDelete = UMLModel.findClass(className).findField(fieldName);
                 UMLModel.findClass(className).deleteField(fieldToDelete);
-
                 // go through fieldList in ClassBox, remove the field from the fieldList, then
                 // remove field from flow
                 for (int i = 0; i < GUIView.findClassBox(className).getFieldTextList().size(); ++i) {
@@ -346,7 +342,6 @@ public class GUIController {
                         GUIView.findClassBox(className).getFieldTextList().remove(i);
                     }
                 }
-
                 stage.close();
             }
         }
@@ -374,9 +369,7 @@ public class GUIController {
             // if the method does exist, delete it and close
             } else {
                 Method methodToDelete = UMLModel.findClass(className).findMethod(methodName);
-
                 UMLModel.findClass(className).deleteMethod(methodToDelete);
-
                 // go through fieldList in ClassBox, remove the field from the fieldList, then
                 // remove field from flow
                 for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
@@ -387,7 +380,6 @@ public class GUIController {
                         GUIView.findClassBox(className).getMethTextList().remove(i);
                     }
                 }
-
                 stage.close();
             }
         }
@@ -414,7 +406,6 @@ public class GUIController {
         } else {
             Relationship relToDelete = UMLModel.findRelationship(srcName, destName,
                     UMLModel.findRelType(srcName, destName));
-
             // update view
             GUIView.deleteRelLine(GUIView.findClassBox(srcName), GUIView.findClassBox(destName));
             // update model
@@ -449,7 +440,6 @@ public class GUIController {
             } else {
                 // if the class name is not already in use, rename the field
                 if (UMLModel.findClass(newClassName) == null) {
-
                     // update model
                     UMLModel.findClass(className).setClassName(newClassName);
                     // update view
@@ -460,7 +450,6 @@ public class GUIController {
                     GUIView.findClassBox(className).getFlow().getChildren().add(0, newTextName);
                     GUIView.findClassBox(className).setClassTitle(newTextName);
                     GUIView.findClassBox(className).setClassBoxName(newClassName);
-
                 // otherwise, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "The field name is already in use");
@@ -478,8 +467,7 @@ public class GUIController {
      * @param newFieldName the new name for the field
      * @param stage the working stage
      */
-    public static void renameFieldAction(String className, String fieldName,
-                                         String newFieldName, Stage stage) {
+    public static void renameFieldAction(String className, String fieldName, String newFieldName, Stage stage) {
         // if any strings are empty, pop an error up
         if (className.isEmpty() || fieldName.isEmpty() || newFieldName.isEmpty()) {
             GUIView.popUpWindow("Error", "All fields are required");
@@ -495,15 +483,12 @@ public class GUIController {
                 GUIView.popUpWindow("Error", "The field name is invalid");
                 // if the field exists and the type matches, rename the field
             }
-
             // if the field name is not already in use, rename the field
             if (UMLModel.findClass(className).findField(newFieldName) == null) {
                 // update model
                 UMLModel.findClass(className).findField(fieldName).setAttName(newFieldName);
-
                 // update view
                 stage.close();
-
                 // go through fieldList in ClassBox, edit text of field in that fieldlist, remove the
                 // old text, add the new, renamed field at the bottom
                 for (int i = 0; i < GUIView.findClassBox(className).getFieldTextList().size(); ++i) {
@@ -511,17 +496,12 @@ public class GUIController {
                             startsWith("\n- " + fieldName)) {
                         GUIView.findClassBox(className).getFieldTextList().get(i).getText().
                                 replace("\n- " + fieldName, "\n- " + newFieldName);
-
                         GUIView.findClassBox(className).getFieldTextList().remove(i);
-
                         GUIView.findClassBox(className).addText(UMLModel.findClass(className).findField(newFieldName),
                                 UMLModel.findClass(className).getFieldList().size(),
                                 UMLModel.findClass(className).getMethodList().size(), true);
-
                     }
                 }
-
-
                 // otherwise, pop an error up
             } else {
                 GUIView.popUpWindow("Error", "The field name is already in use");
@@ -558,7 +538,6 @@ public class GUIController {
                 if (UMLModel.findClass(className).findMethod(newMethodName) == null) {
                     UMLModel.findClass(className).findMethod(methodName).setAttName(newMethodName);
                     stage.close();
-
                     // go through methlist in ClassBox, edit text of method in that methlist, remove the
                     // old method, add the new, renamed method at the bottom
                     for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
@@ -566,16 +545,13 @@ public class GUIController {
                                 startsWith("\n+ " + methodName)) {
                             GUIView.findClassBox(className).getMethTextList().get(i).getText().
                                     replace("\n+ " + methodName, "\n+ " + newMethodName);
-
                             GUIView.findClassBox(className).getMethTextList().remove(i);
-
-                            GUIView.findClassBox(className).addText(UMLModel.findClass(className).findMethod(newMethodName),
+                            GUIView.findClassBox(className).addText(UMLModel.findClass(className).
+                                            findMethod(newMethodName),
                                     UMLModel.findClass(className).getFieldList().size(),
                                     UMLModel.findClass(className).getMethodList().size(), true);
-
                         }
                     }
-
                 // otherwise, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "The method name is already in use");
@@ -619,24 +595,21 @@ public class GUIController {
             } else {
                 // if the parameter name is not already in use, change the parameter
                 if (UMLModel.findClass(className).findMethod(methodName).findParameter(newParamName) == null) {
-
-                    UMLModel.findClass(className).findMethod(methodName).findParameter(paramName).setAttName(newParamName);
+                    UMLModel.findClass(className).findMethod(methodName).findParameter(paramName).
+                            setAttName(newParamName);
                     UMLModel.findClass(className).findMethod(methodName).findParameter(newParamName)
                             .setFieldType(newParamType);
-
                     stage.close();
                     // go through methlist in ClassBox, edit text of method in that methlist, remove the
                     // old method, add the new, renamed method at the bottom
                     for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
                         if (GUIView.findClassBox(className).getMethTextList().get(i).getText().
                                 startsWith("\n+ " + methodName)) {
-
                             GUIView.findClassBox(className).getMethTextList().remove(i);
-
-                            GUIView.findClassBox(className).addText(UMLModel.findClass(className).findMethod(methodName),
+                            GUIView.findClassBox(className).addText(UMLModel.findClass(className).
+                                            findMethod(methodName),
                                     UMLModel.findClass(className).getFieldList().size(),
                                     UMLModel.findClass(className).getMethodList().size(), true);
-
                         }
                     }
                     // otherwise, pop an error up
@@ -689,7 +662,7 @@ public class GUIController {
             // update the view
             GUIView.deleteRelLine(GUIView.findClassBox(src), GUIView.findClassBox(dest));
             drawRelLine(src, dest, newRelType);
-            //
+            // set the relationship type
             UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);
             stage.close();
         }
@@ -710,7 +683,6 @@ public class GUIController {
      * Exits the current window if called
      *
      * @param stage the working stage
-     * @return an event handler telling the window to close
      */
     public static void exitAction(Stage stage) {
         stage.close();
@@ -718,7 +690,6 @@ public class GUIController {
 
     /**
      * Clear the diagram of all classboxes and relationship lines
-     *
      */
     public static void clearDiagram() {
         for (ClassBox cbObj : GUIView.classBoxList) {
@@ -739,18 +710,15 @@ public class GUIController {
      */
     public static void uploadDiagram(ArrayList<UMLClass> classList, ArrayList<Relationship> relList) {
         int classListSize = 0;
-
         for (UMLClass classObj : classList) {
-
             // formats the class boxes
             classListSize += 1;
             int multiplier = (((int) classListSize - 1) / (int) 8);
             int yOffset = 20 + (multiplier * 200);
             int xOffset = (-85) + (((classListSize - 1) % 8) * 115);
-
             int fieldListSize = 0;
             int methodListSize = 0;
-
+            // draws class boxes with fields, methods and parameters
             GUIView.drawClassBox(classObj.getClassName(), xOffset, yOffset);
             for (Field fieldObj : classObj.getFieldList()) {
                 fieldListSize += 1;
@@ -767,6 +735,7 @@ public class GUIController {
                         UMLModel.findClass(classObj.getClassName()).getMethodList().size(), true);
             }
         }
+        // re-draws relationship lines
         for (Relationship relObj : relList) {
             drawRelLine(relObj.getSource().getClassName(),
                     relObj.getDestination().getClassName(), relObj.getRelType());
@@ -789,7 +758,6 @@ public class GUIController {
             case "realization" -> GUIView.drawLine(src, dest, Color.RED);
         }
     }
-
 
     /**
      * main
