@@ -26,21 +26,17 @@ import java.util.List;
  * @author AlarmSquad
  */
 public class GUIView extends Application {
-
     // create the menu bar
     private final MenuBar menuBar = new MenuBar();
     // initialize the root
     static Group superRoot = new Group();
-
+    // diagram width and height for window
     static final double DIAGRAM_WIDTH = 950;
     static final double DIAGRAM_HEIGHT = 640;
-
-    static double boxWidth = 100;
-    static double boxHeight = 20;
-
+    // coordinates for draging objects
     static double startDragX;
     static double startDragY;
-
+    // class box and relationship line lists
     static ArrayList<ClassBox> classBoxList = new ArrayList<>();
     static ArrayList<RelLine> lineList = new ArrayList<RelLine>();
 
@@ -132,7 +128,6 @@ public class GUIView extends Application {
         // when clicked, launch delete relationship window
         MenuItem deleteRel = new MenuItem("Delete Relationship");
         deleteRel.setOnAction(event -> deleteRelWindow());
-
         delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel);
 
         //***************************************//
@@ -154,6 +149,8 @@ public class GUIView extends Application {
         renameMethod.setOnAction(event -> renameMethodWindow());
         renameAttribute.getItems().addAll(renameField, renameMethod);
 
+        //TODO refactor rename attribute to change?
+
         // adds all the rename menu items to rename option
         rename.getItems().addAll(renameClass, renameAttribute);
 
@@ -166,21 +163,17 @@ public class GUIView extends Application {
         changeRelType.setOnAction(event -> changeRelTypeWindow());
         // all of the change options as part of the edit menu
         change.getItems().addAll(changeParam, changeRelType);
-
         // create the edit menu and add the 'add', 'delete', and 'rename' menus to it
         Menu edit = new Menu("Edit");
         // all of the options that are part of the edit menu
         edit.getItems().addAll(add, delete, rename, change);
-
         // create the help menu and its menu item
         Menu help = new Menu("Help");
         MenuItem showCommands = new MenuItem("Show Commands");
         showCommands.setOnAction(event -> showCommandsWindow());
         help.getItems().add(showCommands);
-
         // adds all menus to the menu bar
         menuBar.getMenus().addAll(file, edit, help);
-
         // disable all menu items that cannot be used until updateMenu is called
         addField.setDisable(true);
         addMethod.setDisable(true);
@@ -195,7 +188,6 @@ public class GUIView extends Application {
         renameMethod.setDisable(true);
         changeParam.setDisable(true);
         changeRelType.setDisable(true);
-
         // return the vbox using the menu bar
         return new VBox(menuBar);
     }
@@ -331,7 +323,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -379,7 +370,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -428,7 +418,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(srcNameText, 0, 0);
@@ -482,7 +471,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -522,7 +510,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(label, 0, 0);
@@ -561,7 +548,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -602,7 +588,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -644,7 +629,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(srcNameText, 0, 0);
@@ -685,7 +669,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classLabel, 0, 0);
@@ -738,7 +721,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(givenClassLabel, 0, 0);
@@ -789,7 +771,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(givenClassLabel, 0, 0);
@@ -848,7 +829,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(givenClassLabel, 0, 0);
@@ -906,7 +886,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(srcLabel, 0, 0);
@@ -937,7 +916,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the object and adds it
         GridPane pane = new GridPane();
         pane.add(commandList, 0, 0);
@@ -963,7 +941,6 @@ public class GUIView extends Application {
         // create a button to cancel out of the window
         Button cancel = new Button("Okay");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
-
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(message, 0, 0);
@@ -1128,7 +1105,6 @@ public class GUIView extends Application {
                 destination = box;
             }
         }
-
         assert source != null;
         assert destination != null;
         //source.getClassPane().setTranslateX(source.getBoxWidth() / 2);
@@ -1150,7 +1126,7 @@ public class GUIView extends Application {
         ClassBox classBox = new ClassBox(className);
         superRoot.getChildren().add(classBox.getClassPane());
         classBoxList.add(classBox);
-
+        // place class box in correct area
         classBox.getClassPane().setTranslateX(classBox.getBoxWidth() + xOffset);
         classBox.getClassPane().setTranslateY(classBox.getBoxHeight() + yOffset);
         // when the box is clicked on begin drag with mouse
@@ -1158,7 +1134,6 @@ public class GUIView extends Application {
             startDragX = event.getSceneX();
             startDragY = event.getSceneY();
         });
-
         // keep box under mouse as the mouse continues to drag
         classBox.getClassPane().setOnMouseDragged(event -> {
             classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);

@@ -7,28 +7,32 @@ public class Method extends Attribute {
     private String returnType;
     private ArrayList<Parameter> paramList;
 
+    /**
+     * Method constructor
+     *
+     * @param methodName the name of the method
+     * @param returnType the return type of the method
+     */
     public Method(String methodName, String returnType) {
         super(methodName);
         this.returnType = returnType;
-        paramList = new ArrayList<Parameter>();
+        paramList = new ArrayList<>();
     }
 
+    // getter for return type
     public String getReturnType(){
         return this.returnType;
     }
-    public void setReturnType(String returnType){
-        this.returnType = returnType;
-    }
 
-    /**
-     * Iterates through paramList, returns with .get()
-     *
-     * @param param parameter to add to paramList
-     */
+    // getter for param list
+    public ArrayList<Parameter> getParamList() {
+        return paramList;
+    }
+    // adds a parameter to the param list
     public void addParameter(Parameter param) {
         paramList.add(param);
     }
-
+    // removes a parameter from the param list
     public void deleteParameter(Parameter param) {
         paramList.remove(param);
     }
@@ -36,7 +40,7 @@ public class Method extends Attribute {
     /**
      * Iterates through paramList, returns with .get()
      *
-     * @param paramToFind
+     * @param paramToFind the name of the parameter
      * @return param if found, null if not found
      */
     public Parameter findParameter(String paramToFind) {
@@ -53,25 +57,17 @@ public class Method extends Attribute {
     /**
      * Iterates through paramList, returns with .get()
      *
-     * @param paramToFind
-     * @return param if found, null if not found
+     * @param paramToFind the name of the parameter
      */
-    public Parameter changeParameter(String paramToFind, Parameter paramToChange) {
+    public void changeParameter(String paramToFind, Parameter paramToChange) {
         // iterates through the arraylist
         for (int i = 0; i < paramList.size(); ++i) {
             // if the name matches, return class
             if (paramToFind.equals(paramList.get(i).getAttName())) {
                 paramList.set(i, paramToChange);
-                return paramToChange;
+                return;
             }
         }
-        return null;
     }
-
-    public ArrayList<Parameter> getParamList() {
-        return paramList;
-    }
-
-
 }
 
