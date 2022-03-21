@@ -1,6 +1,7 @@
 package uml;
 
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
@@ -49,7 +51,6 @@ public class GUIView extends Application {
      */
     @Override
     public void start(Stage stage) {
-
         // add the menu to the root
         superRoot.getChildren().add(createDiagramMenu());
         // initialize the window, and set the color
@@ -180,6 +181,21 @@ public class GUIView extends Application {
         // adds all menus to the menu bar
         menuBar.getMenus().addAll(file, edit, help);
 
+        // disable all menu items that cannot be used until updateMenu is called
+        addField.setDisable(true);
+        addMethod.setDisable(true);
+        addRel.setDisable(true);
+        addParam.setDisable(true);
+        deleteClass.setDisable(true);
+        deleteField.setDisable(true);
+        deleteMethod.setDisable(true);
+        deleteRel.setDisable(true);
+        renameClass.setDisable(true);
+        renameField.setDisable(true);
+        renameMethod.setDisable(true);
+        changeParam.setDisable(true);
+        changeRelType.setDisable(true);
+
         // return the vbox using the menu bar
         return new VBox(menuBar);
     }
@@ -265,7 +281,10 @@ public class GUIView extends Application {
         text.setPrefColumnCount(16);
         // create a button to add the class with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addClassAction(text.getText(), stage));
+        add.setOnAction(event -> {
+            GUIController.addClassAction(text.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -305,7 +324,10 @@ public class GUIView extends Application {
         fieldType.setPrefColumnCount(16);
         // create a button to add the field with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage));
+        add.setOnAction(event -> {
+            GUIController.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -350,7 +372,10 @@ public class GUIView extends Application {
         returnType.setPrefColumnCount(14);
         // create a button to add the method with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage));
+        add.setOnAction(event -> {
+            GUIController.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -395,8 +420,11 @@ public class GUIView extends Application {
         relType.setPrefColumnCount(13);
         // create a button to add the relationship with the correct src and dest names
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addRelationshipAction(srcName.getText(),
-                                    destName.getText(), relType.getText(), stage));
+        add.setOnAction(event -> {
+            GUIController.addRelationshipAction(srcName.getText(),
+                    destName.getText(), relType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -446,8 +474,11 @@ public class GUIView extends Application {
         paramType.setPrefColumnCount(14);
         // create a button to add the method with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addParameterAction(className.getText(), methodName.getText(),
-                paramName.getText(), paramType.getText(), stage));
+        add.setOnAction(event -> {
+            GUIController.addParameterAction(className.getText(), methodName.getText(),
+                    paramName.getText(), paramType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -484,7 +515,10 @@ public class GUIView extends Application {
         text.setPrefColumnCount(16);
         // create a button to delete the class with the inputted name
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteClassAction(text.getText(), stage));
+        delete.setOnAction(event -> {
+            GUIController.deleteClassAction(text.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -520,7 +554,10 @@ public class GUIView extends Application {
         fieldName.setPrefColumnCount(16);
         // create a button to add the field with the inputted name
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteFieldAction(className.getText(), fieldName.getText(), stage));
+        delete.setOnAction(event -> {
+            GUIController.deleteFieldAction(className.getText(), fieldName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -558,7 +595,10 @@ public class GUIView extends Application {
         methodName.setPrefColumnCount(15);
         // create a button to add the field with the inputted name
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteMethodAction(className.getText(), methodName.getText(), stage));
+        delete.setOnAction(event -> {
+            GUIController.deleteMethodAction(className.getText(), methodName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -596,8 +636,11 @@ public class GUIView extends Application {
         destName.setPrefColumnCount(13);
         // create a button to delete the relationship with the correct src and dest names
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteRelAction(srcName.getText(),
-                destName.getText(), stage));
+        delete.setOnAction(event -> {
+            GUIController.deleteRelAction(srcName.getText(),
+                    destName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -635,7 +678,10 @@ public class GUIView extends Application {
         newClassName.setPrefColumnCount(14);
         // create a button to add the class with the inputted name
         Button rename = new Button("Rename");
-        rename.setOnAction(event -> GUIController.renameClassAction(classToRename.getText(), newClassName.getText(), stage));
+        rename.setOnAction(event -> {
+            GUIController.renameClassAction(classToRename.getText(), newClassName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -683,9 +729,12 @@ public class GUIView extends Application {
         newFieldName.setPrefColumnCount(14);
         // create a button to add the field with the inputted name
         Button rename = new Button("Rename");
-        rename.setOnAction(event -> GUIController.renameFieldAction(givenClass.getText(),
-                                    fieldToRename.getText(),
-                                    newFieldName.getText(), stage));
+        rename.setOnAction(event -> {
+            GUIController.renameFieldAction(givenClass.getText(),
+                    fieldToRename.getText(),
+                    newFieldName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -732,8 +781,11 @@ public class GUIView extends Application {
         newMethodName.setPrefColumnCount(12);
         // create a button to add the method with the inputted name
         Button rename = new Button("Rename");
-        rename.setOnAction(event -> GUIController.renameMethodAction(givenClass.getText(),
-                methodToRename.getText(), newMethodName.getText(), stage));
+        rename.setOnAction(event -> {
+            GUIController.renameMethodAction(givenClass.getText(),
+                    methodToRename.getText(), newMethodName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -788,8 +840,11 @@ public class GUIView extends Application {
         newParamType.setPrefColumnCount(11);
         // create a button to add the method with the inputted name
         Button change = new Button("Change");
-        change.setOnAction(event -> GUIController.changeParameterAction(givenClass.getText(), givenMethod.getText(),
-                paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage));
+        change.setOnAction(event -> {
+            GUIController.changeParameterAction(givenClass.getText(), givenMethod.getText(),
+                    paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -843,8 +898,11 @@ public class GUIView extends Application {
         newRelTypeName.setPrefColumnCount(16);
         // create a button to add the class with the inputted name
         Button rename = new Button("Change");
-        rename.setOnAction(event -> GUIController.changeRelTypeAction(srcName.getText(),
-                        destName.getText(), oldRelTypeName.getText(), newRelTypeName.getText(), stage));
+        rename.setOnAction(event -> {
+            GUIController.changeRelTypeAction(srcName.getText(),
+                    destName.getText(), oldRelTypeName.getText(), newRelTypeName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
@@ -920,6 +978,110 @@ public class GUIView extends Application {
      * End of window methods & Start of helper methods
      *
      ******************************************************************/
+
+    private void updateMenus() {
+        // get the list of items in the edit menu object
+        ObservableList<MenuItem> editList = menuBar.getMenus().get(1).getItems();
+        // get the add menu object
+        Menu add = (Menu) editList.get(0);
+        // get the add attribute menu object
+        Menu addAttribute = (Menu) add.getItems().get(1);
+        // get the delete menu object
+        Menu delete = (Menu) editList.get(1);
+        // get the delete attribute menu object
+        Menu deleteAttribute = (Menu) delete.getItems().get(1);
+        // get the rename menu object
+        Menu rename = (Menu) editList.get(2);
+        // get the rename attribute menu object
+        Menu renameAttribute = (Menu) rename.getItems().get(1);
+        // get the change menu object
+        Menu change = (Menu) editList.get(3);
+
+        // enable/disable
+        if (!GUIController.getClassList().isEmpty()) {
+            // enable the add field menu item
+            addAttribute.getItems().get(0).setDisable(false);
+            // enable the add method menu item
+            addAttribute.getItems().get(1).setDisable(false);
+            // enable the delete class menu item
+            delete.getItems().get(0).setDisable(false);
+            // enable the rename class menu item
+            rename.getItems().get(0).setDisable(false);
+
+            Boolean fieldExists = false;
+            Boolean methodExists = false;
+            Boolean paramExists = false;
+            // check every object and see if at least one of them has either a field or method
+            for (UMLClass classObj : GUIController.getClassList()) {
+                if (!classObj.getFieldList().isEmpty()) {
+                    fieldExists = true;
+                }
+                if (!classObj.getMethodList().isEmpty()) {
+                    methodExists = true;
+                    for (Method methObj : classObj.getMethodList()) {
+                        if (!methObj.getParamList().isEmpty()) {
+                            paramExists = true;
+                        }
+                    }
+                }
+            }
+            // if there is at least one field in the list, enable the menu items
+            // otherwise, disable them
+            if (fieldExists) {
+                deleteAttribute.getItems().get(0).setDisable(false);
+                renameAttribute.getItems().get(0).setDisable(false);
+            } else {
+                deleteAttribute.getItems().get(0).setDisable(true);
+                renameAttribute.getItems().get(0).setDisable(true);
+            }
+            // if there is at least one method in the list, enable the menu items
+            // otherwise, disable them
+            if (methodExists) {
+                deleteAttribute.getItems().get(1).setDisable(false);
+                renameAttribute.getItems().get(1).setDisable(false);
+                add.getItems().get(3).setDisable(false);
+            } else {
+                deleteAttribute.getItems().get(1).setDisable(true);
+                renameAttribute.getItems().get(1).setDisable(true);
+                add.getItems().get(3).setDisable(true);
+            }
+            // if there is at least one parameter in the list, enable the menu items
+            // otherwise, disable them
+            if (paramExists) {
+                change.getItems().get(0).setDisable(false);
+            } else {
+                change.getItems().get(0).setDisable(true);
+            }
+            // if there are at least 2 classes in the class list, enable add relationship
+            // otherwise, disable it
+            if (GUIController.getClassList().size() > 1) {
+                add.getItems().get(2).setDisable(false);
+            } else {
+                add.getItems().get(2).setDisable(true);
+            }
+            // if there are at least one relationship in the relationship list, enable the menu items
+            // otherwise, disable them
+            if (!GUIController.getRelationshipList().isEmpty()) {
+                delete.getItems().get(2).setDisable(false);
+                change.getItems().get(1).setDisable(false);
+            } else {
+                delete.getItems().get(2).setDisable(true);
+                change.getItems().get(1).setDisable(true);
+            }
+        } else {
+            // disable all the menu items
+            addAttribute.getItems().get(0).setDisable(true);
+            addAttribute.getItems().get(1).setDisable(true);
+            delete.getItems().get(0).setDisable(true);
+            rename.getItems().get(0).setDisable(true);
+            deleteAttribute.getItems().get(0).setDisable(true);
+            renameAttribute.getItems().get(0).setDisable(true);
+            deleteAttribute.getItems().get(1).setDisable(true);
+            renameAttribute.getItems().get(1).setDisable(true);
+            add.getItems().get(3).setDisable(true);
+            change.getItems().get(0).setDisable(true);
+        }
+    }
 
     /**
      * Takes in many parameters from the window and gives it standardized formatting,

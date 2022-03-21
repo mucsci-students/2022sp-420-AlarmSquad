@@ -79,7 +79,7 @@ public class GUIController {
                     UMLClass newClass = new UMLClass(className);
                     UMLModel.addClass(newClass);
                     stage.close();
-                    int multiplier = (((int) UMLModel.getClassList().size() - 1) / (int) 8);
+                    int multiplier = ((UMLModel.getClassList().size() - 1) / 8);
                     int yOffset = 20 + (multiplier * 200);
                     int xOffset = (-85) + (((UMLModel.getClassList().size() - 1) % 8) * 115);
 
@@ -707,6 +707,24 @@ public class GUIController {
      ******************************************************************/
 
     /**
+     * Returns the class list
+     *
+     * @return the class list
+     */
+    public static ArrayList<UMLClass> getClassList() {
+        return UMLModel.getClassList();
+    }
+
+    /**
+     * Returns the relationship list
+     *
+     * @return the relationship list
+     */
+    public static ArrayList<Relationship> getRelationshipList() {
+        return UMLModel.getRelationshipList();
+    }
+
+    /**
      * Exits the current window if called
      *
      * @param stage the working stage
@@ -789,7 +807,6 @@ public class GUIController {
             case "realization" -> GUIView.drawLine(src, dest, Color.RED);
         }
     }
-
 
     /**
      * main
