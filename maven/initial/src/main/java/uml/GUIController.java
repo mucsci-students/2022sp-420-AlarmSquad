@@ -78,7 +78,7 @@ public class GUIController {
                     UMLClass newClass = new UMLClass(className);
                     UMLModel.addClass(newClass);
                     stage.close();
-                    int multiplier = (((int) UMLModel.getClassList().size() - 1) / (int) 8);
+                    int multiplier = ((UMLModel.getClassList().size() - 1) / 8);
                     int yOffset = 20 + (multiplier * 200);
                     int xOffset = (-85) + (((UMLModel.getClassList().size() - 1) % 8) * 115);
                     // Draw the new box for the class
@@ -678,6 +678,24 @@ public class GUIController {
      * End of view action methods
      *
      ******************************************************************/
+
+    /**
+     * Returns the class list
+     *
+     * @return the class list
+     */
+    public static ArrayList<UMLClass> getClassList() {
+        return UMLModel.getClassList();
+    }
+
+    /**
+     * Returns the relationship list
+     *
+     * @return the relationship list
+     */
+    public static ArrayList<Relationship> getRelationshipList() {
+        return UMLModel.getRelationshipList();
+    }
 
     /**
      * Exits the current window if called
