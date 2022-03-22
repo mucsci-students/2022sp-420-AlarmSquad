@@ -18,7 +18,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
@@ -38,7 +40,8 @@ public class GUIView extends Application {
     static double startDragY;
     // class box and relationship line lists
     static ArrayList<ClassBox> classBoxList = new ArrayList<>();
-    static ArrayList<RelLine> lineList = new ArrayList<RelLine>();
+    static ArrayList<RelLine> lineList = new ArrayList<>();
+    static Map<String, List<Double>> coordinateMap = new HashMap<>();
 
     /**
      * Starts the initial window for the diagram
@@ -1129,6 +1132,9 @@ public class GUIView extends Application {
         // place class box in correct area
         classBox.getClassPane().setTranslateX(classBox.getBoxWidth() + xOffset);
         classBox.getClassPane().setTranslateY(classBox.getBoxHeight() + yOffset);
+        // set the x and y to the right coordinates
+        classBox.setX(classBox.getClassPane().getTranslateX());
+        classBox.setY(classBox.getClassPane().getTranslateY());
         // when the box is clicked on begin drag with mouse
         classBox.getClassPane().setOnMouseDragEntered(event -> {
             startDragX = event.getSceneX();
@@ -1138,7 +1144,25 @@ public class GUIView extends Application {
         classBox.getClassPane().setOnMouseDragged(event -> {
             classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);
             classBox.getClassPane().setTranslateY(event.getSceneY() - startDragY);
+            // set the x and y to the right coordinates
+            classBox.setX(classBox.getClassPane().getTranslateX());
+            classBox.setY(classBox.getClassPane().getTranslateY());
         });
+    }
+
+    /**
+     * Moves all the classes in the diagram to their saved x and y fields
+     */
+    public static void moveClassBoxes() {
+        // iterate through the class box list and set the translate x and y to the right value
+        for (ClassBox cbObj : classBoxList) {
+            Double X = coordinateMap.get(cbObj.getClassBoxName()).get(0);
+            Double Y = coordinateMap.get(cbObj.getClassBoxName()).get(1);
+            cbObj.setX(X);
+            cbObj.setY(Y);
+            cbObj.getClassPane().setTranslateX(cbObj.getX());
+            cbObj.getClassPane().setTranslateY(cbObj.getY());
+        }
     }
 
     public static void drawFieldBox(int fieldListSize, int methListSize, Field field, String className) {
@@ -1202,6 +1226,20 @@ public class GUIView extends Application {
             }
         }
         classBoxList.remove(findClassBox(classBoxName));
+    }
+
+    /**
+     * Adds a key value pair to the coordinate map, where the value is a list of the x and y
+     *
+     * @param className the key, the name of the class
+     * @param X the x value for the class box
+     * @param Y the y value for the class box
+     */
+    public static void addToCoordinateMap(String className, Double X, Double Y) {
+        List<Double> coordinateList = new ArrayList<Double>();
+        coordinateList.add(X);
+        coordinateList.add(Y);
+        coordinateMap.put(className, coordinateList);
     }
 
     //***************************************//

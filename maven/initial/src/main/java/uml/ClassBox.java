@@ -21,6 +21,8 @@ public class ClassBox {
     private Text classTitle;
     private ArrayList<Text> fieldTextList;
     private ArrayList<Text> methTextList;
+    private double X;
+    private double Y;
 
     public ClassBox(String className) {
         classBoxName = className;
@@ -37,8 +39,15 @@ public class ClassBox {
         classPane.getChildren().add(1, flow);
     }
 
-
     // Getters and Setters
+    public double getX() {return X;}
+
+    public void setX(double X) {this.X = X;}
+
+    public double getY() {return Y;}
+
+    public void setY(double Y) {this.Y = Y;}
+
     public StackPane getClassPane() {
         return this.classPane;
     }

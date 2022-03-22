@@ -743,6 +743,8 @@ public class GUIController {
                 GUIView.drawFieldBox(fieldListSize, methodListSize,
                         fieldObj, classObj.getClassName());
             }
+            // move all of the class boxes to the right positions
+            GUIView.moveClassBoxes();
             for (Method methodObj : classObj.getMethodList()) {
                 methodListSize += 1;
                 GUIView.drawMethodBox(fieldListSize, methodListSize,

@@ -77,6 +77,10 @@ public class JSON {
             // put the field and method JSONArray into the JSON Class object
             classToBeSaved.put("fieldList", fieldList);
             classToBeSaved.put("methodList", methList);
+
+            // put the x and y in the JSON Class object
+            classToBeSaved.put("X", GUIView.findClassBox(UMLClassObj.getClassName()).getX());
+            classToBeSaved.put("Y", GUIView.findClassBox(UMLClassObj.getClassName()).getY());
             // put the JSONArray into the JSON object
             saveClasses.add(classToBeSaved);
         }
@@ -201,6 +205,9 @@ public class JSON {
                     // add method to class
                     newUMLClass.addMethod(newMeth);
                 }
+
+                // puts the x and y values for the class box in the coordinate map
+                GUIView.addToCoordinateMap((String) current.get("className"), (Double) current.get("X"), (Double) current.get("Y"));
 
                 // add the filled class to the classList
                 UMLModel.addClass(newUMLClass);
