@@ -1156,10 +1156,10 @@ public class GUIView extends Application {
     public static void moveClassBoxes() {
         // iterate through the class box list and set the translate x and y to the right value
         for (ClassBox cbObj : classBoxList) {
-            Double x = coordinateMap.get(cbObj.getClassBoxName()).get(0);
-            Double y = coordinateMap.get(cbObj.getClassBoxName()).get(1);
-            cbObj.setX(x);
-            cbObj.setY(y);
+            Double X = coordinateMap.get(cbObj.getClassBoxName()).get(0);
+            Double Y = coordinateMap.get(cbObj.getClassBoxName()).get(1);
+            cbObj.setX(X);
+            cbObj.setY(Y);
             cbObj.getClassPane().setTranslateX(cbObj.getX());
             cbObj.getClassPane().setTranslateY(cbObj.getY());
         }
@@ -1232,13 +1232,13 @@ public class GUIView extends Application {
      * Adds a key value pair to the coordinate map, where the value is a list of the x and y
      *
      * @param className the key, the name of the class
-     * @param x the x value for the class box
-     * @param y the y value for the class box
+     * @param X the x value for the class box
+     * @param Y the y value for the class box
      */
-    public static void addToCoordinateMap(String className, Double x, Double y) {
+    public static void addToCoordinateMap(String className, Double X, Double Y) {
         List<Double> coordinateList = new ArrayList<Double>();
-        coordinateList.add(x);
-        coordinateList.add(y);
+        coordinateList.add(X);
+        coordinateList.add(Y);
         coordinateMap.put(className, coordinateList);
     }
 
