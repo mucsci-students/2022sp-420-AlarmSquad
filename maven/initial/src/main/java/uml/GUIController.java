@@ -1,6 +1,6 @@
 package uml;
 
-import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -200,7 +200,7 @@ public class GUIController {
                     UMLClass dest = UMLModel.findClass(destName);
                     Relationship newRel = new Relationship(src, dest, relType);
                     UMLModel.addRel(newRel);
-                    drawRelLine(srcName, destName, UMLModel.findRelType(srcName, destName));
+                    GUIView.drawLine(srcName, destName, UMLModel.findRelType(srcName, destName));
                     stage.close();
                 // if the relationship does exist, pop an error up
                 } else {
@@ -661,7 +661,16 @@ public class GUIController {
         else if(!oldReltype.equals(newRelType)){
             // update the view
             GUIView.deleteRelLine(GUIView.findClassBox(src), GUIView.findClassBox(dest));
-            drawRelLine(src, dest, newRelType);
+            if(GUIView.arrowList.size() != 0) {
+                for (ArrayList<Line> arrows : GUIView.arrowList) {
+                    for (Line arrow : arrows) {
+                        GUIView.superRoot.getChildren().remove(arrow);
+                    }
+                    GUIView.superRoot.getChildren().remove(arrows);
+                }
+            }
+            GUIView.arrowList.clear();
+            GUIView.drawLine(src, dest, newRelType);
             // set the relationship type
             UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);
             stage.close();
@@ -716,8 +725,15 @@ public class GUIController {
         for (RelLine relLineObj : GUIView.lineList) {
             GUIView.superRoot.getChildren().remove(relLineObj.getLine());
         }
+        for(ArrayList<Line> arrows : GUIView.arrowList){
+            for (Line arrow : arrows) {
+                GUIView.superRoot.getChildren().remove(arrow);
+            }
+            GUIView.superRoot.getChildren().remove(arrows);
+        }
         GUIView.classBoxList.clear();
         GUIView.lineList.clear();
+        GUIView.arrowList.clear();
     }
 
     /**
@@ -757,25 +773,8 @@ public class GUIController {
         }
         // re-draws relationship lines
         for (Relationship relObj : relList) {
-            drawRelLine(relObj.getSource().getClassName(),
+            GUIView.drawLine(relObj.getSource().getClassName(),
                     relObj.getDestination().getClassName(), relObj.getRelType());
-        }
-    }
-
-    /**
-     * Takes in a source name, destination name and relType and draws a line with a different color
-     * corresponding to the relType
-     *
-     * @param src the source class name
-     * @param dest the destination class name
-     * @param reltype the relType
-     */
-    public static void drawRelLine(String src, String dest, String reltype){
-        switch (reltype) {
-            case "aggregation" -> GUIView.drawLine(src, dest, Color.GREEN);
-            case "composition" -> GUIView.drawLine(src, dest, Color.YELLOW);
-            case "inheritance" -> GUIView.drawLine(src, dest, Color.BLUE);
-            case "realization" -> GUIView.drawLine(src, dest, Color.RED);
         }
     }
 

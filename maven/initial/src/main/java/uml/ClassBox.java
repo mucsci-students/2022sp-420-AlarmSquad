@@ -124,24 +124,19 @@ public class ClassBox {
      * @param numOfMeths number of methods currently in the class
      */
     public <E> void addText(E att, int numOfFields, int numOfMeths, boolean dontAddPadding) {
-
         // Clear the flow each time a method or field is added,
         // thus clearing the classbox of all objects.
         flow.getChildren().clear();
-
         // Remake the flow with just the name of the class added
         flow.getChildren().add(classTitle);
-
         // Must initialize attName outside if/else statement or intellij cries
         String attName = "";
-
         // To format output correctly, determine if att belongs to
         // the class Field or Method
         if (att instanceof Field) {
             // If att is a Field, add a newline to the front of it's name to put it
             // on a new line in the classbox, and add "- " to the front of the name for formatting
             attName = ("\n- " + ((Field) att).getAttName() + " : " + ((Field) att).getFieldType());
-
             // If this is the first field ever being added to the class associated with this
             // classbox, then initialize the fieldTextList, and increase the size of the
             // classbox for formatting. Attributes are added to their classes BEFORE the drawing of the box,
@@ -152,14 +147,12 @@ public class ClassBox {
                 if (!dontAddPadding) {
                     setBoxHeight(boxHeight + 15);
                 }
-
                 // If methods will also need to be placed in the classbox, extra padding
                 // is needed to accommodate the additional separator line between the field list and
                 // the method list.
                 if (numOfMeths != 0)
                     setBoxHeight(boxHeight + 10);
             }
-
             // Add the field to the fieldTextList
             Text text = new Text(attName);
             fieldTextList.add(text);
@@ -170,28 +163,22 @@ public class ClassBox {
         // for formatting
         else {
             attName = ("\n+ " + ((Method) att).getAttName() + "(");
-
             String paramText = "";
-
             ArrayList<Parameter> paramList = ((Method) att).getParamList();
-
             if (paramList.size() >= 1) {
                 paramText += paramList.get(0).getAttName() + " : " + paramList.get(0).getFieldType();
                 for (int i = 1; i < paramList.size(); ++i) {
                     paramText += ", " + paramList.get(i).getAttName() + " : " + paramList.get(i).getFieldType();
                 }
             }
-
             attName += paramText + ")";
             if(!((Method) att).getReturnType().equals("void")){
                  attName += " : " + ((Method) att).getReturnType();
             }
-
             if (dontAddPadding) {
                 String name = ((Method) att).getAttName();
                 methTextList.removeIf(textObj -> textObj.getText().startsWith("\n+ " + name));
             }
-
                 // If this is the first method ever being added to the class associated with this
                 // classbox, then initialize the methTextList, and increase the size of the
                 // classbox for formatting. Attributes are added to their classes BEFORE the drawing of the box,
@@ -202,7 +189,6 @@ public class ClassBox {
                     if (!dontAddPadding) {
                         setBoxHeight(boxHeight + 15);
                     }
-
                     // If fields will also need to be placed in the classbox, extra padding
                     // is needed to accommodate the additional separator line between the field list and
                     // the method list.
@@ -213,11 +199,9 @@ public class ClassBox {
                 Text text = new Text(attName);
                 methTextList.add(text);
             }
-
         // Draw a separating line between the title of the class, and the attribute list(s)
         // that are about to be added
         drawSeparator();
-
         // If fields need to be added...
         if (numOfFields != 0) {
             // Iterate through the fieldTextList, and add each Text object to the flow, which in turn
@@ -230,7 +214,6 @@ public class ClassBox {
                 drawSeparator();
             }
         }
-
         // If methods need to be added...
         if (numOfMeths != 0) {
             // Iterate through the methTextList, and add each Text object to the flow, which in turn
