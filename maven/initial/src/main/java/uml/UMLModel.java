@@ -295,8 +295,9 @@ public class UMLModel {
                 Edit>Rename>Rename Attribute>Rename Field\t\tRename a field from an existing class
                 Edit>Rename>Rename Attribute>Rename Method\tRename a method from an existing class
                 Edit>Change>Change Parameter(s)\t\t\t\tChange a parameter in an existing method
-                Edit>Change>Change Relationship Type\t\t\tChange a relationship type
+                Edit>Add>Add Relationship\t\t\t\t\tAdd a new relationship
                 Edit>Delete>Delete Relationship\t\t\t\t\tDelete an existing relationship
+                Edit>Change>Change Relationship Type\t\t\tChange a relationship type
                 File>Save\t\t\t\t\t\t\t\t\t\tSave the current UML diagram
                 File>Load\t\t\t\t\t\t\t\t\t\tLoad a previously saved UML diagram
                 Help>Show Commands\t\t\t\t\t\t\tDisplay list of commands

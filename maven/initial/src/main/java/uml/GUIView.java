@@ -1,6 +1,8 @@
 package uml;
 
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -13,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -36,7 +39,8 @@ public class GUIView extends Application {
     static double startDragY;
     // class box and relationship line lists
     static ArrayList<ClassBox> classBoxList = new ArrayList<>();
-    static ArrayList<RelLine> lineList = new ArrayList<RelLine>();
+    static ArrayList<RelLine> lineList = new ArrayList<>();
+    static ArrayList<ArrayList<Line>> arrowList = new ArrayList<>();
 
     /**
      * Starts the initial window for the diagram
@@ -901,61 +905,9 @@ public class GUIView extends Application {
      *
      ******************************************************************/
 
-    /**
-     * Takes in many parameters from the window and gives it standardized formatting,
-     * then finalizes and shows it
-     *
-     * @param stage the stage of the window
-     * @param root the group of objects in the window
-     * @param pane the pane of objects
-     * @param title the title of the window
-     * @param height the height of the window
-     * @param width the width of the window
-     */
-    private static void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
-        stage.initModality(Modality.APPLICATION_MODAL);
-        pane.setHgap(5);
-        pane.setVgap(10);
-        pane.setPadding(new Insets(10, 10, 10, 10));
-        stage.setTitle(title);
-        stage.setWidth(width);
-        stage.setHeight(height);
-        stage.setResizable(false);
-        root.getChildren().add(pane);
-        Scene window = new Scene(root);
-        stage.setScene(window);
-        stage.show();
-    }
-
-    /**
-     * Takes in the source and destination class names and a line color
-     *
-     * @param src the source class name
-     * @param dest the destination class name
-     * @param color the line color
-     */
-    public static void drawLine(String src, String dest, Color color){
-        ClassBox source = null;
-        ClassBox destination = null;
-        // search through the class box list for the source and destination classes
-        for(ClassBox box : classBoxList){
-            if(box.getClassBoxName().equals(src)){
-                source = box;
-            }
-            if(box.getClassBoxName().equals(dest)){
-                destination = box;
-            }
-        }
-        assert source != null;
-        assert destination != null;
-        //source.getClassPane().setTranslateX(source.getBoxWidth() / 2);
-        //destination.getClassPane().setTranslateX(destination.getBoxWidth() / 2);
-        // draw a new line that connects to the source and destination class boxes
-        RelLine newRelLine = new RelLine(source, destination, color);
-        // add the new line to the line list and the super root
-        lineList.add(newRelLine);
-        superRoot.getChildren().add(0, newRelLine.getLine());
-    }
+    //***************************************//
+    //*********** Drawing Objects ***********//
+    //***************************************//
 
     /**
      * Takes in a class name and draws a new class box object
@@ -995,6 +947,429 @@ public class GUIView extends Application {
     }
 
     /**
+     * Takes in the source and destination class names and a type
+     * Draws a line with a style depending on the type of relationship
+     *  @param src the source class name
+     * @param dest the destination class name
+     * @param relType the relationship type
+     */
+    public static void drawLine(String src, String dest, String relType){
+        ClassBox source = null;
+        ClassBox destination = null;
+        // search through the class box list for the source and destination classes
+        for(ClassBox box : classBoxList){
+            if(box.getClassBoxName().equals(src)){
+                source = box;
+            }
+            if(box.getClassBoxName().equals(dest)){
+                destination = box;
+            }
+        }
+        assert source != null;
+        assert destination != null;
+        // draw a new line that connects to the source and destination class boxes
+        RelLine newRelLine = new RelLine(source, destination, relType);
+        // create dashed line with empty arrowhead
+        switch (relLineStyle(newRelLine, newRelLine.getRelType())) {
+            case "EA" -> {
+                newRelLine.getLine().setStrokeWidth(0);
+                arrowList.add(emptyArrow(newRelLine));
+            }
+            // create line with filled in arrowhead
+            case "FA" -> arrowList.add(filledArrow(newRelLine));
+
+            // create line with filled in diamond
+            case "FD" -> arrowList.add(filledDiamond(newRelLine));
+
+            // create line with empty diamond
+            case "ED" -> {
+                newRelLine.getLine().setStrokeWidth(0);
+                arrowList.add(emptyDiamond(newRelLine));
+            }
+        }
+        // add the new line to the line list and the super root
+        lineList.add(newRelLine);
+        superRoot.getChildren().add(0, newRelLine.getLine());
+    }
+
+    //***************************************//
+    //******* Manipulation of Objects *******//
+    //***************************************//
+
+    /**
+     * Takes in a relationship line
+     * Draws an empty arrowhead shape
+     * (Realization)
+     *
+     * @param line the relationship line
+     */
+    public static ArrayList<Line> emptyArrow(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(5);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(5);
+        bottomArrow.setStroke(Color.BLACK);
+        // completes the arrow and fills in diamond
+        Line middleArrow = new Line();
+        middleArrow.setStrokeWidth(5);
+        middleArrow.setStroke(Color.BLACK);
+        // for replacement line bindings setup
+        Line tBackArrow = new Line();
+        tBackArrow.setStrokeWidth(0);
+        //tBackArrow.setStroke(Color.BLACK);
+        // Set up arrow's shape
+        InvalidationListener update = observable -> {
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 9 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            //replacement variables to get dashed line closer to arrow
+            double rLength = 7 / Math.hypot(startX - endX, startY - endY);
+            double rDirX = (startX - endX) * rLength;
+            double rDirY = (startY - endY) * rLength;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            tBackArrow.setStartX(topArrow.getStartX());
+            tBackArrow.setStartY(topArrow.getStartY());
+            tBackArrow.setEndX(topArrow.getStartX() + rDirX + orthY);
+            tBackArrow.setEndY(topArrow.getStartY() + rDirY - orthX);
+            middleArrow.setStartX(bottomArrow.getStartX() - .5);
+            middleArrow.setStartY(bottomArrow.getStartY() - .5);
+            middleArrow.setEndX(topArrow.getStartX() - .5);
+            middleArrow.setEndY(topArrow.getStartY() - .5);
+        };
+        // bindings for replacement line to invisible original line
+        DoubleBinding startXBind = line.getCBSrc().getClassPane().translateXProperty().add(line.getCBSrc()
+                .getClassPane().widthProperty().divide(2));
+        DoubleBinding startYBind = line.getCBSrc().getClassPane().translateYProperty().add(line.getCBSrc()
+                .getClassPane().heightProperty().divide(2));
+        DoubleBinding endXBind = tBackArrow.translateXProperty().add(tBackArrow.endXProperty());
+        DoubleBinding endYBind = tBackArrow.translateYProperty().add(tBackArrow.endYProperty());
+        // replacement line for real line, set bindings
+        Line rLine = new Line();
+        rLine.setStroke(Color.BLACK);
+        rLine.setStrokeWidth(9.5);
+        rLine.setStrokeLineCap(StrokeLineCap.BUTT);
+        rLine.getStrokeDashArray().addAll(15d);
+        rLine.setStrokeDashOffset(10);
+        rLine.startXProperty().bind(startXBind);
+        rLine.startYProperty().bind(startYBind);
+        rLine.endXProperty().bind(endXBind);
+        rLine.endYProperty().bind(endYBind);
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update);
+        line.getLine().startYProperty().addListener(update);
+        line.getLine().endXProperty().addListener(update);
+        line.getLine().endYProperty().addListener(update);
+        //same update listener for replacement lines
+        rLine.startXProperty().addListener(update);
+        rLine.startYProperty().addListener(update);
+        rLine.endXProperty().addListener(update);
+        rLine.endYProperty().addListener(update);
+        update.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, middleArrow);
+        superRoot.getChildren().add(4, tBackArrow);
+        superRoot.getChildren().add(5, rLine);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(middleArrow);
+        arrowShape.add(tBackArrow);
+        arrowShape.add(rLine);
+        return arrowShape;
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in arrowhead shape
+     * (Inheritance)
+     *
+     * @param line the relationship line
+     */
+    public static ArrayList<Line> filledArrow(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(6);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(6);
+        bottomArrow.setStroke(Color.BLACK);
+        // completes the arrow and fills in diamond
+        Line middleArrow = new Line();
+        middleArrow.setStrokeWidth(6);
+        middleArrow.setStroke(Color.BLACK);
+        // for filled in arrow or diamond
+        Line fillArrow = new Line();
+        fillArrow.setStrokeWidth(7);
+        fillArrow.setStroke(Color.BLACK);
+        // Set up arrow's shape
+        InvalidationListener update1 = observable -> {
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 9 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            middleArrow.setStartX(bottomArrow.getStartX() - .5);
+            middleArrow.setStartY(bottomArrow.getStartY() - .5);
+            middleArrow.setEndX(topArrow.getStartX() - .5);
+            middleArrow.setEndY(topArrow.getStartY() - .5);
+            fillArrow.setStartX(((middleArrow.getStartX() + middleArrow.getEndX()) / 2));
+            fillArrow.setStartY(((middleArrow.getStartY() + middleArrow.getEndY()) / 2));
+            fillArrow.setEndX(topArrow.getEndX());
+            fillArrow.setEndY(topArrow.getEndY());
+        };
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update1);
+        line.getLine().startYProperty().addListener(update1);
+        line.getLine().endXProperty().addListener(update1);
+        line.getLine().endYProperty().addListener(update1);
+        update1.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, middleArrow);
+        superRoot.getChildren().add(4, fillArrow);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(middleArrow);
+        arrowShape.add(fillArrow);
+        return arrowShape;
+    }
+
+    //TODO fix the rest
+    /**
+     * Takes in a relationship line
+     * Draws a filled in diamond shape
+     * (Composition)
+     *
+     * @param line the relationship line
+     */
+    public static ArrayList<Line> filledDiamond(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(8);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(8);
+        bottomArrow.setStroke(Color.BLACK);
+        // for filled in arrow or diamond
+        Line fillArrow = new Line();
+        fillArrow.setStrokeWidth(7);
+        fillArrow.setStroke(Color.BLACK);
+        // for diamond Shape
+        Line tBackArrow = new Line();
+        tBackArrow.setStrokeWidth(8);
+        tBackArrow.setStroke(Color.BLACK);
+        Line bBackArrow = new Line();
+        bBackArrow.setStrokeWidth(8);
+        bBackArrow.setStroke(Color.BLACK);
+        // Set up arrow's shape
+        InvalidationListener update2 = observable -> {
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 20 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 9 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            tBackArrow.setStartX(topArrow.getStartX());
+            tBackArrow.setStartY(topArrow.getStartY());
+            tBackArrow.setEndX(topArrow.getStartX() + dirX + orthY);
+            tBackArrow.setEndY(topArrow.getStartY() + dirY - orthX);
+            bBackArrow.setStartX(bottomArrow.getStartX());
+            bBackArrow.setStartY(bottomArrow.getStartY());
+            bBackArrow.setEndX(bottomArrow.getStartX() + dirX - orthY);
+            bBackArrow.setEndY(bottomArrow.getStartY() + dirY + orthX);
+            fillArrow.setStartX(tBackArrow.getEndX());
+            fillArrow.setStartY(tBackArrow.getEndY());
+            fillArrow.setEndX(topArrow.getEndX());
+            fillArrow.setEndY(topArrow.getEndY());
+
+        };
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update2);
+        line.getLine().startYProperty().addListener(update2);
+        line.getLine().endXProperty().addListener(update2);
+        line.getLine().endYProperty().addListener(update2);
+        update2.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, fillArrow);
+        superRoot.getChildren().add(4, tBackArrow);
+        superRoot.getChildren().add(5, bBackArrow);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(fillArrow);
+        arrowShape.add(tBackArrow);
+        arrowShape.add(bBackArrow);
+        return arrowShape;
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in diamond shape
+     * (Aggregation)
+     *
+     * @param line the relationship line
+     */
+    public static ArrayList<Line> emptyDiamond(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(6);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(6);
+        bottomArrow.setStroke(Color.BLACK);
+        // for diamond Shape
+        Line tBackArrow = new Line();
+        tBackArrow.setStrokeWidth(6);
+        tBackArrow.setStroke(Color.BLACK);
+        Line bBackArrow = new Line();
+        bBackArrow.setStrokeWidth(6);
+        bBackArrow.setStroke(Color.BLACK);
+        // Set up arrow's shape
+        InvalidationListener update3 = observable -> {
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 11 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            tBackArrow.setStartX(topArrow.getStartX());
+            tBackArrow.setStartY(topArrow.getStartY());
+            tBackArrow.setEndX(topArrow.getStartX() + dirX + orthY);
+            tBackArrow.setEndY(topArrow.getStartY() + dirY - orthX);
+            bBackArrow.setStartX(bottomArrow.getStartX());
+            bBackArrow.setStartY(bottomArrow.getStartY());
+            bBackArrow.setEndX(bottomArrow.getStartX() + dirX - orthY);
+            bBackArrow.setEndY(bottomArrow.getStartY() + dirY + orthX);
+        };
+        // bindings for replacement line to invisible original line
+        DoubleBinding startXBind = line.getCBSrc().getClassPane().translateXProperty().add(line.getCBSrc()
+                .getClassPane().widthProperty().divide(2));
+        DoubleBinding startYBind = line.getCBSrc().getClassPane().translateYProperty().add(line.getCBSrc()
+                .getClassPane().heightProperty().divide(2));
+        DoubleBinding endXBind = tBackArrow.translateXProperty().add(tBackArrow.endXProperty());
+        DoubleBinding endYBind = tBackArrow.translateYProperty().add(tBackArrow.endYProperty());
+        // replacement line for real line, set bindings
+        Line rLine = new Line();
+        rLine.setStroke(Color.BLACK);
+        rLine.setStrokeWidth(9.5);
+        rLine.startXProperty().bind(startXBind);
+        rLine.startYProperty().bind(startYBind);
+        rLine.endXProperty().bind(endXBind);
+        rLine.endYProperty().bind(endYBind);
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update3);
+        line.getLine().startYProperty().addListener(update3);
+        line.getLine().endXProperty().addListener(update3);
+        line.getLine().endYProperty().addListener(update3);
+        //same update listener for replacement lines
+        rLine.startXProperty().addListener(update3);
+        rLine.startYProperty().addListener(update3);
+        rLine.endXProperty().addListener(update3);
+        rLine.endYProperty().addListener(update3);
+        update3.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, tBackArrow);
+        superRoot.getChildren().add(4, bBackArrow);
+        superRoot.getChildren().add(5, rLine);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(tBackArrow);
+        arrowShape.add(bBackArrow);
+        arrowShape.add(rLine);
+        return arrowShape;
+    }
+
+    /**
      * Takes in a class name from the classlist, searches through the
      * class box list for a class box object with the same name as className
      *
@@ -1009,6 +1384,21 @@ public class GUIView extends Application {
             }
         }
         return classbox;
+    }
+
+    /**
+     * Takes in a class box name(class name) and removes it from the super root
+     * and class box list(removes the class from the view)
+     *
+     * @param classBoxName the name of the class box(name of class)
+     */
+    public static void deleteClassBox (String classBoxName){
+        for (ClassBox cbObj : GUIView.classBoxList) {
+            if(cbObj.getClassBoxName().equals(classBoxName)) {
+                GUIView.superRoot.getChildren().remove(cbObj.getClassPane());
+            }
+        }
+        classBoxList.remove(findClassBox(classBoxName));
     }
 
     /**
@@ -1031,18 +1421,59 @@ public class GUIView extends Application {
     }
 
     /**
-     * Takes in a class box name(class name) and removes it from the super root
-     * and class box list(removes the class from the view)
+     * Takes in a relLine and a relType
+     * Styles the relationship line depending on the relationship type
      *
-     * @param classBoxName the name of the class box(name of class)
+     * @param mainLine the main relLine that will be dashed or not
+     * @param relType the relationship type
+     * @return the type of arrowhead shape (arrow or diamond, filled or empty)
      */
-    public static void deleteClassBox (String classBoxName){
-        for (ClassBox cbObj : GUIView.classBoxList) {
-            if(cbObj.getClassBoxName().equals(classBoxName)) {
-                GUIView.superRoot.getChildren().remove(cbObj.getClassPane());
+    public static String relLineStyle(RelLine mainLine, String relType){
+        switch (relType) {
+            case "aggregation" -> {
+                return "ED"; // empty diamond
+            }
+            case "composition" -> {
+                return "FD"; // filled in diamond
+            }
+            case "inheritance" -> {
+                return "FA"; // filled in arrow
+            }
+            case "realization" -> {
+                /*
+                mainLine.getLine().setStrokeLineCap(StrokeLineCap.BUTT);
+                mainLine.getLine().getStrokeDashArray().addAll(15d);
+                mainLine.getLine().setStrokeDashOffset(10);*/
+                return "EA"; // empty arrow
             }
         }
-        classBoxList.remove(findClassBox(classBoxName));
+        return null;
+    }
+
+    /**
+     * Takes in many parameters from the window and gives it standardized formatting,
+     * then finalizes and shows it
+     *
+     * @param stage the stage of the window
+     * @param root the group of objects in the window
+     * @param pane the pane of objects
+     * @param title the title of the window
+     * @param height the height of the window
+     * @param width the width of the window
+     */
+    private static void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
+        stage.initModality(Modality.APPLICATION_MODAL);
+        pane.setHgap(5);
+        pane.setVgap(10);
+        pane.setPadding(new Insets(10, 10, 10, 10));
+        stage.setTitle(title);
+        stage.setWidth(width);
+        stage.setHeight(height);
+        stage.setResizable(false);
+        root.getChildren().add(pane);
+        Scene window = new Scene(root);
+        stage.setScene(window);
+        stage.show();
     }
 
     //***************************************//
