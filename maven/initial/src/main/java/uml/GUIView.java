@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("DanglingJavadoc")
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
  *
@@ -160,7 +161,6 @@ public class GUIView extends Application {
 
         // adds all the rename menu items to rename option
         rename.getItems().addAll(renameClass, renameAttribute);
-
         Menu change = new Menu("Change");
         // open new window for changing a parameter when the option is pressed
         MenuItem changeParam = new MenuItem("Change Parameter(s)");
@@ -230,7 +230,6 @@ public class GUIView extends Application {
         pane.add(text, 1, 0);
         pane.add(save, 0, 1);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Save Project", 120, 300);
     }
@@ -260,7 +259,6 @@ public class GUIView extends Application {
         pane.add(text, 1, 0);
         pane.add(load, 0, 1);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Load Project", 120, 300);
     }
@@ -293,7 +291,6 @@ public class GUIView extends Application {
         pane.add(text, 1, 0);
         pane.add(add, 0, 1);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Class", 120, 300);
     }
@@ -340,7 +337,6 @@ public class GUIView extends Application {
         pane.add(fieldType, 1, 2);
         pane.add(add, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Field", 190, 300);
     }
@@ -387,7 +383,6 @@ public class GUIView extends Application {
         pane.add(returnType, 1, 2);
         pane.add(add, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Method", 190, 300);
     }
@@ -435,7 +430,6 @@ public class GUIView extends Application {
         pane.add(relType, 1, 2);
         pane.add(add, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Relationship", 190, 300);
     }
@@ -490,7 +484,6 @@ public class GUIView extends Application {
         pane.add(paramType, 1, 3);
         pane.add(add, 0, 4);
         pane.add(cancel, 1, 4);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Parameter(s)", 225, 300);
     }
@@ -523,7 +516,6 @@ public class GUIView extends Application {
         pane.add(text, 1, 0);
         pane.add(delete, 0, 1);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Class", 120, 300);
     }
@@ -563,7 +555,6 @@ public class GUIView extends Application {
         pane.add(fieldName, 1, 1);
         pane.add(delete, 0, 2);
         pane.add(cancel, 1, 2);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Field", 155, 300);
     }
@@ -603,7 +594,6 @@ public class GUIView extends Application {
         pane.add(methodName, 1, 1);
         pane.add(delete, 0, 2);
         pane.add(cancel, 1, 2);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Method", 155, 300);
     }
@@ -644,7 +634,6 @@ public class GUIView extends Application {
         pane.add(destName, 1, 1);
         pane.add(delete, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Relationship", 165, 300);
     }
@@ -684,7 +673,6 @@ public class GUIView extends Application {
         pane.add(newClassName, 1, 1);
         pane.add(rename, 0, 2);
         pane.add(cancel, 1, 2);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Rename Class", 155, 300);
     }
@@ -740,7 +728,6 @@ public class GUIView extends Application {
         pane.add(newFieldName, 1, 2);
         pane.add(rename, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Rename Field", 190, 300);
     }
@@ -788,7 +775,6 @@ public class GUIView extends Application {
         pane.add(newMethodName, 1, 2);
         pane.add(rename, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Rename Method", 190, 300);
     }
@@ -850,7 +836,6 @@ public class GUIView extends Application {
         pane.add(newParamType, 1, 4);
         pane.add(change, 0, 5);
         pane.add(cancel, 1, 5);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Change Parameter(s)", 260, 300);
     }
@@ -905,7 +890,6 @@ public class GUIView extends Application {
         pane.add(newRelTypeName, 1, 3);
         pane.add(rename, 0, 4);
         pane.add(cancel, 1, 4);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Change Relationship Type", 225, 300);
     }
@@ -927,7 +911,6 @@ public class GUIView extends Application {
         GridPane pane = new GridPane();
         pane.add(commandList, 0, 0);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Show Commands", 400, 615);
     }
@@ -952,7 +935,6 @@ public class GUIView extends Application {
         GridPane pane = new GridPane();
         pane.add(message, 0, 0);
         pane.add(cancel, 1, 0);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, title, 100, 300);
     }
@@ -966,166 +948,6 @@ public class GUIView extends Application {
     //***************************************//
     //*********** Drawing Objects ***********//
     //***************************************//
-
-    private void updateMenus() {
-        // get the list of items in the edit menu object
-        ObservableList<MenuItem> editList = menuBar.getMenus().get(1).getItems();
-        // get the add menu object
-        Menu add = (Menu) editList.get(0);
-        // get the add attribute menu object
-        Menu addAttribute = (Menu) add.getItems().get(1);
-        // get the delete menu object
-        Menu delete = (Menu) editList.get(1);
-        // get the delete attribute menu object
-        Menu deleteAttribute = (Menu) delete.getItems().get(1);
-        // get the rename menu object
-        Menu rename = (Menu) editList.get(2);
-        // get the rename attribute menu object
-        Menu renameAttribute = (Menu) rename.getItems().get(1);
-        // get the change menu object
-        Menu change = (Menu) editList.get(3);
-
-        // enable/disable
-        if (!GUIController.getClassList().isEmpty()) {
-            // enable the add field menu item
-            addAttribute.getItems().get(0).setDisable(false);
-            // enable the add method menu item
-            addAttribute.getItems().get(1).setDisable(false);
-            // enable the delete class menu item
-            delete.getItems().get(0).setDisable(false);
-            // enable the rename class menu item
-            rename.getItems().get(0).setDisable(false);
-
-            Boolean fieldExists = false;
-            Boolean methodExists = false;
-            Boolean paramExists = false;
-            // check every object and see if at least one of them has either a field or method
-            for (UMLClass classObj : GUIController.getClassList()) {
-                if (!classObj.getFieldList().isEmpty()) {
-                    fieldExists = true;
-                }
-                if (!classObj.getMethodList().isEmpty()) {
-                    methodExists = true;
-                    for (Method methObj : classObj.getMethodList()) {
-                        if (!methObj.getParamList().isEmpty()) {
-                            paramExists = true;
-                        }
-                    }
-                }
-            }
-            // if there is at least one field in the list, enable the menu items
-            // otherwise, disable them
-            if (fieldExists) {
-                deleteAttribute.getItems().get(0).setDisable(false);
-                renameAttribute.getItems().get(0).setDisable(false);
-            } else {
-                deleteAttribute.getItems().get(0).setDisable(true);
-                renameAttribute.getItems().get(0).setDisable(true);
-            }
-            // if there is at least one method in the list, enable the menu items
-            // otherwise, disable them
-            if (methodExists) {
-                deleteAttribute.getItems().get(1).setDisable(false);
-                renameAttribute.getItems().get(1).setDisable(false);
-                add.getItems().get(3).setDisable(false);
-            } else {
-                deleteAttribute.getItems().get(1).setDisable(true);
-                renameAttribute.getItems().get(1).setDisable(true);
-                add.getItems().get(3).setDisable(true);
-            }
-            // if there is at least one parameter in the list, enable the menu items
-            // otherwise, disable them
-            if (paramExists) {
-                change.getItems().get(0).setDisable(false);
-            } else {
-                change.getItems().get(0).setDisable(true);
-            }
-            // if there are at least 2 classes in the class list, enable add relationship
-            // otherwise, disable it
-            if (GUIController.getClassList().size() > 1) {
-                add.getItems().get(2).setDisable(false);
-            } else {
-                add.getItems().get(2).setDisable(true);
-            }
-            // if there are at least one relationship in the relationship list, enable the menu items
-            // otherwise, disable them
-            if (!GUIController.getRelationshipList().isEmpty()) {
-                delete.getItems().get(2).setDisable(false);
-                change.getItems().get(1).setDisable(false);
-            } else {
-                delete.getItems().get(2).setDisable(true);
-                change.getItems().get(1).setDisable(true);
-            }
-        } else {
-            // disable all the menu items
-            addAttribute.getItems().get(0).setDisable(true);
-            addAttribute.getItems().get(1).setDisable(true);
-            delete.getItems().get(0).setDisable(true);
-            rename.getItems().get(0).setDisable(true);
-            deleteAttribute.getItems().get(0).setDisable(true);
-            renameAttribute.getItems().get(0).setDisable(true);
-            deleteAttribute.getItems().get(1).setDisable(true);
-            renameAttribute.getItems().get(1).setDisable(true);
-            add.getItems().get(3).setDisable(true);
-            change.getItems().get(0).setDisable(true);
-        }
-    }
-
-    /**
-     * Takes in many parameters from the window and gives it standardized formatting,
-     * then finalizes and shows it
-     *
-     * @param stage the stage of the window
-     * @param root the group of objects in the window
-     * @param pane the pane of objects
-     * @param title the title of the window
-     * @param height the height of the window
-     * @param width the width of the window
-     */
-    private static void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
-        stage.initModality(Modality.APPLICATION_MODAL);
-        pane.setHgap(5);
-        pane.setVgap(10);
-        pane.setPadding(new Insets(10, 10, 10, 10));
-        stage.setTitle(title);
-        stage.setWidth(width);
-        stage.setHeight(height);
-        stage.setResizable(false);
-        root.getChildren().add(pane);
-        Scene window = new Scene(root);
-        stage.setScene(window);
-        stage.show();
-    }
-
-    /**
-     * Takes in the source and destination class names and a line color
-     *
-     * @param src the source class name
-     * @param dest the destination class name
-     * @param color the line color
-     */
-    public static void drawLine(String src, String dest, Color color){
-        ClassBox source = null;
-        ClassBox destination = null;
-        // search through the class box list for the source and destination classes
-        for(ClassBox box : classBoxList){
-            if(box.getClassBoxName().equals(src)){
-                source = box;
-            }
-            if(box.getClassBoxName().equals(dest)){
-                destination = box;
-            }
-        }
-        assert source != null;
-        assert destination != null;
-        //source.getClassPane().setTranslateX(source.getBoxWidth() / 2);
-        //destination.getClassPane().setTranslateX(destination.getBoxWidth() / 2);
-        // draw a new line that connects to the source and destination class boxes
-        RelLine newRelLine = new RelLine(source, destination, color);
-        // add the new line to the line list and the super root
-        lineList.add(newRelLine);
-        superRoot.getChildren().add(0, newRelLine.getLine());
-    }
 
     /**
      * Takes in a class name and draws a new class box object
@@ -1209,7 +1031,7 @@ public class GUIView extends Application {
         // draw a new line that connects to the source and destination class boxes
         RelLine newRelLine = new RelLine(source, destination, relType);
         // create dashed line with empty arrowhead
-        switch (relLineStyle(newRelLine, newRelLine.getRelType())) {
+        switch (relLineStyle(newRelLine.getRelType())) {
             case "EA" -> {
                 newRelLine.getLine().setStrokeWidth(0);
                 arrowList.add(emptyArrow(newRelLine));
@@ -1257,7 +1079,6 @@ public class GUIView extends Application {
         // for replacement line bindings setup
         Line tBackArrow = new Line();
         tBackArrow.setStrokeWidth(0);
-        //tBackArrow.setStroke(Color.BLACK);
         // Set up arrow's shape
         InvalidationListener update = observable -> {
             double endX = line.getLine().getEndX();
@@ -1420,7 +1241,6 @@ public class GUIView extends Application {
         return arrowShape;
     }
 
-    //TODO fix the rest
     /**
      * Takes in a relationship line
      * Draws a filled in diamond shape
@@ -1663,11 +1483,10 @@ public class GUIView extends Application {
      * Takes in a relLine and a relType
      * Styles the relationship line depending on the relationship type
      *
-     * @param mainLine the main relLine that will be dashed or not
      * @param relType the relationship type
      * @return the type of arrowhead shape (arrow or diamond, filled or empty)
      */
-    public static String relLineStyle(RelLine mainLine, String relType){
+    public static String relLineStyle(String relType){
         switch (relType) {
             case "aggregation" -> {
                 return "ED"; // empty diamond
@@ -1679,14 +1498,114 @@ public class GUIView extends Application {
                 return "FA"; // filled in arrow
             }
             case "realization" -> {
-                /*
-                mainLine.getLine().setStrokeLineCap(StrokeLineCap.BUTT);
-                mainLine.getLine().getStrokeDashArray().addAll(15d);
-                mainLine.getLine().setStrokeDashOffset(10);*/
                 return "EA"; // empty arrow
             }
         }
         return null;
+    }
+
+    private void updateMenus() {
+        // get the list of items in the edit menu object
+        ObservableList<MenuItem> editList = menuBar.getMenus().get(1).getItems();
+        // get the add menu object
+        Menu add = (Menu) editList.get(0);
+        // get the add attribute menu object
+        Menu addAttribute = (Menu) add.getItems().get(1);
+        // get the delete menu object
+        Menu delete = (Menu) editList.get(1);
+        // get the delete attribute menu object
+        Menu deleteAttribute = (Menu) delete.getItems().get(1);
+        // get the rename menu object
+        Menu rename = (Menu) editList.get(2);
+        // get the rename attribute menu object
+        Menu renameAttribute = (Menu) rename.getItems().get(1);
+        // get the change menu object
+        Menu change = (Menu) editList.get(3);
+
+        // enable/disable
+        if (!GUIController.getClassList().isEmpty()) {
+            // enable the add field menu item
+            addAttribute.getItems().get(0).setDisable(false);
+            // enable the add method menu item
+            addAttribute.getItems().get(1).setDisable(false);
+            // enable the delete class menu item
+            delete.getItems().get(0).setDisable(false);
+            // enable the rename class menu item
+            rename.getItems().get(0).setDisable(false);
+
+            boolean fieldExists = false;
+            boolean methodExists = false;
+            boolean paramExists = false;
+            // check every object and see if at least one of them has either a field or method
+            for (UMLClass classObj : GUIController.getClassList()) {
+                if (!classObj.getFieldList().isEmpty()) {
+                    fieldExists = true;
+                }
+                if (!classObj.getMethodList().isEmpty()) {
+                    methodExists = true;
+                    for (Method methObj : classObj.getMethodList()) {
+                        if (!methObj.getParamList().isEmpty()) {
+                            paramExists = true;
+                        }
+                    }
+                }
+            }
+            // if there is at least one field in the list, enable the menu items
+            // otherwise, disable them
+            if (fieldExists) {
+                deleteAttribute.getItems().get(0).setDisable(false);
+                renameAttribute.getItems().get(0).setDisable(false);
+            } else {
+                deleteAttribute.getItems().get(0).setDisable(true);
+                renameAttribute.getItems().get(0).setDisable(true);
+            }
+            // if there is at least one method in the list, enable the menu items
+            // otherwise, disable them
+            if (methodExists) {
+                deleteAttribute.getItems().get(1).setDisable(false);
+                renameAttribute.getItems().get(1).setDisable(false);
+                add.getItems().get(3).setDisable(false);
+            } else {
+                deleteAttribute.getItems().get(1).setDisable(true);
+                renameAttribute.getItems().get(1).setDisable(true);
+                add.getItems().get(3).setDisable(true);
+            }
+            // if there is at least one parameter in the list, enable the menu items
+            // otherwise, disable them
+            if (paramExists) {
+                change.getItems().get(0).setDisable(false);
+            } else {
+                change.getItems().get(0).setDisable(true);
+            }
+            // if there are at least 2 classes in the class list, enable add relationship
+            // otherwise, disable it
+            if (GUIController.getClassList().size() > 1) {
+                add.getItems().get(2).setDisable(false);
+            } else {
+                add.getItems().get(2).setDisable(true);
+            }
+            // if there are at least one relationship in the relationship list, enable the menu items
+            // otherwise, disable them
+            if (!GUIController.getRelationshipList().isEmpty()) {
+                delete.getItems().get(2).setDisable(false);
+                change.getItems().get(1).setDisable(false);
+            } else {
+                delete.getItems().get(2).setDisable(true);
+                change.getItems().get(1).setDisable(true);
+            }
+        } else {
+            // disable all the menu items
+            addAttribute.getItems().get(0).setDisable(true);
+            addAttribute.getItems().get(1).setDisable(true);
+            delete.getItems().get(0).setDisable(true);
+            rename.getItems().get(0).setDisable(true);
+            deleteAttribute.getItems().get(0).setDisable(true);
+            renameAttribute.getItems().get(0).setDisable(true);
+            deleteAttribute.getItems().get(1).setDisable(true);
+            renameAttribute.getItems().get(1).setDisable(true);
+            add.getItems().get(3).setDisable(true);
+            change.getItems().get(0).setDisable(true);
+        }
     }
 
     /**
