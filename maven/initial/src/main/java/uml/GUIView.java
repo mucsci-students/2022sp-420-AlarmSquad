@@ -249,7 +249,10 @@ public class GUIView extends Application {
         text.setPrefColumnCount(17);
         // create a button to load the diagram of a file with the inputted name
         Button load = new Button("Load");
-        load.setOnAction(event -> GUIController.loadAction(text.getText(), stage));
+        load.setOnAction(event -> {
+            GUIController.loadAction(text.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
         cancel.setOnAction(event -> GUIController.exitAction(stage));
