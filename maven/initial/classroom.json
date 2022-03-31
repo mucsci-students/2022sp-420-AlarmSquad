@@ -1,1 +1,0 @@
-{"relationshipList":[{"destination":"teacher","relType":"inheritance","source":"student"}],"classList":[{"X":222.66666666666666,"Y":109.33333333333333,"className":"student","methodList":[],"fieldList":[]},{"X":672.0,"Y":258.0,"className":"teacher","methodList":[],"fieldList":[]}]}
