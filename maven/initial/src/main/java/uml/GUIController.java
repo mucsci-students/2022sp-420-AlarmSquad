@@ -664,15 +664,6 @@ public class GUIController {
         else if(!oldReltype.equals(newRelType)){
             // update the view
             GUIView.deleteRelLine(GUIView.findClassBox(src), GUIView.findClassBox(dest));
-            if(GUIView.arrowList.size() != 0) {
-                for (ArrayList<Line> arrows : GUIView.arrowList) {
-                    for (Line arrow : arrows) {
-                        GUIView.superRoot.getChildren().remove(arrow);
-                    }
-                    GUIView.superRoot.getChildren().remove(arrows);
-                }
-            }
-            GUIView.arrowList.clear();
             GUIView.drawLine(src, dest, newRelType);
             // set the relationship type
             UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);
