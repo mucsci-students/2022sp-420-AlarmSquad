@@ -122,21 +122,13 @@ public class JSON {
      */
     @SuppressWarnings("unchecked")
     public static void load(String fileName) {
-
         try {
-            // a file which acts as the save file directory
-            File dir = new File(FILE_DIR);
-            // a list of the names of the files in the directory
-
-            boolean hasFoundFile = false;
-
-            for (String file : Objects.requireNonNull(dir.list())) {
-                if (file.equals((fileName + ".json"))) {
-                    hasFoundFile = true;
-                    break;
-                }
+            // if the file name doesn't already end in .json, append it
+            if (!fileName.endsWith(".json")) {
+                fileName += ".json";
             }
-            if (!hasFoundFile) {
+            // checks to see if the file exists in the directory
+            if (!doesFileExist(fileName)) {
                 System.out.println("File does not exist");
                 return;
             }
@@ -146,7 +138,7 @@ public class JSON {
             UMLModel.clearRelationshipList();
 
             // gets the file in the correct directory
-            File fileToBeLoaded = new File(FILE_DIR + "/" + fileName + ".json");
+            File fileToBeLoaded = new File(FILE_DIR + "/" + fileName);
             // makes the JSONParser
             Object obj = new JSONParser().parse(new FileReader(fileToBeLoaded));
             // casting obj to JSONObject
@@ -237,11 +229,31 @@ public class JSON {
                 UMLModel.addRel(newRelationship);
             }
 
-            System.out.println("Diagram has been loaded from \"" + fileName + ".json\"");
+            System.out.println("Diagram has been loaded from \"" + fileName + "\"");
 
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+    }
+
+    /**
+     * Checks to see if the provided file is in the directory
+     *
+     * @param fileName the provided file name
+     * @return true if found, false otherwise
+     */
+    public static boolean doesFileExist(String fileName) {
+        if (!fileName.endsWith(".json")) {
+            fileName += ".json";
+        }
+        // a file which acts as the save file directory
+        File dir = new File(FILE_DIR);
+        for (String file : Objects.requireNonNull(dir.list())) {
+            if (file.equals((fileName))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
