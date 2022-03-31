@@ -1429,6 +1429,44 @@ public class GUIView extends Application {
     }
 
     /**
+     * Takes in the source and destination class box objects
+     * finds and returns the relationship line corresponding to
+     * the src and dest
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     * @return the relationship line
+     */
+    public static RelLine findRelLine(ClassBox src, ClassBox dest){
+        for(RelLine line : lineList){
+            if(line.getCBSrc().equals(src)) {
+                if (line.getCBDest().equals(dest)) {
+                    return line;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Takes in a relationship line
+     * returns the arrow shape (list of lines)
+     *
+     * @param line the relationship line
+     * @return the arrow shape
+     */
+    public static ArrayList<Line> findArrow(RelLine line){
+        for(ArrayList<Line> arrows : arrowList){
+            for(Line arrow : arrows){
+                if(arrow.getEndX() == line.getLine().getEndX()){
+                    return arrows;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Takes in a class name from the classlist, searches through the
      * class box list for a class box object with the same name as className
      *
@@ -1469,14 +1507,19 @@ public class GUIView extends Application {
      * @param dest the destination class box object
      */
     public static void deleteRelLine (ClassBox src, ClassBox dest){
-        for(int i = 0; i < lineList.size(); ++i){
-            if(lineList.get(i).getCBSrc().equals(src)){
-                if(lineList.get(i).getCBDest().equals(dest)){
-                    superRoot.getChildren().remove(lineList.get(i).getLine());
-                    lineList.remove(lineList.get(i));
+        for(ArrayList<Line> arrows : arrowList){
+            if(arrows.equals(findArrow(findRelLine(src, dest)))) {
+                for (Line arrow : arrows) {
+                    superRoot.getChildren().remove(arrow);
                 }
+                superRoot.getChildren().remove(arrows);
+                arrowList.remove(arrows);
+                break;
             }
         }
+        superRoot.getChildren().remove(findRelLine(src, dest).getLine());
+        lineList.remove(findRelLine(src, dest).getLine());
+        lineList.remove(findRelLine(src, dest));
     }
 
     /**
