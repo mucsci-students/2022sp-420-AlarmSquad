@@ -18,8 +18,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -238,32 +241,13 @@ public class GUIView extends Application {
      * Creates a window for the load method and its data
      */
     private void loadWindow() {
-        // initialize the stage and root
         Stage stage = new Stage();
-        Group root = new Group();
-        stage.setAlwaysOnTop(true);
-        // create a label for the text box
-        Label label = new Label("File name: ");
-        // create a text box for user input
-        TextField text = new TextField();
-        text.setPrefColumnCount(17);
-        // create a button to load the diagram of a file with the inputted name
-        Button load = new Button("Load");
-        load.setOnAction(event -> {
-            GUIController.loadAction(text.getText(), stage);
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            GUIController.loadAction(file.getName(), stage);
             updateMenus();
-        });
-        // create a button to cancel out of the window and enable menu again
-        Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-        // create the pane for the objects and add them all
-        GridPane pane = new GridPane();
-        pane.add(label, 0, 0);
-        pane.add(text, 1, 0);
-        pane.add(load, 0, 1);
-        pane.add(cancel, 1, 1);
-        // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Load Project", 120, 300);
+        }
     }
 
     /**

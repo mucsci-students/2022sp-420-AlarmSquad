@@ -31,6 +31,10 @@ public class JSON {
      */
     @SuppressWarnings("unchecked")
     public static void save(String fileName) {
+        // if the file name doesn't already end in .json, append it
+        if (!fileName.endsWith(".json")) {
+            fileName += ".json";
+        }
 
         // a JSON array that contains a list of all the classes
         JSONArray saveClasses = new JSONArray();
@@ -104,7 +108,7 @@ public class JSON {
 
 
         // a file with the correct directory and file name
-        File fileToBeSaved = new File(FILE_DIR, fileName + ".json");
+        File fileToBeSaved = new File(FILE_DIR, fileName);
         // save the file
         try (FileWriter file = new FileWriter(fileToBeSaved)) {
             file.write(saveFile.toString());
