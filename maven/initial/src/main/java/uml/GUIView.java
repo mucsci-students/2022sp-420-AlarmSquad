@@ -467,6 +467,7 @@ public class GUIView extends Application {
         add.setOnAction(event -> {
             GUIController.addParameterAction(className.getText(), methodName.getText(),
                     paramName.getText(), paramType.getText(), stage);
+            addParameterWindowLoop ();
             updateMenus();
         });
         // create a button to cancel out of the window and enable menu again
@@ -486,6 +487,31 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 4);
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Parameter(s)", 225, 300);
+    }
+
+    private void addParameterWindowLoop () {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label continueText = new Label("Add Another Parameter?");
+        // create a button to continue creating parameters
+        Button yes = new Button("Yes");
+        yes.setOnAction(event -> {
+            stage.close();
+            addParameterWindow();
+        });
+        // create a button to stop creating parameters
+        Button no = new Button("No");
+        no.setOnAction(event -> GUIController.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(continueText, 0, 0);
+        pane.add(yes, 0, 1);
+        pane.add(no, 1, 1);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Continue?", 100, 200);
     }
 
     /**

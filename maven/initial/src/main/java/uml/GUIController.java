@@ -112,7 +112,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(fieldName)) {
                 GUIView.popUpWindow("Error", "The field name is invalid");
             // if the field type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidType(fieldType)) {
+            } else if (UMLModel.isNotValidInput(fieldType)) {
                 GUIView.popUpWindow("Error", "The field type is invalid");
             // check if the field exists
             } else {
@@ -152,7 +152,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(methodName)) {
                 GUIView.popUpWindow("Error", "The method name is invalid");
             // if the return type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidReturnType(returnType)) {
+            } else if (UMLModel.isNotValidInput(returnType)) {
                 GUIView.popUpWindow("Error", "The return type is invalid");
             // check if the method exists
             } else {
@@ -239,7 +239,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(paramName)) {
                 GUIView.popUpWindow("Error", "The parameter name is invalid");
             // if the parameter type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidType(paramType)) {
+            } else if (UMLModel.isNotValidInput(paramType)) {
                 GUIView.popUpWindow("Error", "The parameter type is invalid");
             } else {
                 // if the parameter does not exist, add it and close
@@ -590,7 +590,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(newParamName)) {
                 GUIView.popUpWindow("Error", "The parameter name is invalid");
                 // if the parameter type is not a valid string, pop an error up
-            } else if (UMLModel.isNotValidType(newParamType)) {
+            } else if (UMLModel.isNotValidInput(newParamType)) {
                 GUIView.popUpWindow("Error", "The parameter type is invalid");
             } else {
                 // if the parameter name is not already in use, change the parameter
