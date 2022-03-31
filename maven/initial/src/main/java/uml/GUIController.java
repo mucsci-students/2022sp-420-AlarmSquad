@@ -45,7 +45,7 @@ public class GUIController {
             GUIView.popUpWindow("Error", "File name is required");
             // if the file does not exist, pop an error up
         } else if (!JSON.doesFileExist(fileName)) {
-            GUIView.popUpWindow("Error", "File does not exist");
+            GUIView.popUpWindow("Error", "The selected file is invalid");
             // otherwise, load the file and exit the window
         } else {
             JSON.load(fileName);
