@@ -14,9 +14,17 @@ public class CLIController {
     // Creates a new scanner
     private static final Scanner scan = new Scanner(System.in);
 
+    private UMLModel model;
+
+    public CLIController(UMLModel model) {
+        this.model = model;
+    }
+
     // Interprets user input
     public static void main(String[] args) {
-        clearScreen();
+        UMLModel model = new UMLModel();
+        CLIController controller = new CLIController(model);
+        controller.clearScreen();
 
         // intro to CLI for user
         String intro = "Welcome to ALARM Squad's UML editor!";
@@ -50,19 +58,21 @@ public class CLIController {
                         }
                         // clear screen
                         case "clear" -> {
-                            clearScreen();
+                            controller.clearScreen();
                             System.out.print(prompt);
                         }
                         // save case
                         case "save" -> {
                             System.out.print("Save file name: ");
                             String saveFileName = scan.next();
-                            JSON.saveCLI(saveFileName);
+                            JSON json = new JSON(model);
+                            json.saveCLI(saveFileName);
                         }
                         // load case
                         case "load" -> {
+                            JSON json = new JSON(model);
                             // if no files exist
-                            if (JSON.ifDirIsEmpty()) {
+                            if (json.ifDirIsEmpty()) {
                                 System.out.println("No save files found");
                                 System.out.print(prompt);
                             }
@@ -70,12 +80,19 @@ public class CLIController {
                             else {
                                 System.out.print("Load file name: ");
                                 String loadFileName = scan.next();
-                                JSON.loadCLI(loadFileName);
+                                UMLModel newModel = json.loadCLI(loadFileName);
+                                if (newModel != null) {
+                                    // inform the user that the load succeeded
+                                    System.out.println("Diagram has been loaded from \"" + loadFileName + "\"");
+                                    model = newModel;
+                                } else {
+                                    System.out.println("File does not exist");
+                                }
                             }
                         }
                         // help case
                         case "help" -> {
-                            System.out.println(UMLModel.getCLIHelpMenu());
+                            System.out.println(model.getCLIHelpMenu());
                             System.out.print(prompt);
                         }
 
@@ -91,17 +108,17 @@ public class CLIController {
                                 String className = getClassName("add", "");
 
                                 // Edge cases for class name, checks validity
-                                if (UMLModel.isNotValidInput(className)) {
+                                if (model.isNotValidInput(className)) {
                                     break;
                                 }
 
                                 // Checks for duplicates
-                                if(UMLModel.getClassList().stream().anyMatch(o -> o.getClassName().equals(className))){
+                                if(model.getClassList().stream().anyMatch(o -> o.getClassName().equals(className))){
                                     System.out.printf("Class %s already exists\n", className);
                                 } else {
                                     // Adds class to class list then prompts confirmation to use
                                     UMLClass newUMLClass = new UMLClass(className);
-                                    UMLModel.getClassList().add(newUMLClass);
+                                    model.getClassList().add(newUMLClass);
                                     System.out.println("Added class \"" + className + "\"");
                                 }
                             }
@@ -109,7 +126,7 @@ public class CLIController {
                             case "rel" -> {
                                 // If user inputted "a rel" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    if (!addRelFlag(inputList, "add")) {
+                                    if (!controller.addRelFlag(inputList, "add")) {
                                         // If user tried to input an invalid flag, break
                                         break;
                                     }
@@ -117,30 +134,30 @@ public class CLIController {
                                 switch (inputList.get(2)) {
                                     // relationship type flags
                                     case "-a", "-c", "-i", "-r" -> {
-                                        String relType = flagToString(inputList.get(2));
+                                        String relType = controller.flagToString(inputList.get(2));
                                         // if a flag was not given by user input
                                         if (!relType.equals("")) {
                                             System.out.print("Enter source class name: ");
                                             String sourceName = scan.next().trim();
                                             // If source class is valid and exists get destination class
-                                            if (UMLModel.findClass(sourceName) != (null)) {
+                                            if (model.findClass(sourceName) != (null)) {
                                                 System.out.print("Enter destination: ");
                                                 String destinationName = scan.next().trim();
                                                 // If destination class is valid and exists add
                                                 // relationship to relationship array list
-                                                if (UMLModel.findClass(destinationName) != (null)) {
-                                                    if (UMLModel.findRelationship(sourceName, destinationName, relType)
-                                                            != null || UMLModel.isRelated(sourceName, destinationName)){
+                                                if (model.findClass(destinationName) != (null)) {
+                                                    if (model.findRelationship(sourceName, destinationName, relType)
+                                                            != null || model.isRelated(sourceName, destinationName)){
                                                         System.out.println("Relationship already exists between " +
                                                                 sourceName + " and " + destinationName + " with "
-                                                                + UMLModel.findRelType(sourceName,destinationName) +
+                                                                + model.findRelType(sourceName,destinationName) +
                                                                 " type");
                                                         break;
                                                     }
                                                     Relationship newRelationship =
-                                                            new Relationship(UMLModel.findClass(sourceName),
-                                                                    UMLModel.findClass(destinationName), relType);
-                                                    UMLModel.addRel(newRelationship);
+                                                            new Relationship(model.findClass(sourceName),
+                                                                    model.findClass(destinationName), relType);
+                                                    model.addRel(newRelationship);
                                                     System.out.println("Relationship added between " + sourceName
                                                             + " and " + destinationName + " with " + relType + " type");
                                                 }
@@ -166,7 +183,7 @@ public class CLIController {
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    if (addAttFlag(inputList, "add")) {
+                                    if (controller.addAttFlag(inputList, "add")) {
                                         // If user tried to input an invalid flag, break
                                         break;
                                     }
@@ -176,22 +193,22 @@ public class CLIController {
                                     case "-f", "-m" -> {
                                         // Convert flag to "field" or "method".
                                         // Needed for method calls later on
-                                        String attType = flagToString(inputList.get(2));
+                                        String attType = controller.flagToString(inputList.get(2));
                                         if (!attType.equals("")) {
                                             // Get name of class user wants to add attribute to and
                                             // ensure the class exists
                                             String classToAddAttName = getClassName("add", attType);
-                                            UMLClass classToAddAtt = UMLModel.findClass(classToAddAttName);
+                                            UMLClass classToAddAtt = model.findClass(classToAddAttName);
                                             // If class exists...
                                             if (classToAddAtt != null) {
                                                 // Get name of attribute user wants to add
                                                 String attName = getAttName(attType);
                                                 // Ensure attribute name is valid
-                                                if (!UMLModel.isNotValidInput(attName)) {
+                                                if (!model.isNotValidInput(attName)) {
                                                     // If attribute doesn't already exist in class, add it to class
                                                     if (classToAddAtt.getAttList(attType).stream()
                                                             .noneMatch(attObj -> attObj.getAttName().equals(attName))){
-                                                        addAttribute(classToAddAtt, attType, attName);
+                                                        controller.addAttribute(classToAddAtt, attType, attName);
                                                     }
                                                     // If attribute user entered already exists in class, inform user
                                                     // and break
@@ -212,16 +229,16 @@ public class CLIController {
                                         UMLClass classToAddParam;
                                         Method methodToAddParam;
                                         String paramName;
-                                        if((classToAddParam = findClass("add", "parameter")) == null) {
+                                        if((classToAddParam = controller.findClass("add", "parameter")) == null) {
                                             break;
                                         }
-                                        if((methodToAddParam = findMethod(classToAddParam)) == null) {
+                                        if((methodToAddParam = controller.findMethod(classToAddParam)) == null) {
                                             break;
                                         }
-                                        if((paramName = findParamName(methodToAddParam)) == null) {
+                                        if((paramName = controller.findParamName(methodToAddParam)) == null) {
                                             break;
                                         }
-                                        String paramType = getAttType("parameter");
+                                        String paramType = controller.getAttType("parameter");
                                         Parameter param = new Parameter(paramName, paramType);
                                         methodToAddParam.addParameter(param);
                                     }
@@ -251,27 +268,27 @@ public class CLIController {
                                 // Get user input of Class name to be deleted
                                 System.out.print("Enter class name to delete: ");
                                 String classDeleteInput = scan.next().trim();
-                                UMLClass UMLClassToDel = UMLModel.findClass(classDeleteInput);
+                                UMLClass UMLClassToDel = model.findClass(classDeleteInput);
                                 if (UMLClassToDel != null) {
                                     // Copy classList into new ArrayList with deleted Class
-                                    UMLModel.setClassList(deleteClass(classDeleteInput));
+                                    model.setClassList(controller.deleteClass(classDeleteInput));
                                 }
                             }
                             // delete relationship
                             case "rel" -> {
                                 System.out.print("Enter relationship source name: ");
                                 String sourceToFind = scan.next().trim();
-                                UMLClass src = UMLModel.findClass(sourceToFind);
+                                UMLClass src = model.findClass(sourceToFind);
                                 if (src != null) {
                                     // If source name was found, proceed to find dest name
                                     System.out.print("Enter relationship destination name: ");
                                     String destToFind = scan.next().trim();
-                                    UMLClass dest = UMLModel.findClass(destToFind);
+                                    UMLClass dest = model.findClass(destToFind);
                                     if (dest != null) {
                                         // Find the type of relationship
-                                        String relType = UMLModel.findRelType(sourceToFind, destToFind);
+                                        String relType = model.findRelType(sourceToFind, destToFind);
                                         // Find the relationship
-                                        Relationship r = UMLModel.findRelationship(sourceToFind, destToFind, relType);
+                                        Relationship r = model.findRelationship(sourceToFind, destToFind, relType);
                                         if (r != null) {
                                             System.out.print("Delete relationship between \"" +
                                                     r.getSource().getClassName() + "\" and \"" +
@@ -279,7 +296,7 @@ public class CLIController {
                                             String rAnswer = scan.next().trim();
                                             // If the user wants to delete the relationship, proceed to do so
                                             if (rAnswer.equalsIgnoreCase("y")) {
-                                                UMLModel.deleteRel(r);
+                                                model.deleteRel(r);
                                                 System.out.println("Relationship has been deleted");
                                             }
                                             // If not, prompt user and move on
@@ -294,7 +311,7 @@ public class CLIController {
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one.
                                 if (inputList.size() == 2) {
-                                    if (addAttFlag(inputList, "delete")) {
+                                    if (controller.addAttFlag(inputList, "delete")) {
                                         // If user inputs invalid flag, break
                                         break;
                                     }
@@ -304,17 +321,17 @@ public class CLIController {
                                     case "-f", "-m" -> {
                                         // Convert -f flag to the string "field",
                                         // and the same for -m flag, etc.
-                                        String flagName = flagToString(inputList.get(2));
+                                        String flagName = controller.flagToString(inputList.get(2));
 
                                         // If user entered a valid flag...
                                         if (!flagName.equals("")) {
                                             // Get name of class user wants to add attribute to and
                                             // ensure the class exists
                                             String classToDelAttName = getClassName("delete", flagName);
-                                            UMLClass classToDelAtt = UMLModel.findClass(classToDelAttName);
+                                            UMLClass classToDelAtt = model.findClass(classToDelAttName);
                                             if (classToDelAtt != null) {
                                                 // Delete attribute within specified class
-                                                delAttribute(classToDelAtt, flagName);
+                                                controller.delAttribute(classToDelAtt, flagName);
                                             }
                                             // If class was not found, inform user and break
                                             else {
@@ -327,13 +344,13 @@ public class CLIController {
                                         UMLClass classToDeleteParam;
                                         Method methodToDeleteParam;
                                         Parameter param;
-                                        if((classToDeleteParam = findClass("delete", "parameter")) == null) {
+                                        if((classToDeleteParam = controller.findClass("delete", "parameter")) == null) {
                                             break;
                                         }
-                                        if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {
+                                        if((methodToDeleteParam = controller.findMethod(classToDeleteParam)) == null) {
                                             break;
                                         }
-                                        if((param = findParam(methodToDeleteParam)) == null) {
+                                        if((param = controller.findParam(methodToDeleteParam)) == null) {
                                             break;
                                         }
                                         String paramName = param.getAttName();
@@ -374,16 +391,16 @@ public class CLIController {
                                 System.out.print("Enter class to rename: ");
                                 String oldClassName = scan.next().trim();
                                 // If Class exists, set Class name to user inputted name
-                                UMLClass oldUMLClass = UMLModel.findClass(oldClassName);
+                                UMLClass oldUMLClass = model.findClass(oldClassName);
                                 // Prompt user to rename a class name
                                 if (oldUMLClass != null) {
                                     System.out.print("Enter new name for class " + oldUMLClass.getClassName() + ": ");
                                     String newName = scan.next().trim();
-                                    if (UMLModel.isNotValidInput(newName)) {
+                                    if (model.isNotValidInput(newName)) {
                                         System.out.println("\"" + newName + "\" is not a valid identifier\n");
                                         break;
                                     }
-                                    if (UMLModel.findClass(newName) != null) {
+                                    if (model.findClass(newName) != null) {
                                         System.out.println("Class \"" + newName + "\" already exists\n");
                                         break;
                                     }
@@ -413,14 +430,14 @@ public class CLIController {
                                     // change field
                                     case "-f" -> {
                                         // Show user classes and attributes before asking for input
-                                        listClasses();
+                                        controller.listClasses();
                                         System.out.print("Enter class that contains field: ");
                                         String classWithFieldName = scan.next().trim();
                                         // Ensure class exists
-                                        UMLClass UMLClassWithField = UMLModel.findClass(classWithFieldName);
+                                        UMLClass UMLClassWithField = model.findClass(classWithFieldName);
                                         if (UMLClassWithField != null) {
                                             // List attributes in class before asking for input
-                                            listClass(classWithFieldName);
+                                            controller.listClass(classWithFieldName);
                                             System.out.print("Enter field to be renamed: ");
                                             String oldFieldName = scan.next().trim();
                                             // Ensure attribute exists
@@ -429,7 +446,7 @@ public class CLIController {
                                                 // Rename attribute with user's new name
                                                 System.out.print("Enter new name for " + oldFieldName + ": ");
                                                 String newFieldName = scan.next().trim();
-                                                if (UMLModel.isNotValidInput(newFieldName)) {
+                                                if (model.isNotValidInput(newFieldName)) {
                                                     System.out.println("\"" + newFieldName +
                                                             "\" is not a valid identifier\n");
                                                     break;
@@ -441,7 +458,7 @@ public class CLIController {
                                                     break;
                                                 }
                                                 //get fieldtype
-                                                String newFieldType = getAttType(newFieldName);
+                                                String newFieldType = controller.getAttType(newFieldName);
                                                 if(newFieldType == null){
                                                     break;
                                                 }
@@ -455,14 +472,14 @@ public class CLIController {
                                     // change method
                                     case "-m" -> {
                                         // Show user classes and attributes before asking for input
-                                        listClasses();
+                                        controller.listClasses();
                                         System.out.print("Enter class that contains method: ");
                                         String classWithMethodName = scan.next().trim();
                                         // Ensure class exists
-                                        UMLClass UMLClassWithMethod = UMLModel.findClass(classWithMethodName);
+                                        UMLClass UMLClassWithMethod = model.findClass(classWithMethodName);
                                         if (UMLClassWithMethod != null) {
                                             // List attributes in class before asking for input
-                                            listClass(classWithMethodName);
+                                            controller.listClass(classWithMethodName);
                                             System.out.print("Enter method to be renamed: ");
                                             String oldMethodName = scan.next().trim();
                                             // Ensure attribute exists
@@ -471,7 +488,7 @@ public class CLIController {
                                                 // Rename attribute with user's new name
                                                 System.out.print("Enter new name for " + oldMethodName + ": ");
                                                 String newMethodName = scan.next().trim();
-                                                if (UMLModel.isNotValidInput(newMethodName)) {
+                                                if (model.isNotValidInput(newMethodName)) {
                                                     System.out.println("\"" + newMethodName +
                                                             "\" is not a valid identifier\n");
                                                     break;
@@ -483,7 +500,7 @@ public class CLIController {
                                                     break;
                                                 }
                                                 //get methodtype
-                                                String newMethodReturnType = getAttReturnType(newMethodName);
+                                                String newMethodReturnType = controller.getAttReturnType(newMethodName);
                                                 if (newMethodReturnType == null) {
                                                     break;
                                                 }
@@ -503,18 +520,18 @@ public class CLIController {
                                         UMLClass classToChangeParam;
                                         Method methodToChangeParam;
                                         Parameter param;
-                                        if((classToChangeParam = findClass("change", "parameter")) == null) {
+                                        if((classToChangeParam = controller.findClass("change", "parameter")) == null) {
                                             break;
                                         }
-                                        if((methodToChangeParam = findMethod(classToChangeParam)) == null) {
+                                        if((methodToChangeParam = controller.findMethod(classToChangeParam)) == null) {
                                             break;
                                         }
-                                        if((param = findParam(methodToChangeParam)) == null) {
+                                        if((param = controller.findParam(methodToChangeParam)) == null) {
                                             break;
                                         }
                                         String oldParamName = param.getAttName();
                                         String newParamName = getAttName("parameter");
-                                        String newParamType = getAttType("parameter");
+                                        String newParamType = controller.getAttType("parameter");
                                         param = new Parameter(newParamName, newParamType);
                                         methodToChangeParam.changeParameter(oldParamName, param);
                                     }
@@ -526,14 +543,14 @@ public class CLIController {
                                 System.out.print("Enter source name: ");
                                 String srcName = scan.next().trim();
                                 // if source exists continue
-                                if(UMLModel.findClass(srcName) != (null)){
+                                if(model.findClass(srcName) != (null)){
                                     // prompt user for destination
                                     System.out.print("Enter destination name: ");
                                     String destName = scan.next().trim();
                                     // if destination exists, continue
-                                    if(UMLModel.findClass(destName) != (null)){
+                                    if(model.findClass(destName) != (null)){
                                         // if the relationship does not exist
-                                        if(!UMLModel.isRelated(srcName, destName)){
+                                        if(!model.isRelated(srcName, destName)){
                                             System.out.println("Relationship does not exist");
                                             break;
                                         }
@@ -541,7 +558,7 @@ public class CLIController {
                                         System.out.print("Enter old relationship type: ");
                                         String oldRelType = scan.next().trim();
                                         // check old type
-                                        if(!Objects.equals(UMLModel.findRelType(srcName, destName), oldRelType)){
+                                        if(!Objects.equals(model.findRelType(srcName, destName), oldRelType)){
                                             System.out.println("Relationship type does not exist for: "
                                                     + srcName + " and " + destName);
                                         }
@@ -550,12 +567,12 @@ public class CLIController {
                                             System.out.print("Enter new relationship type: ");
                                             String newRelType = scan.next().trim();
                                             // check type validity
-                                            if(!UMLModel.checkType(newRelType)){
+                                            if(!model.checkType(newRelType)){
                                                 System.out.println("Invalid relationship type");
                                             }
                                             // change the type
                                             else {
-                                                UMLModel.changeRelType(srcName, destName, newRelType);
+                                                model.changeRelType(srcName, destName, newRelType);
                                                 System.out.print("Relationship type changed\n");
                                             }
                                         }
@@ -578,7 +595,7 @@ public class CLIController {
                         switch (inputList.get(1)) {
                             // many classes
                             case "classes" -> {
-                                listClasses();
+                                controller.listClasses();
                                 System.out.print(prompt);
                             }
                             // one class
@@ -587,9 +604,9 @@ public class CLIController {
                                 System.out.print("Enter class name: ");
                                 String classToDisplayName = scan.next().trim();
                                 // print class name
-                                if (UMLModel.findClass(classToDisplayName) != null) {
+                                if (model.findClass(classToDisplayName) != null) {
                                     System.out.println("\n--------------------");
-                                    listClass(classToDisplayName);
+                                    controller.listClass(classToDisplayName);
                                     System.out.println("\n--------------------\n");
                                 }
                                 else{
@@ -599,7 +616,7 @@ public class CLIController {
                             // list relationships
                             case "rel" -> {
                                 // Ensure there are relationships to list. If not, break
-                                if (UMLModel.getRelationshipList().size() == 0) {
+                                if (model.getRelationshipList().size() == 0) {
                                     System.out.println("There are no relationships to list");
                                     System.out.print(prompt);
                                     break;
@@ -608,21 +625,21 @@ public class CLIController {
                                 // designating which class is the source and destination
                                 System.out.println("\n--------------------");
                                 // if there is only one relationship, print it
-                                if (UMLModel.getRelationshipList().size() >= 1) {
-                                    System.out.print(UMLModel.getRelationshipList().get(0).getSource().getClassName());
-                                    System.out.print(" [" + UMLModel.getRelationshipList().get(0).getRelType() +
+                                if (model.getRelationshipList().size() >= 1) {
+                                    System.out.print(model.getRelationshipList().get(0).getSource().getClassName());
+                                    System.out.print(" [" + model.getRelationshipList().get(0).getRelType() +
                                             "] -> ");
-                                    System.out.print(UMLModel.getRelationshipList().get(0).getDestination().
+                                    System.out.print(model.getRelationshipList().get(0).getDestination().
                                             getClassName());
                                 }
                                 // iterates through relationship list and prints the relationship
-                                for (int i = 1; i < UMLModel.getRelationshipList().size(); ++i) {
+                                for (int i = 1; i < model.getRelationshipList().size(); ++i) {
                                     System.out.println();
-                                    System.out.print("\n" + UMLModel.getRelationshipList().get(i).getSource()
+                                    System.out.print("\n" + model.getRelationshipList().get(i).getSource()
                                             .getClassName());
-                                    System.out.print(" [" + UMLModel.getRelationshipList().get(i).getRelType() +
+                                    System.out.print(" [" + model.getRelationshipList().get(i).getRelType() +
                                             "] -> ");
-                                    System.out.print(UMLModel.getRelationshipList().get(i).getDestination().
+                                    System.out.print(model.getRelationshipList().get(i).getDestination().
                                             getClassName());
                                 }
                                 System.out.println("\n--------------------\n");
@@ -680,7 +697,7 @@ public class CLIController {
      * @param classToDeleteName the name of the class to delete
      * @return the classList
      */
-    public static ArrayList<UMLClass> deleteClass(String classToDeleteName) {
+    public ArrayList<UMLClass> deleteClass(String classToDeleteName) {
         // Create new class object. If a class matches the user inputted name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
         UMLClass UMLClassToDelete = null;
@@ -688,7 +705,7 @@ public class CLIController {
         // a class name to delete, and continue to delete a class afterwards
         while (UMLClassToDelete == null) {
             // Iterate through ArrayList of classes to see if class exists
-            for (UMLClass UMLClassObj : UMLModel.getClassList()) {
+            for (UMLClass UMLClassObj : this.model.getClassList()) {
                 if (UMLClassObj.getClassName().equals(classToDeleteName)) {
                     UMLClassToDelete = UMLClassObj;
                 }
@@ -700,8 +717,8 @@ public class CLIController {
                 String theNextAnswer = scan.next().trim();
                 // User confirms if they wish to delete. If no, break out of loop
                 if (theNextAnswer.equalsIgnoreCase("y")) {
-                    UMLModel.setRelationshipList(UMLModel.updateRelationshipList(classToDeleteName));
-                    UMLModel.deleteClass(UMLClassToDelete);
+                    this.model.setRelationshipList(this.model.updateRelationshipList(classToDeleteName));
+                    this.model.deleteClass(UMLClassToDelete);
                     System.out.print("Class \"" + UMLClassToDelete.getClassName() + "\" has been deleted\n");
                     break;
                 } else if (theNextAnswer.equalsIgnoreCase("n")) {
@@ -715,7 +732,7 @@ public class CLIController {
                 System.out.println("Class \"" + classToDeleteName + "\" was not found");
             }
         }
-        return UMLModel.getClassList();
+        return this.model.getClassList();
     }
 
     /**
@@ -723,9 +740,9 @@ public class CLIController {
      *
      * @param className the name of the class to list
      */
-    public static void listClass(String className) {
+    public void listClass(String className) {
         // copy class and attribute lists for more readable
-        UMLClass copyClass = UMLModel.findClass(className);
+        UMLClass copyClass = this.model.findClass(className);
         ArrayList<Field> copyFieldList = Objects.requireNonNull(copyClass).getFieldList();
         ArrayList<Method> copyMethList = Objects.requireNonNull(copyClass).getMethodList();
         // prints the name of a class
@@ -766,16 +783,16 @@ public class CLIController {
     /**
      * List all the contents of all classes in the diagram in a nice way
      */
-    public static void listClasses() {
+    public void listClasses() {
         // if there are classes to list, list them
-        if (UMLModel.getClassList().size() != 0) {
+        if (this.model.getClassList().size() != 0) {
             // Loops through classList and calls listClass on all elements
             System.out.print("\n--------------------\n");
-            if (UMLModel.getClassList().size() == 1) {
-                listClass(UMLModel.getClassList().get(0).getClassName());
+            if (this.model.getClassList().size() == 1) {
+                listClass(this.model.getClassList().get(0).getClassName());
             } else {
                 // Loops through classList and calls listClass on all elements
-                for (UMLClass aUMLClass : UMLModel.getClassList()) {
+                for (UMLClass aUMLClass : this.model.getClassList()) {
                     System.out.println();
                     listClass(aUMLClass.getClassName());
                     System.out.print("\n");
@@ -810,11 +827,11 @@ public class CLIController {
      * @param attType the type of attribute to be defined
      * @return the user's given type for the attribute
      */
-    public static String getAttType(String attType) {
+    public String getAttType(String attType) {
         if (attType.equals("method")) {
             System.out.print("Enter " + attType + " return type: ");
             String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-            if (UMLModel.isNotValidReturnType(attToGet)) {
+            if (this.model.isNotValidReturnType(attToGet)) {
                 System.out.println("\"" + attToGet + "\" is not a valid return type");
                 return null;
             }
@@ -822,7 +839,7 @@ public class CLIController {
         }
         System.out.print("Enter " + attType + " type: ");
         String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-        if (UMLModel.isNotValidType(attToGet)) {
+        if (this.model.isNotValidType(attToGet)) {
             System.out.println("\"" + attToGet + "\" is not a valid type");
             return null;
         }
@@ -835,13 +852,13 @@ public class CLIController {
      * @param attType the type of attribute to be defined
      * @return the user's given type for the attribute
      */
-    public static String getAttReturnType(String attType) {
+    public String getAttReturnType(String attType) {
         if (attType.equals("method")) {
             attType += " return";
         }
         System.out.print("Enter " + attType + " type: ");
         String attToGet = scan.next().trim();
-        if (UMLModel.isNotValidReturnType(attToGet)) {
+        if (this.model.isNotValidReturnType(attToGet)) {
             System.out.println("\"" + attToGet + "\" is not a valid return type");
             return null;
         }
@@ -858,7 +875,7 @@ public class CLIController {
      * @param <E> the class type(generic)
      * @return true if the object does not exist, false otherwise
      */
-    public static <E> boolean ifDoesntExist(E obj, String type, String name) {
+    public <E> boolean ifDoesntExist(E obj, String type, String name) {
         if (obj == null) {
             System.out.printf("%s %s does not exist\n", type, name);
             return true;
@@ -876,7 +893,7 @@ public class CLIController {
      * @param <E> the class type
      * @return true if dups exist, false otherwise
      */
-    public static <E> boolean ifExists(E obj, String type, String name) {
+    public <E> boolean ifExists(E obj, String type, String name) {
         if (obj != null) {
             System.out.printf("%s %s already exists", type, name);
             return true;
@@ -892,7 +909,7 @@ public class CLIController {
      * @param attType the type of attribute(field, method, parameter)
      * @param attName the name of the attribute
      */
-    public static void addAttribute(UMLClass classToAddAtt, String attType, String attName) {
+    public void addAttribute(UMLClass classToAddAtt, String attType, String attName) {
         // If attribute is a method, get its return type.
         // If attribute is a field, get its type.
         // Ensure type is valid
@@ -921,7 +938,7 @@ public class CLIController {
      * @param classWithAttToDel the class object
      * @param attType the attribute type
      */
-    public static void delAttribute(UMLClass classWithAttToDel, String attType) {
+    public void delAttribute(UMLClass classWithAttToDel, String attType) {
         // Get name of field or method user wants to delete
         System.out.print("Enter " + attType + " to delete: ");
         String attToDel = scan.next().trim();
@@ -954,9 +971,9 @@ public class CLIController {
      * @param type the type of attribute
      * @return the class found
      */
-    public static UMLClass findClass(String op, String type) {
+    public UMLClass findClass(String op, String type) {
         String className = getClassName(op, type);
-        UMLClass umlClass = UMLModel.findClass(className);
+        UMLClass umlClass = this.model.findClass(className);
         if (ifDoesntExist(umlClass, "Class", className)) { return null; }
         return umlClass;
     }
@@ -968,7 +985,7 @@ public class CLIController {
      * @param umlClass the class objcet
      * @return the method object
      */
-    public static Method findMethod(UMLClass umlClass) {
+    public Method findMethod(UMLClass umlClass) {
         String methodName = getAttName("method");
         Method method = umlClass.findMethod(methodName);
         if (ifDoesntExist(method, "Method", methodName)) { return null; }
@@ -982,7 +999,7 @@ public class CLIController {
      * @param method the method object
      * @return the parameter object
      */
-    public static Parameter findParam(Method method) {
+    public Parameter findParam(Method method) {
         String paramName = getAttName("parameter");
         Parameter param = method.findParameter(paramName);
         if (ifDoesntExist(param, "Parameter", paramName)) { return null; }
@@ -996,7 +1013,7 @@ public class CLIController {
      * @param method the method object
      * @return the parameter name
      */
-    public static String findParamName(Method method) {
+    public String findParamName(Method method) {
         String paramName = getAttName("parameter");
         Parameter param = method.findParameter(paramName);
         if (ifExists(param, "Parameter", paramName)) { return null; }
@@ -1015,7 +1032,7 @@ public class CLIController {
      * @param operation user command
      * @return true if flag is invalid, false otherwise
      */
-    public static boolean addAttFlag(ArrayList<String> userInputList, String operation) {
+    public boolean addAttFlag(ArrayList<String> userInputList, String operation) {
         System.out.print("type \"-f\" to " + operation + " a field, or \"-m\" to " +
                 operation + " a method: ");
         String attFlag = scan.next().trim();
@@ -1039,7 +1056,7 @@ public class CLIController {
      * @param operation the command
      * @return returns true if the correct flag is returned, false otherwise
      */
-    public static boolean addRelFlag(ArrayList<String> userInputList, String operation) {
+    public boolean addRelFlag(ArrayList<String> userInputList, String operation) {
         System.out.print("type \"-a\" for aggregation, \n\"-c\" for composition, \n" +
                 "\"-i\" for inheritance, \nor \"-r\" for realization to " + operation + " that relationship type: ");
         String relFlag = scan.next().trim();
@@ -1061,7 +1078,7 @@ public class CLIController {
      *
      * @param flag the flag of the command
      */
-    public static String flagToString(String flag) {
+    public String flagToString(String flag) {
         return switch (flag) {
             case "-f" -> "field";
             case "-m" -> "method";
@@ -1079,7 +1096,7 @@ public class CLIController {
     //***************************************//
 
     // clears the screen
-    private static void clearScreen() {
+    private void clearScreen() {
         // Clears Screen
         try {
             if (System.getProperty("os.name").contains("Windows"))
@@ -1090,4 +1107,5 @@ public class CLIController {
             System.out.println("couldn't clear screen");
         }
     }
+
 }

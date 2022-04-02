@@ -9,12 +9,12 @@ public class Driver {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            GUIController.main(args);
+            GUIView.main(args);
         } else {
             if (args[0].equals("--cli")) {
                 CLIController.main(args);
             } else if (args[0].equals("--gui")) {
-                GUIController.main(args);
+                GUIView.main(args);
             }
             else {
                 System.out.println("Invalid flag. Use either --cli to start the command line interface or --gui to start the GUI interface.");

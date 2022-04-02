@@ -15,13 +15,30 @@ import java.util.Objects;
 public class JSON {
 
     // the default directory to save new files to
-    private final static String DEFAULT_DIR = System.getProperty("user.dir");
+    private final String DEFAULT_DIR = System.getProperty("user.dir");
+    // the model to use in the save
+    private UMLModel model;
+    // the view of the gui
+    private GUIView view;
     // a copy of the classList from Driver
-    private static final ArrayList<UMLClass> UML_CLASS_LIST = UMLModel.getClassList();
+    private ArrayList<UMLClass> classList;
     // a copy of the relationshipList from Driver
-    private static final ArrayList<Relationship> relationshipList = UMLModel.getRelationshipList();
+    private ArrayList<Relationship> relationshipList;
     // the JSON object to be saved
-    private static JSONObject saveFile = new JSONObject();
+    private JSONObject saveFile = new JSONObject();
+
+    public JSON(UMLModel model) {
+        this.model = model;
+        this.classList = model.getClassList();
+        this.relationshipList = model.getRelationshipList();
+    }
+
+    public JSON(UMLModel model, GUIView view) {
+        this.view = view;
+        this.model = model;
+        this.classList = model.getClassList();
+        this.relationshipList = model.getRelationshipList();
+    }
 
     /**
      * Saves the current UML diagram to a file with a given name in the default directory
@@ -30,7 +47,7 @@ public class JSON {
      * @param fileName the name of the file to be saved to
      */
     @SuppressWarnings("unchecked")
-    public static void saveCLI(String fileName) {
+    public void saveCLI(String fileName) {
         // if the file name doesn't already end in .json, append it
         if (!fileName.endsWith(".json")) {
             fileName += ".json";
@@ -57,7 +74,7 @@ public class JSON {
      * @param file the file to be saved to
      */
     @SuppressWarnings("unchecked")
-    public static void saveGUI(File file) {
+    public void saveGUI(File file) {
         // perform the save and give the data to the saveFile object
         saveFile = executeSave(false);
         // save the file to the given file
@@ -76,7 +93,7 @@ public class JSON {
      * @return a JSONObject to be used by other save methods
      */
     @SuppressWarnings("unchecked")
-    private static JSONObject executeSave(boolean isInCLI) {
+    private JSONObject executeSave(boolean isInCLI) {
         // a JSON array that contains a list of all the classes
         JSONArray saveClasses = new JSONArray();
         // a JSON array that contains a list of all the relationships
@@ -84,7 +101,7 @@ public class JSON {
 
         int numClasses = 0;
         // iterate through the classList
-        for (UMLClass UMLClassObj : UML_CLASS_LIST) {
+        for (UMLClass UMLClassObj : classList) {
             numClasses++;
             JSONObject classToBeSaved = new JSONObject();
             // add name to JSON
@@ -135,8 +152,8 @@ public class JSON {
                 location.put("x", (double) xOffset);
                 location.put("y", (double) yOffset);
             } else {
-                location.put("x", GUIView.findClassBox(UMLClassObj.getClassName()).getX());
-                location.put("y", GUIView.findClassBox(UMLClassObj.getClassName()).getY());
+                location.put("x", this.view.findClassBox(UMLClassObj.getClassName()).getX());
+                location.put("y", this.view.findClassBox(UMLClassObj.getClassName()).getY());
             }
 
             // put the location object in the JSON Class object
@@ -171,22 +188,19 @@ public class JSON {
      * @param fileName the name of the file to be loaded from
      */
     @SuppressWarnings("unchecked")
-    public static void loadCLI(String fileName) {
+    public UMLModel loadCLI(String fileName) {
         // if the file name doesn't already end in .json, append it
         if (!fileName.endsWith(".json")) {
             fileName += ".json";
         }
         // checks to see if the file exists in the directory
         if (!doesFileExist(fileName)) {
-            System.out.println("File does not exist");
-            return;
+            return null;
         }
         // gets the file in the correct directory
         File fileToBeLoaded = new File(DEFAULT_DIR + "/" + fileName);
-        // perform the load with the new file
-        executeLoad(fileToBeLoaded, true);
-        // inform the user that the load succeeded
-        System.out.println("Diagram has been loaded from \"" + fileName + "\"");
+        // perform the load with the new file and return the model
+        return executeLoad(fileToBeLoaded, true);
     }
 
     /**
@@ -196,9 +210,9 @@ public class JSON {
      * @param file the file to be loaded from
      */
     @SuppressWarnings("unchecked")
-    public static void loadGUI(File file) {
+    public UMLModel loadGUI(File file) {
         // perform the load with the given file
-        executeLoad(file, false);
+        return executeLoad(file, false);
     }
 
     /**
@@ -207,11 +221,12 @@ public class JSON {
      *
      * @param file the file to be loaded from
      */
-    private static void executeLoad(File file, boolean isInCLI) {
+    @SuppressWarnings("unchecked")
+    private UMLModel executeLoad(File file, boolean isInCLI) {
         try {
             // wipe both lists
-            UMLModel.clearClassList();
-            UMLModel.clearRelationshipList();
+            this.model.clearClassList();
+            this.model.clearRelationshipList();
             // makes the JSONParser
             Object obj = new JSONParser().parse(new FileReader(file));
             // casting obj to JSONObject
@@ -271,10 +286,10 @@ public class JSON {
                 // get the JSON object containing the x and y values for the class box to be created
                 JSONObject location = (JSONObject) current.get("location");
                 // puts the x and y values for the class box in the coordinate map
-                GUIView.addToCoordinateMap((String) current.get("className"), (Double) location.get("x"), (Double) location.get("y"));
+                this.view.addToCoordinateMap((String) current.get("className"), (Double) location.get("x"), (Double) location.get("y"));
 
                 // add the filled class to the classList
-                UMLModel.addClass(newUMLClass);
+                this.model.addClass(newUMLClass);
             }
 
             // JSONArray for getting the saved relationshipList
@@ -295,19 +310,20 @@ public class JSON {
                 // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
                 // make a new relationship with the correct parameters
-                Relationship newRelationship = new Relationship(Objects.requireNonNull(UMLModel.findClass(sourceName)),
-                        Objects.requireNonNull(UMLModel.findClass(destinationName)), relTypeName);
+                Relationship newRelationship = new Relationship(Objects.requireNonNull(this.model.findClass(sourceName)),
+                        Objects.requireNonNull(this.model.findClass(destinationName)), relTypeName);
                 // add the relationship to the relationship list
-                UMLModel.addRel(newRelationship);
+                this.model.addRel(newRelationship);
             }
         } catch (Exception exception) {
             // if the program catches an error related to an invalid file, inform the user
             if (isInCLI) {
                 System.out.println("Invalid file");
             } else {
-                GUIView.popUpWindow("Error", "Invalid file");
+                this.view.popUpWindow("Error", "Invalid file");
             }
         }
+        return this.model;
     }
 
     /**
@@ -316,7 +332,7 @@ public class JSON {
      * @param fileName the provided file name
      * @return true if found, false otherwise
      */
-    public static boolean doesFileExist(String fileName) {
+    public boolean doesFileExist(String fileName) {
         if (!fileName.endsWith(".json")) {
             fileName += ".json";
         }
@@ -335,7 +351,7 @@ public class JSON {
      *
      * @return true if empty, false otherwise
      */
-    public static boolean ifDirIsEmpty() {
+    public boolean ifDirIsEmpty() {
         File dir = new File(DEFAULT_DIR);
         String[] fileList = dir.list();
         return Objects.requireNonNull(fileList).length == 1;

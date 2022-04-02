@@ -5,49 +5,52 @@ import java.util.ArrayList;
 // The project model; holds information on the project data
 public class UMLModel {
     // The arraylist of classes the diagram has
-    private static ArrayList<UMLClass> UMLClassList = new ArrayList<>();
+    private ArrayList<UMLClass> UMLClassList;
     // The arraylist of relationships the diagram has
-    private static ArrayList<Relationship> relationshipList = new ArrayList<>();
+    private ArrayList<Relationship> relationshipList;
+
+    public UMLModel() {
+        this.UMLClassList = new ArrayList<>();
+        this.relationshipList = new ArrayList<>();
+    }
 
     // getter for class list
-    public static ArrayList<UMLClass> getClassList() { return UMLClassList; }
+    public ArrayList<UMLClass> getClassList() { return UMLClassList; }
     // setter for class list
-    public static void setClassList(ArrayList<UMLClass> UMLClassList) {
-        UMLModel.UMLClassList = UMLClassList;
+    public void setClassList(ArrayList<UMLClass> UMLClassList) {
+        this.UMLClassList = UMLClassList;
     }
     // getter for relationship list
-    public static ArrayList<Relationship> getRelationshipList() {
-        return relationshipList;
+    public ArrayList<Relationship> getRelationshipList() {
+        return this.relationshipList;
     }
     // setter for relationship list
-    public static void setRelationshipList(ArrayList<Relationship> relationshipList) {
-        UMLModel.relationshipList = relationshipList;
-    }
+    public void setRelationshipList(ArrayList<Relationship> relationshipList) { this.relationshipList = relationshipList; }
 
     // add a class to the class list
-    public static void addClass(UMLClass newUMLClass) {
-        UMLClassList.add(newUMLClass);
+    public void addClass(UMLClass newUMLClass) {
+        this.UMLClassList.add(newUMLClass);
     }
     // remove a class from the class list
-    public static void deleteClass(UMLClass delUMLClass) {
-        UMLClassList.remove(delUMLClass);
+    public void deleteClass(UMLClass delUMLClass) {
+        this.UMLClassList.remove(delUMLClass);
     }
     // clear the entire class list
-    public static void clearClassList() {
-        UMLClassList.clear();
+    public void clearClassList() {
+        this.UMLClassList.clear();
     }
 
     // add a relationship to the rel list
-    public static void addRel(Relationship newRel) {
-        relationshipList.add(newRel);
+    public void addRel(Relationship newRel) {
+        this.relationshipList.add(newRel);
     }
     // remove a relationship from the rel list
-    public static void deleteRel(Relationship delRel) {
-        relationshipList.remove(delRel);
+    public void deleteRel(Relationship delRel) {
+        this.relationshipList.remove(delRel);
     }
     // clear the entire rel list
-    public static void clearRelationshipList() {
-        relationshipList.clear();
+    public void clearRelationshipList() {
+        this.relationshipList.clear();
     }
 
     /**
@@ -56,7 +59,7 @@ public class UMLModel {
      *
      * @return true if class exists in arraylist, false if not
      */
-    public static UMLClass findClass(String nameOfClass) {
+    public UMLClass findClass(String nameOfClass) {
         for (UMLClass aUMLClass : UMLClassList) {
             // if the name matches, return class
             if (nameOfClass.equals(aUMLClass.getClassName())) {
@@ -79,7 +82,7 @@ public class UMLModel {
      * @param relType type name
      * @return the relationship, null if not found
      */
-    public static Relationship findRelationship(String source, String dest, String relType) {
+    public Relationship findRelationship(String source, String dest, String relType) {
         for (Relationship relationship : relationshipList) {
             // If the name matches, return class
             if (relationship.getSource().getClassName().equals(source) &&
@@ -100,7 +103,7 @@ public class UMLModel {
      * @param dest class name
      * @return string of relationship type
      */
-    public static String findRelType(String source, String dest) {
+    public String findRelType(String source, String dest) {
         for(Relationship relationship : relationshipList){
             // if name matches, return relationship type
             if(relationship.getSource().getClassName().equals(source) &&
@@ -120,7 +123,7 @@ public class UMLModel {
      * @param dest the destination class name
      * @return true if two classes are related in src->dest order, false otherwise
      */
-    public static boolean isRelated(String source, String dest){
+    public boolean isRelated(String source, String dest){
         for(Relationship relationship : relationshipList){
             if(findRelationship(source, dest, findRelType(source,dest)) != null){
                 return true;
@@ -135,7 +138,7 @@ public class UMLModel {
      * @param relType the relationship type
      * @return false if none are correct, true otherwise
      */
-    public static boolean checkType(String relType){
+    public boolean checkType(String relType){
         return switch (relType){
             case "aggregation", "composition", "inheritance", "realization" -> true;
             default -> false;
@@ -149,7 +152,7 @@ public class UMLModel {
      * @param dest the destination name
      * @param newRelType the new relationship type
      */
-    public static void changeRelType(String src, String dest, String newRelType){
+    public void changeRelType(String src, String dest, String newRelType){
         // finds the relationship and changes the type
         for(Relationship r : relationshipList){
             if(r.getSource().getClassName().equals(src) &&
@@ -166,7 +169,7 @@ public class UMLModel {
      * @param className the name of the class associated with any relationship
      * @return updated relationship list
      */
-    public static ArrayList<Relationship> updateRelationshipList(String className) {
+    public ArrayList<Relationship> updateRelationshipList(String className) {
         relationshipList.removeIf(rel -> rel.getSource().getClassName().equals(className) ||
                 rel.getDestination().getClassName().equals(className));
         return relationshipList;
@@ -183,7 +186,7 @@ public class UMLModel {
      * @param input the string to check
      * @return true if valid, otherwise false
      */
-    public static boolean isValidIdentifier(String input) {
+    public boolean isValidIdentifier(String input) {
         if (input == null) {
             return false;
         }
@@ -205,7 +208,7 @@ public class UMLModel {
      * @param input the string to check
      * @return false if valid, otherwise true
      */
-    public static boolean isNotValidInput(String input) {
+    public boolean isNotValidInput(String input) {
         if (!isValidIdentifier(input)) {
             System.out.printf("Input %s is not a valid identifier\n", input);
             return true;
@@ -219,7 +222,7 @@ public class UMLModel {
      * @param input the string to check
      * @return false if valid, otherwise true
      */
-    public static boolean isNotValidType(String input) {
+    public boolean isNotValidType(String input) {
         return switch (input) {
             case "string", "int", "double", "float", "char", "boolean", "short", "long" -> false;
             default -> true;
@@ -232,7 +235,7 @@ public class UMLModel {
      * @param input the string to check
      * @return false if valid, otherwise true
      */
-    public static boolean isNotValidReturnType(String input) {
+    public boolean isNotValidReturnType(String input) {
         return (isNotValidType(input) && !input.equals("void"));
     }
 
@@ -241,7 +244,7 @@ public class UMLModel {
      *
      * @return the help menu
      */
-    public static String getCLIHelpMenu() {
+    public String getCLIHelpMenu() {
         return """
                    Commands		       Description
                 --------------	    -----------------
@@ -280,7 +283,7 @@ public class UMLModel {
      *
      * @return the help menu
      */
-    public static String getGUIHelpMenu() {
+    public String getGUIHelpMenu() {
         return """
                  Commands\t\t\t\t\t\t\t\t\t   Description
                 --------------\t\t\t\t\t\t\t\t\t-----------------
