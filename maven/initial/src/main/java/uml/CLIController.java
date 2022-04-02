@@ -347,20 +347,33 @@ public class CLIController {
                                         if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {
                                             break;
                                         }
-                                        if((param = findParam(methodToDeleteParam)) == null) {
-                                            break;
-                                        }
-                                        String paramName = param.getAttName();
-                                        System.out.printf("Delete parameter \"%s\"? (y/n): ", paramName);
-                                        String answer = scan.next().trim();
-                                        // If the user wants to delete a parameter, proceed to do so
-                                        if (answer.equalsIgnoreCase("y")) {
-                                            methodToDeleteParam.deleteParameter(param);
-                                            System.out.printf("Parameter \"%s\" has been deleted\n", paramName);
-                                        }
-                                        // If user types n, confirm and return
-                                        else {
-                                            System.out.printf("Parameter \"%s\" has NOT been deleted\n", paramName);
+
+                                        String answer = "y";
+
+                                        // While loop lets user to continuously add parameters until they choose not
+                                        // to or an error occurs
+                                        while (answer.equals("y")) {
+                                            if((param = findParam(methodToDeleteParam)) == null) {
+                                                break;
+                                            }
+                                            String paramName = param.getAttName();
+                                            System.out.printf("Delete parameter \"%s\"? [y/N]: ", paramName);
+                                            answer = scan.next().trim();
+                                            // If the user wants to delete a parameter, proceed to do so
+                                            if (answer.equalsIgnoreCase("y")) {
+                                                methodToDeleteParam.deleteParameter(param);
+                                                if (methodToDeleteParam.getParamList().size() <= 0) {
+                                                    break;
+                                                }
+                                                System.out.printf("Parameter \"%s\" has been deleted." +
+                                                        " Delete another? [y/N]: ", paramName);
+                                                answer = scan.next().trim();
+                                            }
+                                            // If user types n, confirm and return
+                                            else {
+                                                System.out.printf("Parameter \"%s\" has NOT been deleted\n", paramName);
+                                                break;
+                                            }
                                         }
                                     } // If user entered invalid flag, inform user and break
                                     default -> {
@@ -904,7 +917,7 @@ public class CLIController {
      */
     public static <E> boolean ifExists(E obj, String type, String name) {
         if (obj != null) {
-            System.out.printf("%s %s already exists", type, name);
+            System.out.printf("%s %s already exists\n", type, name);
             return true;
         }
         return false;
