@@ -212,29 +212,17 @@ public class GUIView extends Application {
      * Creates a window for the save method and its data
      */
     private void saveWindow() {
-        // initialize the stage and root
         Stage stage = new Stage();
-        Group root = new Group();
-        stage.setAlwaysOnTop(true);
-        // create a label for the text box
-        Label label = new Label("File name: ");
-        // create a text box for user input
-        TextField text = new TextField();
-        text.setPrefColumnCount(17);
-        // create a button to save the diagram to a file with the inputted name
-        Button save = new Button("Save");
-        save.setOnAction(event -> GUIController.saveAction(text.getText(), stage));
-        // create a button to cancel out of the window and enable menu again
-        Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-        // create the pane for the objects and add them all
-        GridPane pane = new GridPane();
-        pane.add(label, 0, 0);
-        pane.add(text, 1, 0);
-        pane.add(save, 0, 1);
-        pane.add(cancel, 1, 1);
-        // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Save Project", 120, 300);
+        // create a file chooser and set the text to represent the right file
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        // get the selected file
+        File file = fileChooser.showSaveDialog(stage);
+        // if the file is not null, run the save action method
+        if (file != null) {
+            GUIController.saveAction(file, stage);
+        }
     }
 
     /**
@@ -242,10 +230,13 @@ public class GUIView extends Application {
      */
     private void loadWindow() {
         Stage stage = new Stage();
+        // create a file chooser
         FileChooser fileChooser = new FileChooser();
+        // get the selected file
         File file = fileChooser.showOpenDialog(stage);
+        // if the file is not null, run the load action method and update the menus
         if (file != null) {
-            GUIController.loadAction(file.getName(), stage);
+            GUIController.loadAction(file, stage);
             updateMenus();
         }
     }
