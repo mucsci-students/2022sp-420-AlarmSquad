@@ -233,12 +233,25 @@ public class CLIController {
                                         if((methodToAddParam = findMethod(classToAddParam)) == null) {
                                             break;
                                         }
-                                        if((paramName = findParamName(methodToAddParam)) == null) {
-                                            break;
+
+                                        String answer = "y";
+
+                                        // While loop lets user to continuously add parameters until they choose not
+                                        // to or an error occurs
+                                        while (answer.equals("y")) {
+                                            if((paramName = findParamName(methodToAddParam)) == null) {
+                                                break;
+                                            }
+                                            String paramType;
+                                            if ((paramType = getAttType("parameter")) == null)
+                                            {
+                                                break;
+                                            }
+                                            Parameter param = new Parameter(paramName, paramType);
+                                            methodToAddParam.addParameter(param);
+                                            System.out.printf("Add another? [y/N]: ");
+                                            answer = scan.next().toLowerCase();
                                         }
-                                        String paramType = getAttType("parameter");
-                                        Parameter param = new Parameter(paramName, paramType);
-                                        methodToAddParam.addParameter(param);
                                     }
                                     // If flag user entered is invalid, inform user and break
                                     default -> {
@@ -347,20 +360,33 @@ public class CLIController {
                                         if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {
                                             break;
                                         }
-                                        if((param = findParam(methodToDeleteParam)) == null) {
-                                            break;
-                                        }
-                                        String paramName = param.getAttName();
-                                        System.out.printf("Delete parameter \"%s\"? (y/n): ", paramName);
-                                        String answer = scan.next().trim();
-                                        // If the user wants to delete a parameter, proceed to do so
-                                        if (answer.equalsIgnoreCase("y")) {
-                                            methodToDeleteParam.deleteParameter(param);
-                                            System.out.printf("Parameter \"%s\" has been deleted\n", paramName);
-                                        }
-                                        // If user types n, confirm and return
-                                        else {
-                                            System.out.printf("Parameter \"%s\" has NOT been deleted\n", paramName);
+
+                                        String answer = "y";
+
+                                        // While loop lets user to continuously add parameters until they choose not
+                                        // to or an error occurs
+                                        while (answer.equals("y")) {
+                                            if((param = findParam(methodToDeleteParam)) == null) {
+                                                break;
+                                            }
+                                            String paramName = param.getAttName();
+                                            System.out.printf("Delete parameter \"%s\"? [y/N]: ", paramName);
+                                            answer = scan.next().trim();
+                                            // If the user wants to delete a parameter, proceed to do so
+                                            if (answer.equalsIgnoreCase("y")) {
+                                                methodToDeleteParam.deleteParameter(param);
+                                                if (methodToDeleteParam.getParamList().size() <= 0) {
+                                                    break;
+                                                }
+                                                System.out.printf("Parameter \"%s\" has been deleted." +
+                                                        " Delete another? [y/N]: ", paramName);
+                                                answer = scan.next().trim();
+                                            }
+                                            // If user types n, confirm and return
+                                            else {
+                                                System.out.printf("Parameter \"%s\" has NOT been deleted\n", paramName);
+                                                break;
+                                            }
                                         }
                                     } // If user entered invalid flag, inform user and break
                                     default -> {
@@ -523,14 +549,29 @@ public class CLIController {
                                         if((methodToChangeParam = findMethod(classToChangeParam)) == null) {
                                             break;
                                         }
-                                        if((param = findParam(methodToChangeParam)) == null) {
-                                            break;
+                                        String answer = "y";
+                                        while (answer.equals("y")) {
+                                            if ((param = findParam(methodToChangeParam)) == null) {
+                                                break;
+                                            }
+                                            String oldParamName;
+                                            if((oldParamName = param.getAttName()) == null) {
+                                                break;
+                                            }
+                                            String newParamName;
+                                            if((newParamName = getAttName("parameter")) == null) {
+                                                break;
+                                            }
+                                            String newParamType;
+                                            if ((newParamType = getAttType("parameter")) == null) {
+                                                break;
+                                            }
+                                            param = new Parameter(newParamName, newParamType);
+                                            methodToChangeParam.changeParameter(oldParamName, param);
+
+                                            System.out.printf("Change another? [y/N]: ");
+                                            answer = scan.next().toLowerCase();
                                         }
-                                        String oldParamName = param.getAttName();
-                                        String newParamName = getAttName("parameter");
-                                        String newParamType = getAttType("parameter");
-                                        param = new Parameter(newParamName, newParamType);
-                                        methodToChangeParam.changeParameter(oldParamName, param);
                                     }
                                 }
                             }
@@ -827,17 +868,15 @@ public class CLIController {
     public static String getAttType(String attType) {
         if (attType.equals("method")) {
             System.out.print("Enter " + attType + " return type: ");
-            String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-            if (UMLModel.isNotValidReturnType(attToGet)) {
-                System.out.println("\"" + attToGet + "\" is not a valid return type");
+            String attToGet = scan.next().trim();
+            if (UMLModel.isNotValidInput(attToGet)) {
                 return null;
             }
             return attToGet;
         }
         System.out.print("Enter " + attType + " type: ");
-        String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-        if (UMLModel.isNotValidType(attToGet)) {
-            System.out.println("\"" + attToGet + "\" is not a valid type");
+        String attToGet = scan.next().trim();
+        if (UMLModel.isNotValidInput(attToGet)) {
             return null;
         }
         return attToGet;
@@ -855,8 +894,7 @@ public class CLIController {
         }
         System.out.print("Enter " + attType + " type: ");
         String attToGet = scan.next().trim();
-        if (UMLModel.isNotValidReturnType(attToGet)) {
-            System.out.println("\"" + attToGet + "\" is not a valid return type");
+        if (UMLModel.isNotValidInput(attToGet)) {
             return null;
         }
         return attToGet;
@@ -892,7 +930,7 @@ public class CLIController {
      */
     public static <E> boolean ifExists(E obj, String type, String name) {
         if (obj != null) {
-            System.out.printf("%s %s already exists", type, name);
+            System.out.printf("%s %s already exists\n", type, name);
             return true;
         }
         return false;
