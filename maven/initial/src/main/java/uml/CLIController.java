@@ -65,12 +65,12 @@ public class CLIController {
                         case "save" -> {
                             System.out.print("Save file name: ");
                             String saveFileName = scan.next();
-                            JSON json = new JSON(model);
+                            JSON json = new JSON(this.model);
                             json.saveCLI(saveFileName);
                         }
                         // load case
                         case "load" -> {
-                            JSON json = new JSON(model);
+                            JSON json = new JSON(this.model);
                             // if no files exist
                             if (json.ifDirIsEmpty()) {
                                 System.out.println("No save files found");
@@ -84,7 +84,8 @@ public class CLIController {
                                 if (newModel != null) {
                                     // inform the user that the load succeeded
                                     System.out.println("Diagram has been loaded from \"" + loadFileName + "\"");
-                                    model = newModel;
+                                    setState();
+                                    this.model = newModel;
                                 } else {
                                     System.out.println("File does not exist");
                                 }
@@ -99,8 +100,20 @@ public class CLIController {
                         case "undo" -> {
                             if (!undo()) {
                                 System.out.println("No actions to undo.");
+                                System.out.print(prompt);
                             } else {
                                 System.out.println("Last action undone.");
+                                System.out.print(prompt);
+                            }
+                        }
+                        // undo case
+                        case "redo" -> {
+                            if (!redo()) {
+                                System.out.println("No actions to redo.");
+                                System.out.print(prompt);
+                            } else {
+                                System.out.println("Last action redone.");
+                                System.out.print(prompt);
                             }
                         }
 
@@ -126,6 +139,7 @@ public class CLIController {
                                 } else {
                                     // Adds class to class list then prompts confirmation to use
                                     UMLClass newUMLClass = new UMLClass(className);
+                                    setState();
                                     model.addClass(newUMLClass);
                                     System.out.println("Added class \"" + className + "\"");
                                 }
@@ -165,6 +179,7 @@ public class CLIController {
                                                     Relationship newRelationship =
                                                             new Relationship(model.findClass(sourceName),
                                                                     model.findClass(destinationName), relType);
+                                                    setState();
                                                     model.addRel(newRelationship);
                                                     System.out.println("Relationship added between " + sourceName
                                                             + " and " + destinationName + " with " + relType + " type");
@@ -216,6 +231,7 @@ public class CLIController {
                                                     // If attribute doesn't already exist in class, add it to class
                                                     if (classToAddAtt.getAttList(attType).stream()
                                                             .noneMatch(attObj -> attObj.getAttName().equals(attName))){
+                                                        setState();
                                                         addAttribute(classToAddAtt, attType, attName);
                                                     }
                                                     // If attribute user entered already exists in class, inform user
@@ -248,6 +264,7 @@ public class CLIController {
                                         }
                                         String paramType = getAttType("parameter");
                                         Parameter param = new Parameter(paramName, paramType);
+                                        setState();
                                         methodToAddParam.addParameter(param);
                                     }
                                     // If flag user entered is invalid, inform user and break
@@ -279,6 +296,7 @@ public class CLIController {
                                 UMLClass UMLClassToDel = model.findClass(classDeleteInput);
                                 if (UMLClassToDel != null) {
                                     // Copy classList into new ArrayList with deleted Class
+                                    setState();
                                     model.setClassList(deleteClass(classDeleteInput));
                                 }
                             }
@@ -304,6 +322,7 @@ public class CLIController {
                                             String rAnswer = scan.next().trim();
                                             // If the user wants to delete the relationship, proceed to do so
                                             if (rAnswer.equalsIgnoreCase("y")) {
+                                                setState();
                                                 model.deleteRel(r);
                                                 System.out.println("Relationship has been deleted");
                                             }
@@ -338,6 +357,7 @@ public class CLIController {
                                             String classToDelAttName = getClassName("delete", flagName);
                                             UMLClass classToDelAtt = model.findClass(classToDelAttName);
                                             if (classToDelAtt != null) {
+                                                setState();
                                                 // Delete attribute within specified class
                                                 delAttribute(classToDelAtt, flagName);
                                             }
@@ -366,6 +386,7 @@ public class CLIController {
                                         String answer = scan.next().trim();
                                         // If the user wants to delete a parameter, proceed to do so
                                         if (answer.equalsIgnoreCase("y")) {
+                                            setState();
                                             methodToDeleteParam.deleteParameter(param);
                                             System.out.printf("Parameter \"%s\" has been deleted\n", paramName);
                                         }
@@ -412,6 +433,7 @@ public class CLIController {
                                         System.out.println("Class \"" + newName + "\" already exists\n");
                                         break;
                                     }
+                                    setState();
                                     oldUMLClass.setClassName(newName);
                                     // Inform user of renamed Class
                                     System.out.println("The class \"" + oldClassName +
@@ -472,6 +494,7 @@ public class CLIController {
                                                 }
                                                 //make a new field
                                                 Field changedField = new Field(newFieldName, newFieldType);
+                                                setState();
                                                 //replace orignal field
                                                 UMLClassWithField.changeField(oldFieldName, changedField);
                                             }
@@ -517,9 +540,9 @@ public class CLIController {
                                                 }
                                                 //make a new method
                                                 Method changedMethod = new Method(newMethodName, newMethodReturnType);
+                                                setState();
                                                 //replace orginal method
                                                 UMLClassWithMethod.changeMethod(oldMethodName, changedMethod);
-
                                             }
                                         }
                                     }
@@ -541,6 +564,7 @@ public class CLIController {
                                         String newParamName = getAttName("parameter");
                                         String newParamType = getAttType("parameter");
                                         param = new Parameter(newParamName, newParamType);
+                                        setState();
                                         methodToChangeParam.changeParameter(oldParamName, param);
                                     }
                                 }
@@ -580,6 +604,7 @@ public class CLIController {
                                             }
                                             // change the type
                                             else {
+                                                setState();
                                                 model.changeRelType(srcName, destName, newRelType);
                                                 System.out.print("Relationship type changed\n");
                                             }
@@ -815,16 +840,49 @@ public class CLIController {
     }
 
     /**
-     *
-     *
-     * @return
+     * Creates a memento object using the current state and puts it onto the state stack
      */
-    public boolean undo() {
-        if (this.caretaker.stackIsEmpty()) {
+    private void setState() {
+        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList()));
+        caretaker.pushToUndoStack(currState);
+    }
+
+    /**
+     * Undoes the most recent action
+     *
+     * @return true if the undo succeeded, otherwise false
+     */
+    private boolean undo() {
+        // if the stack is empty, return false, otherwise perform the undo and return
+        if (this.caretaker.undoStackIsEmpty()) {
             return false;
         } else {
-            Memento prevState = caretaker.undoHelper(this.model);
-            UMLModel prevModel = prevState.getState();
+            // get the current state the model is in
+            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList()));
+            // get the previous state on the state stack, and pass the helper the current state for the redo stack
+            Memento prevState = caretaker.undoHelper(currState);
+            // make this current model the previous model
+            this.model = prevState.getState();
+            return true;
+        }
+    }
+
+    /**
+     * Redoes the most recent action
+     *
+     * @return true if the redo succeeded, otherwise false
+     */
+    private boolean redo() {
+        // if the stack is empty, return false, otherwise perform the redo and return
+        if (this.caretaker.redoStackIsEmpty()) {
+            return false;
+        } else {
+            // get the current state the model is in
+            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList()));
+            // get the previous state on the state stack, and pass the helper the current state for the undo stack
+            Memento prevState = caretaker.redoHelper(currState);
+            // make this current model the previous model
+            this.model = prevState.getState();
             return true;
         }
     }

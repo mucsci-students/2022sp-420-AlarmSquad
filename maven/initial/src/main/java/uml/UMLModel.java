@@ -24,8 +24,37 @@ public class UMLModel {
      * @param relationshipList
      */
     public UMLModel(ArrayList<UMLClass> UMLClassList, ArrayList<Relationship> relationshipList) {
-        this.UMLClassList = UMLClassList;
-        this.relationshipList = relationshipList;
+        // initialize the new array lists
+        this.UMLClassList = new ArrayList<>();
+        this.relationshipList = new ArrayList<>();
+        // iterate through the given class list
+        for (UMLClass classObj : UMLClassList) {
+            // make a new class object and populate it
+            UMLClass newClass = new UMLClass(classObj.getClassName());
+            // iterate through the class' field list
+            for (Field fieldObj : classObj.getFieldList()) {
+                // make a new field object and populate it, then add it to the class's field list
+                Field newField = new Field(fieldObj.getAttName(), fieldObj.getFieldType());
+                newClass.addField(newField);
+            }
+            // iterate through the class' method list
+            for (Method methObj : classObj.getMethodList()) {
+                // make a new method object and populate it, then add it to the class's method list
+                Method newMethod = new Method(methObj.getAttName(), methObj.getReturnType());
+                // iterate through the method's parameter list
+                for (Parameter paramObj : methObj.getParamList()) {
+                    // make a new parameter object and populate it, then add it to the method's parameter list
+                    Parameter newParameter = new Parameter(paramObj.getAttName(), paramObj.getFieldType());
+                    newMethod.addParameter(newParameter);
+                }
+                newClass.addMethod(methObj);
+            }
+            // add the new class object to the new class list
+            this.UMLClassList.add(newClass);
+        }
+        for (Relationship relObj : relationshipList) {
+            this.relationshipList.add(relObj);
+        }
     }
 
     /**
