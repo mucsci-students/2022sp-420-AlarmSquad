@@ -258,33 +258,10 @@ public class UMLModel {
      */
     public boolean isNotValidInput(String input) {
         if (!isValidIdentifier(input)) {
-            System.out.printf("Input %s is not a valid identifier\n", input);
+            System.out.printf("Input \"%s\" is not a valid identifier\n", input);
             return true;
         }
         return false;
-    }
-
-    /**
-     * Takes a string and checks if it is a valid field type
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public boolean isNotValidType(String input) {
-        return switch (input) {
-            case "string", "int", "double", "float", "char", "boolean", "short", "long" -> false;
-            default -> true;
-        };
-    }
-
-    /**
-     * Takes a string and checks if it is a valid field type
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public boolean isNotValidReturnType(String input) {
-        return (isNotValidType(input) && !input.equals("void"));
     }
 
     /**

@@ -22,6 +22,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -163,12 +166,15 @@ public class GUIView extends Application {
         // if the delete method button is pressed, open a new window to delete method
         MenuItem deleteMethod = new MenuItem("Delete Method");
         deleteMethod.setOnAction(event -> deleteMethodWindow());
+        // if the delete method button is pressed, open a new window to delete method
+        MenuItem deleteParam = new MenuItem("Delete Parameter(s)");
+        deleteParam.setOnAction(event -> deleteParameterWindow());
         deleteAttribute.getItems().addAll(deleteField, deleteMethod);
         // Menu item for deleting a relationship,
         // when clicked, launch delete relationship window
         MenuItem deleteRel = new MenuItem("Delete Relationship");
         deleteRel.setOnAction(event -> deleteRelWindow());
-        delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel);
+        delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel, deleteParam);
 
         //***************************************//
         //******* Rename/Change Menu Items ******//
@@ -222,6 +228,7 @@ public class GUIView extends Application {
         deleteField.setDisable(true);
         deleteMethod.setDisable(true);
         deleteRel.setDisable(true);
+        deleteParam.setDisable(true);
         renameClass.setDisable(true);
         renameField.setDisable(true);
         renameMethod.setDisable(true);
@@ -472,8 +479,9 @@ public class GUIView extends Application {
         // create a button to add the method with the inputted name
         Button add = new Button("Add");
         add.setOnAction(event -> {
-            this.controller.addParameterAction(className.getText(), methodName.getText(),
-                    paramName.getText(), paramType.getText(), stage);
+            if(this.controller.addParameterAction(className.getText(), methodName.getText(),
+                    paramName.getText(), paramType.getText(), stage))
+                addParameterWindowLoop ();
             updateMenus();
         });
         // create a button to cancel out of the window and enable menu again
@@ -493,6 +501,31 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 4);
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Parameter(s)", 225, 300);
+    }
+
+    private void addParameterWindowLoop () {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label continueText = new Label("Add Another Parameter?");
+        // create a button to continue creating parameters
+        Button yes = new Button("Yes");
+        yes.setOnAction(event -> {
+            stage.close();
+            addParameterWindow();
+        });
+        // create a button to stop creating parameters
+        Button no = new Button("No");
+        no.setOnAction(event -> GUIController.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(continueText, 0, 0);
+        pane.add(yes, 0, 1);
+        pane.add(no, 1, 1);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Continue?", 110, 220);
     }
 
     /**
@@ -603,6 +636,82 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 2);
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Method", 155, 300);
+    }
+
+    /**
+     * Creates a window for the delete parameter method and its data
+     */
+    private void deleteParameterWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label classNameText = new Label("Class name: ");
+        // create a label for the text box for the method name
+        Label methodNameText = new Label("Method name: ");
+        // create a label for the text box for the parameter name
+        Label paramText = new Label("Parameter name: ");
+        // create the text box for the class name
+        TextField className = new TextField();
+        className.setPrefColumnCount(15);
+        // create the text box for the method name
+        TextField methodName = new TextField();
+        methodName.setPrefColumnCount(15);
+        // create the text box for the class name
+        TextField paramName = new TextField();
+        paramName.setPrefColumnCount(15);
+        // create the text box for the class name
+        TextField paramType = new TextField();
+        paramType.setPrefColumnCount(15);
+        // create a button to add the field with the inputted name
+        Button delete = new Button("Delete");
+        delete.setOnAction(event -> {
+            if(GUIController.deleteParamAction(className.getText(), methodName.getText(), paramName.getText(),
+                    stage))
+                deleteParameterWindowLoop();
+            updateMenus();
+        });
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> GUIController.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(classNameText, 0, 0);
+        pane.add(methodNameText, 0, 1);
+        pane.add(paramText, 0, 2);
+        pane.add(className, 1, 0);
+        pane.add(methodName, 1, 1);
+        pane.add(paramName, 1, 2);
+        pane.add(delete, 0, 3);
+        pane.add(cancel, 1, 3);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Delete Parameter(s)", 185, 320);
+    }
+
+    private void deleteParameterWindowLoop () {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label continueText = new Label("Delete Another Parameter?");
+        // create a button to continue creating parameters
+        Button yes = new Button("Yes");
+        yes.setOnAction(event -> {
+            stage.close();
+            deleteParameterWindow();
+        });
+        // create a button to stop creating parameters
+        Button no = new Button("No");
+        no.setOnAction(event -> GUIController.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(continueText, 0, 0);
+        pane.add(yes, 0, 1);
+        pane.add(no, 1, 1);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Continue?", 110, 220);
     }
 
     /**
@@ -822,8 +931,9 @@ public class GUIView extends Application {
         // create a button to add the method with the inputted name
         Button change = new Button("Change");
         change.setOnAction(event -> {
-            this.controller.changeParameterAction(givenClass.getText(), givenMethod.getText(),
-                    paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage);
+            if(this.controller.changeParameterAction(givenClass.getText(), givenMethod.getText(),
+                    paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage))
+                changeParameterWindowLoop();
             updateMenus();
         });
         // create a button to cancel out of the window and enable menu again
@@ -845,6 +955,31 @@ public class GUIView extends Application {
         pane.add(cancel, 1, 5);
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Change Parameter(s)", 260, 300);
+    }
+
+    private void changeParameterWindowLoop () {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label continueText = new Label("Change Another Parameter?");
+        // create a button to continue creating parameters
+        Button yes = new Button("Yes");
+        yes.setOnAction(event -> {
+            stage.close();
+            changeParamWindow();
+        });
+        // create a button to stop creating parameters
+        Button no = new Button("No");
+        no.setOnAction(event -> GUIController.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(continueText, 0, 0);
+        pane.add(yes, 0, 1);
+        pane.add(no, 1, 1);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Continue?", 110, 220);
     }
 
     /**
@@ -985,6 +1120,11 @@ public class GUIView extends Application {
             classBox.setX(classBox.getClassPane().getTranslateX());
             classBox.setY(classBox.getClassPane().getTranslateY());
         });
+        // Increases box width if className is too big for the default
+        if((int)(font.getStringBounds(className, frc)).getWidth() + 30 > classBox.getBoxWidth())
+        {
+            classBox.setBoxWidth((int)(font.getStringBounds(className, frc)).getWidth() + 30);
+        }
     }
 
     /**
@@ -1006,12 +1146,61 @@ public class GUIView extends Application {
         ClassBox box = findClassBox(className);
         box.setBoxHeight(box.getBoxHeight() + 15);
         box.addText(field, fieldListSize, methListSize, false);
+
+        // Increases box size if the field will extend past it
+        if((int)(font.getStringBounds(field.getAttName() + " : " + field.getFieldType(), frc)).getWidth() + 30
+                > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(field.getAttName() + " : " + field.getFieldType(), frc))
+                    .getWidth() + 30);
+        }
     }
 
     public void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
         ClassBox box = findClassBox(className);
         box.setBoxHeight(box.getBoxHeight() + 15);
         box.addText(meth, fieldListSize, methListSize, false);
+
+        // Calculates pixel width of type
+        String methType = "";
+        if (!meth.getReturnType().equals("void"))
+        {
+            methType = meth.getReturnType();
+        }
+
+        // Increases box size if the method will extend past it
+        if((int)(font.getStringBounds(meth.getAttName() + " : " + meth.getReturnType(), frc))
+                .getWidth() + 30 > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + " : " +
+                    meth.getReturnType(), frc)).getWidth() + 30);
+        }
+    }
+
+    public static void resizeMethod(Method meth, String className) {
+        ClassBox box = findClassBox(className);
+
+        // Calculates pixel width of type
+        String methType = "";
+        if (!meth.getReturnType().equals("void"))
+        {
+            methType = meth.getReturnType();
+        }
+
+        // Caculate pixel length of all parameters in the current method
+        String param = "";
+        for (Parameter tempParam : meth.getParamList())
+        {
+            param += ", " + tempParam.getAttName() + " : " + tempParam.getFieldType();
+        }
+
+        // Increases box size if the method will extend past it
+        if((int)(font.getStringBounds(meth.getAttName() + "(" + param + ") " + meth.getReturnType(), frc))
+                .getWidth() > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + "(" + param + ") " +
+                    meth.getReturnType(), frc)).getWidth());
+        }
     }
 
     /**
@@ -1613,6 +1802,7 @@ public class GUIView extends Application {
             // otherwise, disable them
             if (methodExists) {
                 deleteAttribute.getItems().get(1).setDisable(false);
+                deleteAttribute.getItems().get(1).setDisable(false);
                 renameAttribute.getItems().get(1).setDisable(false);
                 add.getItems().get(3).setDisable(false);
             } else {
@@ -1623,8 +1813,10 @@ public class GUIView extends Application {
             // if there is at least one parameter in the list, enable the menu items
             // otherwise, disable them
             if (paramExists) {
+                delete.getItems().get(3).setDisable(false);
                 change.getItems().get(0).setDisable(false);
             } else {
+                delete.getItems().get(3).setDisable(true);
                 change.getItems().get(0).setDisable(true);
             }
             // if there are at least 2 classes in the class list, enable add relationship

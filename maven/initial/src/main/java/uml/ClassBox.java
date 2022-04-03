@@ -85,7 +85,7 @@ public class ClassBox {
     }
 
     public void setBoxWidth(double boxWidth) {
-        this.titleBox.setHeight(boxWidth);
+        this.titleBox.setWidth(boxWidth);
         this.boxWidth = boxWidth;
     }
 

@@ -227,7 +227,7 @@ public class GUIController {
      * @param paramType the type of parameter to add
      * @param stage the working stage
      */
-    public void addParameterAction(String className, String methodName, String paramName, String paramType,
+    public boolean addParameterAction(String className, String methodName, String paramName, String paramType,
                                           Stage stage) {
         // if any string is empty, pop an error up
         if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || paramType.isEmpty()) {
@@ -254,12 +254,15 @@ public class GUIController {
                     this.view.findClassBox(className).addText(this.model.findClass(className).findMethod(methodName),
                             this.model.findClass(className).getFieldList().size(),
                             this.model.findClass(className).getMethodList().size(), true);
+                    this.view.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
+                    return true;
                 // if the method does exist, pop an error up
                 } else {
                     this.view.popUpWindow("Error", "Field already exists");
                 }
             }
         }
+        return false;
     }
 
     //***************************************//
@@ -387,6 +390,52 @@ public class GUIController {
                 stage.close();
             }
         }
+    }
+
+    /**
+     * Deletes a field from a class if the given string is nonempty and the field exists,
+     * pops an error up otherwise
+     *
+     * @param className the name of the class to delete the field from
+     * @param methodName the name of the method to search for parameters
+     * @param paramName the name of the parameter to delete
+     * @param stage the working stage
+     */
+    public static boolean deleteParamAction(String className, String methodName, String paramName, Stage stage){
+        // if any string is empty, pop an error up
+        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty()) {
+            GUIView.popUpWindow("Error", "All fields are required");
+        } else {
+            // if the class does not exist, pop an error up
+            if (UMLModel.findClass(className) == null) {
+                GUIView.popUpWindow("Error", "Class does not exist");
+                // if the method does not exist, pop an error up
+            } else if (UMLModel.findClass(className).findMethod(methodName) == null) {
+                GUIView.popUpWindow("Error", "Method does not exist");
+                // if the parameter does not exist, pop an error up
+            } else if (UMLModel.findClass(className).findMethod(methodName).findParameter(paramName) == null) {
+                GUIView.popUpWindow("Error", "Parameter does not exist");
+                // if the parameter name is not a valid string, pop an error up
+            } else {
+                Parameter paramToDelete = UMLModel.findClass(className).findMethod(methodName).findParameter(paramName);
+                UMLModel.findClass(className).findMethod(methodName).deleteParameter(paramToDelete);
+                // go through methlist in ClassBox, edit text of method in that methlist, remove the
+                // old method, add the new, renamed method at the bottom
+                for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
+                    if (GUIView.findClassBox(className).getMethTextList().get(i).getText().
+                            startsWith("\n+ " + methodName)) {
+                        GUIView.findClassBox(className).getMethTextList().remove(i);
+                        GUIView.findClassBox(className).addText(UMLModel.findClass(className).
+                                        findMethod(methodName),
+                                UMLModel.findClass(className).getFieldList().size(),
+                                UMLModel.findClass(className).getMethodList().size(), true);
+                    }
+                }
+                stage.close();
+                return (UMLModel.findClass(className).findMethod(methodName).getParamList().size() > 0);
+            }
+        }
+        return false;
     }
 
     /**
@@ -575,7 +624,7 @@ public class GUIController {
      * @param newParamType the new type for the parameter
      * @param stage the working stage
      */
-    public void changeParameterAction(String className, String methodName, String paramName,
+    public boolean changeParameterAction(String className, String methodName, String paramName,
                                              String newParamName, String newParamType, Stage stage) {
         // if any strings are empty, pop an error up
         if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || newParamName.isEmpty()) {
@@ -614,14 +663,17 @@ public class GUIController {
                                             findMethod(methodName),
                                     this.model.findClass(className).getFieldList().size(),
                                     this.model.findClass(className).getMethodList().size(), true);
+                            this.view.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
                         }
                     }
+                    return true;
                     // otherwise, pop an error up
                 } else {
                     this.view.popUpWindow("Error", "The parameter name is already in use");
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -760,6 +812,7 @@ public class GUIController {
                 methodListSize += 1;
                 this.view.drawMethodBox(fieldListSize, methodListSize,
                         methodObj, classObj.getClassName());
+                this.view.resizeMethod(methodObj, classObj.getClassName());
                 this.view.findClassBox(classObj.getClassName()).addText(this.model.findClass(
                         classObj.getClassName()).findMethod(methodObj.getAttName()),
                         this.model.findClass(classObj.getClassName()).getFieldList().size(),
