@@ -14,8 +14,9 @@ public class Driver {
         } else {
             if (args[0].equals("--cli")) {
                 UMLModel model = new UMLModel();
+                CLIView view = new CLIView();
                 Caretaker caretaker = new Caretaker();
-                CLIController controller = new CLIController(model, caretaker);
+                CLIController controller = new CLIController(model, caretaker, view);
                 controller.run();
             } else if (args[0].equals("--gui")) {
                 GUIView.main(args);
