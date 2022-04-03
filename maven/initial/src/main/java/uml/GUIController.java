@@ -106,7 +106,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(fieldName)) {
                 GUIView.popUpWindow("Error", "The field name is invalid");
             // if the field type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidType(fieldType)) {
+            } else if (UMLModel.isNotValidInput(fieldType)) {
                 GUIView.popUpWindow("Error", "The field type is invalid");
             // check if the field exists
             } else {
@@ -146,7 +146,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(methodName)) {
                 GUIView.popUpWindow("Error", "The method name is invalid");
             // if the return type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidReturnType(returnType)) {
+            } else if (UMLModel.isNotValidInput(returnType)) {
                 GUIView.popUpWindow("Error", "The return type is invalid");
             // check if the method exists
             } else {
@@ -217,7 +217,7 @@ public class GUIController {
      * @param paramType the type of parameter to add
      * @param stage the working stage
      */
-    public static void addParameterAction(String className, String methodName, String paramName, String paramType,
+    public static boolean addParameterAction(String className, String methodName, String paramName, String paramType,
                                           Stage stage) {
         // if any string is empty, pop an error up
         if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || paramType.isEmpty()) {
@@ -233,7 +233,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(paramName)) {
                 GUIView.popUpWindow("Error", "The parameter name is invalid");
             // if the parameter type is not a valid type, pop an error up
-            } else if (UMLModel.isNotValidType(paramType)) {
+            } else if (UMLModel.isNotValidInput(paramType)) {
                 GUIView.popUpWindow("Error", "The parameter type is invalid");
             } else {
                 // if the parameter does not exist, add it and close
@@ -245,12 +245,14 @@ public class GUIController {
                             UMLModel.findClass(className).getFieldList().size(),
                             UMLModel.findClass(className).getMethodList().size(), true);
                     GUIView.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
+                    return true;
                 // if the method does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
                 }
             }
         }
+        return false;
     }
 
     //***************************************//
@@ -378,6 +380,52 @@ public class GUIController {
                 stage.close();
             }
         }
+    }
+
+    /**
+     * Deletes a field from a class if the given string is nonempty and the field exists,
+     * pops an error up otherwise
+     *
+     * @param className the name of the class to delete the field from
+     * @param methodName the name of the method to search for parameters
+     * @param paramName the name of the parameter to delete
+     * @param stage the working stage
+     */
+    public static boolean deleteParamAction(String className, String methodName, String paramName, Stage stage){
+        // if any string is empty, pop an error up
+        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty()) {
+            GUIView.popUpWindow("Error", "All fields are required");
+        } else {
+            // if the class does not exist, pop an error up
+            if (UMLModel.findClass(className) == null) {
+                GUIView.popUpWindow("Error", "Class does not exist");
+                // if the method does not exist, pop an error up
+            } else if (UMLModel.findClass(className).findMethod(methodName) == null) {
+                GUIView.popUpWindow("Error", "Method does not exist");
+                // if the parameter does not exist, pop an error up
+            } else if (UMLModel.findClass(className).findMethod(methodName).findParameter(paramName) == null) {
+                GUIView.popUpWindow("Error", "Parameter does not exist");
+                // if the parameter name is not a valid string, pop an error up
+            } else {
+                Parameter paramToDelete = UMLModel.findClass(className).findMethod(methodName).findParameter(paramName);
+                UMLModel.findClass(className).findMethod(methodName).deleteParameter(paramToDelete);
+                // go through methlist in ClassBox, edit text of method in that methlist, remove the
+                // old method, add the new, renamed method at the bottom
+                for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
+                    if (GUIView.findClassBox(className).getMethTextList().get(i).getText().
+                            startsWith("\n+ " + methodName)) {
+                        GUIView.findClassBox(className).getMethTextList().remove(i);
+                        GUIView.findClassBox(className).addText(UMLModel.findClass(className).
+                                        findMethod(methodName),
+                                UMLModel.findClass(className).getFieldList().size(),
+                                UMLModel.findClass(className).getMethodList().size(), true);
+                    }
+                }
+                stage.close();
+                return (UMLModel.findClass(className).findMethod(methodName).getParamList().size() > 0);
+            }
+        }
+        return false;
     }
 
     /**
@@ -566,7 +614,7 @@ public class GUIController {
      * @param newParamType the new type for the parameter
      * @param stage the working stage
      */
-    public static void changeParameterAction(String className, String methodName, String paramName,
+    public static boolean changeParameterAction(String className, String methodName, String paramName,
                                              String newParamName, String newParamType, Stage stage) {
         // if any strings are empty, pop an error up
         if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || newParamName.isEmpty()) {
@@ -585,7 +633,7 @@ public class GUIController {
             } else if (UMLModel.isNotValidInput(newParamName)) {
                 GUIView.popUpWindow("Error", "The parameter name is invalid");
                 // if the parameter type is not a valid string, pop an error up
-            } else if (UMLModel.isNotValidType(newParamType)) {
+            } else if (UMLModel.isNotValidInput(newParamType)) {
                 GUIView.popUpWindow("Error", "The parameter type is invalid");
             } else {
                 // if the parameter name is not already in use, change the parameter
@@ -608,12 +656,14 @@ public class GUIController {
                             GUIView.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
                         }
                     }
+                    return true;
                     // otherwise, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "The parameter name is already in use");
                 }
             }
         }
+        return false;
     }
 
     /**

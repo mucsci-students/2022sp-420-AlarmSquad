@@ -1,5 +1,9 @@
 package uml;
 
+import org.jline.reader.LineReader;
+import org.jline.reader.ParsedLine;
+import org.jline.terminal.Terminal;
+
 import java.io.IOException;
 import java.util.*;
 @SuppressWarnings("DanglingJavadoc")
@@ -14,29 +18,41 @@ public class CLIController {
     // Creates a new scanner
     private static final Scanner scan = new Scanner(System.in);
 
-    // Interprets user input
-    public static void main(String[] args) {
-        clearScreen();
+    //creates a linereader
+    private static LineReader reader;
 
+    //our prompt string
+    private static String prompt = "> ";
+
+
+    public static void main(String[] args){
+
+        //builds console from cli view
+        reader = CLIView.buildConsole();
         // intro to CLI for user
         String intro = "Welcome to ALARM Squad's UML editor!";
         intro += "\n\nType 'help' to list all commands and their accompanying descriptions.\n";
         System.out.println(intro);
-
-        // Default prompt for user
-        String prompt = "> ";
-        System.out.print(prompt);
-
-        // Enters the command loop
+        //loop for reading and replacing input
         while (true) {
-            // Takes in the next line of user input
-            String input = scan.nextLine().trim();
-            // user input
-            ArrayList<String> inputList = new ArrayList<>(Arrays.asList(input.split(" ")));
+            //matches strings to regex and replaces them
+            String line = reader.readLine(prompt).replaceAll("\\s+", " ").trim();
+            //adds spaces between strings
+            String[] input = line.split(" ");
+            //passes input to switch statement
+            inputInterpreter(input);
+        }
+    }
+
+
+    // Interprets user input
+    public static void inputInterpreter(String[] inputList) {
+        clearScreen();
 
             try {
+
                 // Check first word user inputted and act accordingly
-                switch (inputList.get(0)) {
+                switch (inputList[0]) {
                         // If the user enters a blank line, prompt again
                         case "" -> System.out.print(prompt);
 
@@ -76,7 +92,6 @@ public class CLIController {
                         // help case
                         case "help" -> {
                             System.out.println(UMLModel.getCLIHelpMenu());
-                            System.out.print(prompt);
                         }
 
                     //***************************************//
@@ -84,7 +99,7 @@ public class CLIController {
                     //***************************************//
 
                     case "add", "a" -> {
-                        switch (inputList.get(1)) {
+                        switch (inputList[1]) {
                             // add class
                             case "class" -> {
                                 // Get user defined name for Class, then adds new Class to the classList
@@ -108,16 +123,16 @@ public class CLIController {
                             // add relationship
                             case "rel" -> {
                                 // If user inputted "a rel" with no flag, ask for one
-                                if (inputList.size() == 2) {
-                                    if (!addRelFlag(inputList, "add")) {
+                                if (inputList.length == 2) {
+                                    if (!addRelFlag(convertStringList2ArrayList(inputList), "add")) {
                                         // If user tried to input an invalid flag, break
                                         break;
                                     }
                                 }
-                                switch (inputList.get(2)) {
+                                switch (inputList[2]) {
                                     // relationship type flags
                                     case "-a", "-c", "-i", "-r" -> {
-                                        String relType = flagToString(inputList.get(2));
+                                        String relType = flagToString(inputList[2]);
                                         // if a flag was not given by user input
                                         if (!relType.equals("")) {
                                             System.out.print("Enter source class name: ");
@@ -165,18 +180,18 @@ public class CLIController {
                             // add attribute
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one
-                                if (inputList.size() == 2) {
-                                    if (addAttFlag(inputList, "add")) {
+                                if (inputList.length == 2) {
+                                    if (addAttFlag(convertStringList2ArrayList(inputList), "add")) {
                                         // If user tried to input an invalid flag, break
                                         break;
                                     }
                                 }
-                                switch (inputList.get(2)) {
+                                switch (inputList[2]) {
                                     // add field or method
                                     case "-f", "-m" -> {
                                         // Convert flag to "field" or "method".
                                         // Needed for method calls later on
-                                        String attType = flagToString(inputList.get(2));
+                                        String attType = flagToString(inputList[2]);
                                         if (!attType.equals("")) {
                                             // Get name of class user wants to add attribute to and
                                             // ensure the class exists
@@ -218,12 +233,25 @@ public class CLIController {
                                         if((methodToAddParam = findMethod(classToAddParam)) == null) {
                                             break;
                                         }
-                                        if((paramName = findParamName(methodToAddParam)) == null) {
-                                            break;
+
+                                        String answer = "y";
+
+                                        // While loop lets user to continuously add parameters until they choose not
+                                        // to or an error occurs
+                                        while (answer.equals("y")) {
+                                            if((paramName = findParamName(methodToAddParam)) == null) {
+                                                break;
+                                            }
+                                            String paramType;
+                                            if ((paramType = getAttType("parameter")) == null)
+                                            {
+                                                break;
+                                            }
+                                            Parameter param = new Parameter(paramName, paramType);
+                                            methodToAddParam.addParameter(param);
+                                            System.out.printf("Add another? [y/N]: ");
+                                            answer = scan.next().toLowerCase();
                                         }
-                                        String paramType = getAttType("parameter");
-                                        Parameter param = new Parameter(paramName, paramType);
-                                        methodToAddParam.addParameter(param);
                                     }
                                     // If flag user entered is invalid, inform user and break
                                     default -> {
@@ -235,7 +263,6 @@ public class CLIController {
                             // If the user's command is not valid
                             default -> {
                                 System.out.println("Please enter a valid command");
-                                System.out.print(prompt);
                             }
                         }
                     }
@@ -245,7 +272,7 @@ public class CLIController {
                     //***************************************//
 
                     case "delete", "d" -> {
-                        switch (inputList.get(1)) {
+                        switch (inputList[1]) {
                             // delete class of the user's choice from the class list
                             case "class" -> {
                                 // Get user input of Class name to be deleted
@@ -293,18 +320,18 @@ public class CLIController {
                             // delete attribute
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one.
-                                if (inputList.size() == 2) {
-                                    if (addAttFlag(inputList, "delete")) {
+                                if (inputList.length == 2) {
+                                    if (addAttFlag(convertStringList2ArrayList(inputList), "delete")) {
                                         // If user inputs invalid flag, break
                                         break;
                                     }
                                 }
                                 // delete field or method
-                                switch (inputList.get(2)) {
+                                switch (inputList[2]) {
                                     case "-f", "-m" -> {
                                         // Convert -f flag to the string "field",
                                         // and the same for -m flag, etc.
-                                        String flagName = flagToString(inputList.get(2));
+                                        String flagName = flagToString(inputList[2]);
 
                                         // If user entered a valid flag...
                                         if (!flagName.equals("")) {
@@ -333,20 +360,33 @@ public class CLIController {
                                         if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {
                                             break;
                                         }
-                                        if((param = findParam(methodToDeleteParam)) == null) {
-                                            break;
-                                        }
-                                        String paramName = param.getAttName();
-                                        System.out.printf("Delete parameter \"%s\"? (y/n): ", paramName);
-                                        String answer = scan.next().trim();
-                                        // If the user wants to delete a parameter, proceed to do so
-                                        if (answer.equalsIgnoreCase("y")) {
-                                            methodToDeleteParam.deleteParameter(param);
-                                            System.out.printf("Parameter \"%s\" has been deleted\n", paramName);
-                                        }
-                                        // If user types n, confirm and return
-                                        else {
-                                            System.out.printf("Parameter \"%s\" has NOT been deleted\n", paramName);
+
+                                        String answer = "y";
+
+                                        // While loop lets user to continuously add parameters until they choose not
+                                        // to or an error occurs
+                                        while (answer.equals("y")) {
+                                            if((param = findParam(methodToDeleteParam)) == null) {
+                                                break;
+                                            }
+                                            String paramName = param.getAttName();
+                                            System.out.printf("Delete parameter \"%s\"? [y/N]: ", paramName);
+                                            answer = scan.next().trim();
+                                            // If the user wants to delete a parameter, proceed to do so
+                                            if (answer.equalsIgnoreCase("y")) {
+                                                methodToDeleteParam.deleteParameter(param);
+                                                if (methodToDeleteParam.getParamList().size() <= 0) {
+                                                    break;
+                                                }
+                                                System.out.printf("Parameter \"%s\" has been deleted." +
+                                                        " Delete another? [y/N]: ", paramName);
+                                                answer = scan.next().trim();
+                                            }
+                                            // If user types n, confirm and return
+                                            else {
+                                                System.out.printf("Parameter \"%s\" has NOT been deleted\n", paramName);
+                                                break;
+                                            }
                                         }
                                     } // If user entered invalid flag, inform user and break
                                     default -> {
@@ -368,7 +408,7 @@ public class CLIController {
                     //***************************************//
 
                     case "rename", "r" -> {
-                        switch (inputList.get(1)) {
+                        switch (inputList[1]) {
                             case "class" -> {
                                 // Get user input of Class name to be renamed
                                 System.out.print("Enter class to rename: ");
@@ -406,10 +446,10 @@ public class CLIController {
                     //***************************************//
 
                     case "c", "change" -> {
-                        switch (inputList.get(1)) {
+                        switch (inputList[1]) {
                             // change attribute
                             case "att" -> {
-                                switch (inputList.get(2)) {
+                                switch (inputList[2]) {
                                     // change field
                                     case "-f" -> {
                                         // Show user classes and attributes before asking for input
@@ -509,14 +549,29 @@ public class CLIController {
                                         if((methodToChangeParam = findMethod(classToChangeParam)) == null) {
                                             break;
                                         }
-                                        if((param = findParam(methodToChangeParam)) == null) {
-                                            break;
+                                        String answer = "y";
+                                        while (answer.equals("y")) {
+                                            if ((param = findParam(methodToChangeParam)) == null) {
+                                                break;
+                                            }
+                                            String oldParamName;
+                                            if((oldParamName = param.getAttName()) == null) {
+                                                break;
+                                            }
+                                            String newParamName;
+                                            if((newParamName = getAttName("parameter")) == null) {
+                                                break;
+                                            }
+                                            String newParamType;
+                                            if ((newParamType = getAttType("parameter")) == null) {
+                                                break;
+                                            }
+                                            param = new Parameter(newParamName, newParamType);
+                                            methodToChangeParam.changeParameter(oldParamName, param);
+
+                                            System.out.printf("Change another? [y/N]: ");
+                                            answer = scan.next().toLowerCase();
                                         }
-                                        String oldParamName = param.getAttName();
-                                        String newParamName = getAttName("parameter");
-                                        String newParamType = getAttType("parameter");
-                                        param = new Parameter(newParamName, newParamType);
-                                        methodToChangeParam.changeParameter(oldParamName, param);
                                     }
                                 }
                             }
@@ -575,7 +630,7 @@ public class CLIController {
                     //***************************************//
 
                     case "list", "l" -> {
-                        switch (inputList.get(1)) {
+                        switch (inputList[1]) {
                             // many classes
                             case "classes" -> {
                                 listClasses();
@@ -646,7 +701,7 @@ public class CLIController {
                 System.out.println("Please enter a valid command");
                 System.out.print(prompt);
             }
-        }
+
     }
 
 
@@ -813,17 +868,15 @@ public class CLIController {
     public static String getAttType(String attType) {
         if (attType.equals("method")) {
             System.out.print("Enter " + attType + " return type: ");
-            String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-            if (UMLModel.isNotValidReturnType(attToGet)) {
-                System.out.println("\"" + attToGet + "\" is not a valid return type");
+            String attToGet = scan.next().trim();
+            if (UMLModel.isNotValidInput(attToGet)) {
                 return null;
             }
             return attToGet;
         }
         System.out.print("Enter " + attType + " type: ");
-        String attToGet = scan.next().trim().toLowerCase(Locale.ROOT);
-        if (UMLModel.isNotValidType(attToGet)) {
-            System.out.println("\"" + attToGet + "\" is not a valid type");
+        String attToGet = scan.next().trim();
+        if (UMLModel.isNotValidInput(attToGet)) {
             return null;
         }
         return attToGet;
@@ -841,8 +894,7 @@ public class CLIController {
         }
         System.out.print("Enter " + attType + " type: ");
         String attToGet = scan.next().trim();
-        if (UMLModel.isNotValidReturnType(attToGet)) {
-            System.out.println("\"" + attToGet + "\" is not a valid return type");
+        if (UMLModel.isNotValidInput(attToGet)) {
             return null;
         }
         return attToGet;
@@ -878,7 +930,7 @@ public class CLIController {
      */
     public static <E> boolean ifExists(E obj, String type, String name) {
         if (obj != null) {
-            System.out.printf("%s %s already exists", type, name);
+            System.out.printf("%s %s already exists\n", type, name);
             return true;
         }
         return false;
@@ -1089,5 +1141,13 @@ public class CLIController {
         } catch (IOException | InterruptedException ex) {
             System.out.println("couldn't clear screen");
         }
+    }
+
+    private static ArrayList<String> convertStringList2ArrayList(String[] list) {
+        ArrayList<String> listToReturn = new ArrayList<>();
+        for (int i = 0; i >= list.length; i++) {
+            listToReturn.add(list[i]);
+        }
+        return listToReturn;
     }
 }
