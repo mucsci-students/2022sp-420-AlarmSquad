@@ -14,7 +14,7 @@ public class Memento {
      * @param state the state of the model this memento is storing
      */
     public Memento(UMLModel state){
-        this.state = state;
+        this.state = new UMLModel(state);
     }
 
     /**

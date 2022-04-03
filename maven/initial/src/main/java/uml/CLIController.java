@@ -23,11 +23,8 @@ public class CLIController {
     }
 
     // Interprets user input
-    public static void main(String[] args) {
-        Caretaker caretaker = new Caretaker();
-        UMLModel model = new UMLModel();
-        CLIController controller = new CLIController(model, caretaker);
-        controller.clearScreen();
+    public void run() {
+        clearScreen();
 
         // intro to CLI for user
         String intro = "Welcome to ALARM Squad's UML editor!";
@@ -61,7 +58,7 @@ public class CLIController {
                         }
                         // clear screen
                         case "clear" -> {
-                            controller.clearScreen();
+                            clearScreen();
                             System.out.print(prompt);
                         }
                         // save case
@@ -100,10 +97,10 @@ public class CLIController {
                         }
                         // undo case
                         case "undo" -> {
-                            if (controller.undo()) {
-                                System.out.println("Last action undone.");
-                            } else {
+                            if (!undo()) {
                                 System.out.println("No actions to undo.");
+                            } else {
+                                System.out.println("Last action undone.");
                             }
                         }
 
@@ -130,8 +127,6 @@ public class CLIController {
                                     // Adds class to class list then prompts confirmation to use
                                     UMLClass newUMLClass = new UMLClass(className);
                                     model.addClass(newUMLClass);
-                                    Memento state = new Memento(model);
-                                    caretaker.push(state);
                                     System.out.println("Added class \"" + className + "\"");
                                 }
                             }
@@ -139,7 +134,7 @@ public class CLIController {
                             case "rel" -> {
                                 // If user inputted "a rel" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    if (!controller.addRelFlag(inputList, "add")) {
+                                    if (!addRelFlag(inputList, "add")) {
                                         // If user tried to input an invalid flag, break
                                         break;
                                     }
@@ -147,7 +142,7 @@ public class CLIController {
                                 switch (inputList.get(2)) {
                                     // relationship type flags
                                     case "-a", "-c", "-i", "-r" -> {
-                                        String relType = controller.flagToString(inputList.get(2));
+                                        String relType = flagToString(inputList.get(2));
                                         // if a flag was not given by user input
                                         if (!relType.equals("")) {
                                             System.out.print("Enter source class name: ");
@@ -196,7 +191,7 @@ public class CLIController {
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one
                                 if (inputList.size() == 2) {
-                                    if (controller.addAttFlag(inputList, "add")) {
+                                    if (addAttFlag(inputList, "add")) {
                                         // If user tried to input an invalid flag, break
                                         break;
                                     }
@@ -206,7 +201,7 @@ public class CLIController {
                                     case "-f", "-m" -> {
                                         // Convert flag to "field" or "method".
                                         // Needed for method calls later on
-                                        String attType = controller.flagToString(inputList.get(2));
+                                        String attType = flagToString(inputList.get(2));
                                         if (!attType.equals("")) {
                                             // Get name of class user wants to add attribute to and
                                             // ensure the class exists
@@ -215,13 +210,13 @@ public class CLIController {
                                             // If class exists...
                                             if (classToAddAtt != null) {
                                                 // Get name of attribute user wants to add
-                                                String attName = controller.getAttName(attType);
+                                                String attName = getAttName(attType);
                                                 // Ensure attribute name is valid
                                                 if (!model.isNotValidInput(attName)) {
                                                     // If attribute doesn't already exist in class, add it to class
                                                     if (classToAddAtt.getAttList(attType).stream()
                                                             .noneMatch(attObj -> attObj.getAttName().equals(attName))){
-                                                        controller.addAttribute(classToAddAtt, attType, attName);
+                                                        addAttribute(classToAddAtt, attType, attName);
                                                     }
                                                     // If attribute user entered already exists in class, inform user
                                                     // and break
@@ -242,16 +237,16 @@ public class CLIController {
                                         UMLClass classToAddParam;
                                         Method methodToAddParam;
                                         String paramName;
-                                        if((classToAddParam = controller.findClass("add", "parameter")) == null) {
+                                        if((classToAddParam = findClass("add", "parameter")) == null) {
                                             break;
                                         }
-                                        if((methodToAddParam = controller.findMethod(classToAddParam)) == null) {
+                                        if((methodToAddParam = findMethod(classToAddParam)) == null) {
                                             break;
                                         }
-                                        if((paramName = controller.findParamName(methodToAddParam)) == null) {
+                                        if((paramName = findParamName(methodToAddParam)) == null) {
                                             break;
                                         }
-                                        String paramType = controller.getAttType("parameter");
+                                        String paramType = getAttType("parameter");
                                         Parameter param = new Parameter(paramName, paramType);
                                         methodToAddParam.addParameter(param);
                                     }
@@ -284,7 +279,7 @@ public class CLIController {
                                 UMLClass UMLClassToDel = model.findClass(classDeleteInput);
                                 if (UMLClassToDel != null) {
                                     // Copy classList into new ArrayList with deleted Class
-                                    model.setClassList(controller.deleteClass(classDeleteInput));
+                                    model.setClassList(deleteClass(classDeleteInput));
                                 }
                             }
                             // delete relationship
@@ -324,7 +319,7 @@ public class CLIController {
                             case "att" -> {
                                 // If user inputted "a att" with no flag, ask for one.
                                 if (inputList.size() == 2) {
-                                    if (controller.addAttFlag(inputList, "delete")) {
+                                    if (addAttFlag(inputList, "delete")) {
                                         // If user inputs invalid flag, break
                                         break;
                                     }
@@ -334,7 +329,7 @@ public class CLIController {
                                     case "-f", "-m" -> {
                                         // Convert -f flag to the string "field",
                                         // and the same for -m flag, etc.
-                                        String flagName = controller.flagToString(inputList.get(2));
+                                        String flagName = flagToString(inputList.get(2));
 
                                         // If user entered a valid flag...
                                         if (!flagName.equals("")) {
@@ -344,7 +339,7 @@ public class CLIController {
                                             UMLClass classToDelAtt = model.findClass(classToDelAttName);
                                             if (classToDelAtt != null) {
                                                 // Delete attribute within specified class
-                                                controller.delAttribute(classToDelAtt, flagName);
+                                                delAttribute(classToDelAtt, flagName);
                                             }
                                             // If class was not found, inform user and break
                                             else {
@@ -357,13 +352,13 @@ public class CLIController {
                                         UMLClass classToDeleteParam;
                                         Method methodToDeleteParam;
                                         Parameter param;
-                                        if((classToDeleteParam = controller.findClass("delete", "parameter")) == null) {
+                                        if((classToDeleteParam = findClass("delete", "parameter")) == null) {
                                             break;
                                         }
-                                        if((methodToDeleteParam = controller.findMethod(classToDeleteParam)) == null) {
+                                        if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {
                                             break;
                                         }
-                                        if((param = controller.findParam(methodToDeleteParam)) == null) {
+                                        if((param = findParam(methodToDeleteParam)) == null) {
                                             break;
                                         }
                                         String paramName = param.getAttName();
@@ -443,14 +438,14 @@ public class CLIController {
                                     // change field
                                     case "-f" -> {
                                         // Show user classes and attributes before asking for input
-                                        controller.listClasses();
+                                        listClasses();
                                         System.out.print("Enter class that contains field: ");
                                         String classWithFieldName = scan.next().trim();
                                         // Ensure class exists
                                         UMLClass UMLClassWithField = model.findClass(classWithFieldName);
                                         if (UMLClassWithField != null) {
                                             // List attributes in class before asking for input
-                                            controller.listClass(classWithFieldName);
+                                            listClass(classWithFieldName);
                                             System.out.print("Enter field to be renamed: ");
                                             String oldFieldName = scan.next().trim();
                                             // Ensure attribute exists
@@ -471,7 +466,7 @@ public class CLIController {
                                                     break;
                                                 }
                                                 //get fieldtype
-                                                String newFieldType = controller.getAttType(newFieldName);
+                                                String newFieldType = getAttType(newFieldName);
                                                 if(newFieldType == null){
                                                     break;
                                                 }
@@ -485,14 +480,14 @@ public class CLIController {
                                     // change method
                                     case "-m" -> {
                                         // Show user classes and attributes before asking for input
-                                        controller.listClasses();
+                                        listClasses();
                                         System.out.print("Enter class that contains method: ");
                                         String classWithMethodName = scan.next().trim();
                                         // Ensure class exists
                                         UMLClass UMLClassWithMethod = model.findClass(classWithMethodName);
                                         if (UMLClassWithMethod != null) {
                                             // List attributes in class before asking for input
-                                            controller.listClass(classWithMethodName);
+                                            listClass(classWithMethodName);
                                             System.out.print("Enter method to be renamed: ");
                                             String oldMethodName = scan.next().trim();
                                             // Ensure attribute exists
@@ -513,7 +508,7 @@ public class CLIController {
                                                     break;
                                                 }
                                                 //get methodtype
-                                                String newMethodReturnType = controller.getAttReturnType(newMethodName);
+                                                String newMethodReturnType = getAttReturnType(newMethodName);
                                                 if (newMethodReturnType == null) {
                                                     break;
                                                 }
@@ -533,18 +528,18 @@ public class CLIController {
                                         UMLClass classToChangeParam;
                                         Method methodToChangeParam;
                                         Parameter param;
-                                        if((classToChangeParam = controller.findClass("change", "parameter")) == null) {
+                                        if((classToChangeParam = findClass("change", "parameter")) == null) {
                                             break;
                                         }
-                                        if((methodToChangeParam = controller.findMethod(classToChangeParam)) == null) {
+                                        if((methodToChangeParam = findMethod(classToChangeParam)) == null) {
                                             break;
                                         }
-                                        if((param = controller.findParam(methodToChangeParam)) == null) {
+                                        if((param = findParam(methodToChangeParam)) == null) {
                                             break;
                                         }
                                         String oldParamName = param.getAttName();
-                                        String newParamName = controller.getAttName("parameter");
-                                        String newParamType = controller.getAttType("parameter");
+                                        String newParamName = getAttName("parameter");
+                                        String newParamType = getAttType("parameter");
                                         param = new Parameter(newParamName, newParamType);
                                         methodToChangeParam.changeParameter(oldParamName, param);
                                     }
@@ -608,7 +603,7 @@ public class CLIController {
                         switch (inputList.get(1)) {
                             // many classes
                             case "classes" -> {
-                                controller.listClasses();
+                                listClasses();
                                 System.out.print(prompt);
                             }
                             // one class
@@ -619,7 +614,7 @@ public class CLIController {
                                 // print class name
                                 if (model.findClass(classToDisplayName) != null) {
                                     System.out.println("\n--------------------");
-                                    controller.listClass(classToDisplayName);
+                                    listClass(classToDisplayName);
                                     System.out.println("\n--------------------\n");
                                 }
                                 else{
@@ -697,7 +692,7 @@ public class CLIController {
      * @param attType the type of attribute to be defined
      * @return the user's given name for the class
      */
-    public static String getClassName(String operation, String attType) {
+    public String getClassName(String operation, String attType) {
         // Get user input of Class name
         System.out.print("Enter class name to " + operation + " " + attType + ": ");
         return scan.next().trim();
@@ -819,16 +814,17 @@ public class CLIController {
         }
     }
 
+    /**
+     *
+     *
+     * @return
+     */
     public boolean undo() {
-        Caretaker history = Caretaker.getInstance();
-        System.out.println("before the if");
-        if (history.stackIsEmpty()) {
-            System.out.println("it failed for some fucking reason");
+        if (this.caretaker.stackIsEmpty()) {
             return false;
         } else {
-            UMLModel old = history.undo(new UMLModel(this.model));
-            this.model.setClassList(old.getClassList());
-            this.model.setRelationshipList(old.getRelationshipList());
+            Memento prevState = caretaker.undoHelper(this.model);
+            UMLModel prevModel = prevState.getState();
             return true;
         }
     }

@@ -9,14 +9,32 @@ public class UMLModel {
     // The arraylist of relationships the diagram has
     private ArrayList<Relationship> relationshipList;
 
+    /**
+     * Default constructor
+     */
     public UMLModel() {
         this.UMLClassList = new ArrayList<>();
         this.relationshipList = new ArrayList<>();
     }
 
+    /**
+     * Parameterized constructor
+     *
+     * @param UMLClassList
+     * @param relationshipList
+     */
+    public UMLModel(ArrayList<UMLClass> UMLClassList, ArrayList<Relationship> relationshipList) {
+        this.UMLClassList = UMLClassList;
+        this.relationshipList = relationshipList;
+    }
+
+    /**
+     * Copy constructor
+     *
+     * @param modelToCopy the model to copy from
+     */
     public UMLModel(UMLModel modelToCopy) {
-        this.UMLClassList.addAll(modelToCopy.getClassList());
-        this.relationshipList.addAll(modelToCopy.getRelationshipList());
+        this(modelToCopy.getClassList(), modelToCopy.getRelationshipList());
     }
 
     // getter for class list
@@ -25,7 +43,7 @@ public class UMLModel {
     public void setClassList(ArrayList<UMLClass> UMLClassList) { this.UMLClassList = UMLClassList; }
     // getter for relationship list
     public ArrayList<Relationship> getRelationshipList() {
-        return this.relationshipList;
+        return relationshipList;
     }
     // setter for relationship list
     public void setRelationshipList(ArrayList<Relationship> relationshipList) { this.relationshipList = relationshipList; }

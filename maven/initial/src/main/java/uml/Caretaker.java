@@ -7,22 +7,15 @@ import java.util.Stack;
  */
 public class Caretaker {
 
-    private static Caretaker caretakerSimpleton = null;
     // the stack of states the UMLModel has taken
     private Stack<Memento> mementoStack;
 
     /**
      * Constructor
+     * Gets the initial state of the project and adds it to the stack
      */
     public Caretaker() {
         this.mementoStack = new Stack<>();
-    }
-
-    public static Caretaker getInstance(){
-        if (caretakerSimpleton == null) {
-            caretakerSimpleton = new Caretaker();
-        }
-        return caretakerSimpleton;
     }
 
     /**
@@ -59,11 +52,17 @@ public class Caretaker {
      * @return true if empty, false otherwise
      */
     public boolean stackIsEmpty() {
-        return mementoStack.empty();
+        return mementoStack.isEmpty();
     }
 
-    public UMLModel undo(UMLModel modelToAddToRedo) {
+    /**
+     * Performs the undo action on the undo stack and adds the state to the redo stack
+     *
+     * @param modelToAddToRedo the state to add to the redo stack
+     * @return the state to roll back to
+     */
+    public Memento undoHelper(UMLModel modelToAddToRedo) {
         Memento prevState = mementoStack.pop();
-        return prevState.getState();
+        return prevState;
     }
 }
