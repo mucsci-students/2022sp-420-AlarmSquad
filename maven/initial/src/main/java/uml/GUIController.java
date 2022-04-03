@@ -115,9 +115,6 @@ public class GUIController {
             // if the field name is not a valid string, pop an error up
             } else if (this.model.isNotValidInput(fieldName)) {
                 this.view.popUpWindow("Error", "The field name is invalid");
-            // if the field type is not a valid type, pop an error up
-            } else if (this.model.isNotValidType(fieldType)) {
-                this.view.popUpWindow("Error", "The field type is invalid");
             // check if the field exists
             } else {
                 // if the field does not exist, add it and close
@@ -155,9 +152,6 @@ public class GUIController {
             // if the method name is not a valid string, pop an error up
             } else if (this.model.isNotValidInput(methodName)) {
                 this.view.popUpWindow("Error", "The method name is invalid");
-            // if the return type is not a valid type, pop an error up
-            } else if (this.model.isNotValidReturnType(returnType)) {
-                this.view.popUpWindow("Error", "The return type is invalid");
             // check if the method exists
             } else {
                 // if the method does not exist, add it and close
@@ -242,9 +236,6 @@ public class GUIController {
             // if the parameter name is not a valid string, pop an error up
             } else if (this.model.isNotValidInput(paramName)) {
                 this.view.popUpWindow("Error", "The parameter name is invalid");
-            // if the parameter type is not a valid type, pop an error up
-            } else if (this.model.isNotValidType(paramType)) {
-                this.view.popUpWindow("Error", "The parameter type is invalid");
             } else {
                 // if the parameter does not exist, add it and close
                 if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {
@@ -254,7 +245,7 @@ public class GUIController {
                     this.view.findClassBox(className).addText(this.model.findClass(className).findMethod(methodName),
                             this.model.findClass(className).getFieldList().size(),
                             this.model.findClass(className).getMethodList().size(), true);
-                    this.view.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
+                    this.view.resizeMethod(this.model.findClass(className).findMethod(methodName), className);
                     return true;
                 // if the method does exist, pop an error up
                 } else {
@@ -401,38 +392,38 @@ public class GUIController {
      * @param paramName the name of the parameter to delete
      * @param stage the working stage
      */
-    public static boolean deleteParamAction(String className, String methodName, String paramName, Stage stage){
+    public boolean deleteParamAction(String className, String methodName, String paramName, Stage stage){
         // if any string is empty, pop an error up
         if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty()) {
-            GUIView.popUpWindow("Error", "All fields are required");
+            this.view.popUpWindow("Error", "All fields are required");
         } else {
             // if the class does not exist, pop an error up
-            if (UMLModel.findClass(className) == null) {
-                GUIView.popUpWindow("Error", "Class does not exist");
+            if (this.model.findClass(className) == null) {
+                this.view.popUpWindow("Error", "Class does not exist");
                 // if the method does not exist, pop an error up
-            } else if (UMLModel.findClass(className).findMethod(methodName) == null) {
-                GUIView.popUpWindow("Error", "Method does not exist");
+            } else if (this.model.findClass(className).findMethod(methodName) == null) {
+                this.view.popUpWindow("Error", "Method does not exist");
                 // if the parameter does not exist, pop an error up
-            } else if (UMLModel.findClass(className).findMethod(methodName).findParameter(paramName) == null) {
-                GUIView.popUpWindow("Error", "Parameter does not exist");
+            } else if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {
+                this.view.popUpWindow("Error", "Parameter does not exist");
                 // if the parameter name is not a valid string, pop an error up
             } else {
-                Parameter paramToDelete = UMLModel.findClass(className).findMethod(methodName).findParameter(paramName);
-                UMLModel.findClass(className).findMethod(methodName).deleteParameter(paramToDelete);
+                Parameter paramToDelete = this.model.findClass(className).findMethod(methodName).findParameter(paramName);
+                this.model.findClass(className).findMethod(methodName).deleteParameter(paramToDelete);
                 // go through methlist in ClassBox, edit text of method in that methlist, remove the
                 // old method, add the new, renamed method at the bottom
-                for (int i = 0; i < GUIView.findClassBox(className).getMethTextList().size(); ++i) {
-                    if (GUIView.findClassBox(className).getMethTextList().get(i).getText().
+                for (int i = 0; i < this.view.findClassBox(className).getMethTextList().size(); ++i) {
+                    if (this.view.findClassBox(className).getMethTextList().get(i).getText().
                             startsWith("\n+ " + methodName)) {
-                        GUIView.findClassBox(className).getMethTextList().remove(i);
-                        GUIView.findClassBox(className).addText(UMLModel.findClass(className).
+                        this.view.findClassBox(className).getMethTextList().remove(i);
+                        this.view.findClassBox(className).addText(this.model.findClass(className).
                                         findMethod(methodName),
-                                UMLModel.findClass(className).getFieldList().size(),
-                                UMLModel.findClass(className).getMethodList().size(), true);
+                                this.model.findClass(className).getFieldList().size(),
+                                this.model.findClass(className).getMethodList().size(), true);
                     }
                 }
                 stage.close();
-                return (UMLModel.findClass(className).findMethod(methodName).getParamList().size() > 0);
+                return (this.model.findClass(className).findMethod(methodName).getParamList().size() > 0);
             }
         }
         return false;
@@ -642,9 +633,6 @@ public class GUIController {
                 // if the parameter name is not a valid string, pop an error up
             } else if (this.model.isNotValidInput(newParamName)) {
                 this.view.popUpWindow("Error", "The parameter name is invalid");
-                // if the parameter type is not a valid string, pop an error up
-            } else if (this.model.isNotValidType(newParamType)) {
-                this.view.popUpWindow("Error", "The parameter type is invalid");
             } else {
                 // if the parameter name is not already in use, change the parameter
                 if (this.model.findClass(className).findMethod(methodName).findParameter(newParamName) == null) {
@@ -663,7 +651,7 @@ public class GUIController {
                                             findMethod(methodName),
                                     this.model.findClass(className).getFieldList().size(),
                                     this.model.findClass(className).getMethodList().size(), true);
-                            this.view.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
+                            this.view.resizeMethod(this.model.findClass(className).findMethod(methodName), className);
                         }
                     }
                     return true;

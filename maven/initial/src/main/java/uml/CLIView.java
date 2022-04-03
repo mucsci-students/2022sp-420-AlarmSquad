@@ -1,6 +1,5 @@
 package uml;
 
-
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -44,7 +43,6 @@ public class CLIView {
         reader.option(LineReader.Option.COMPLETE_IN_WORD, true);
         reader.option(LineReader.Option.RECOGNIZE_EXACT, true);
         reader.option(LineReader.Option.CASE_INSENSITIVE, true);
-
         return reader;
     }
 }

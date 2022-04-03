@@ -54,6 +54,9 @@ public class GUIView extends Application {
     private ArrayList<RelLine> lineList = new ArrayList<>();
     private ArrayList<ArrayList<Line>> arrowList = new ArrayList<>();
     private Map<String, List<Double>> coordinateMap = new HashMap<>();
+    private AffineTransform affineTransform = new AffineTransform();
+    private FontRenderContext frc = new FontRenderContext(affineTransform, true, true);
+    private Font font = new Font("Arial", Font.PLAIN, 12);
     private GUIController controller;
     private UMLModel model;
 
@@ -518,7 +521,7 @@ public class GUIView extends Application {
         });
         // create a button to stop creating parameters
         Button no = new Button("No");
-        no.setOnAction(event -> GUIController.exitAction(stage));
+        no.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(continueText, 0, 0);
@@ -667,14 +670,14 @@ public class GUIView extends Application {
         // create a button to add the field with the inputted name
         Button delete = new Button("Delete");
         delete.setOnAction(event -> {
-            if(GUIController.deleteParamAction(className.getText(), methodName.getText(), paramName.getText(),
+            if(this.controller.deleteParamAction(className.getText(), methodName.getText(), paramName.getText(),
                     stage))
                 deleteParameterWindowLoop();
             updateMenus();
         });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -704,7 +707,7 @@ public class GUIView extends Application {
         });
         // create a button to stop creating parameters
         Button no = new Button("No");
-        no.setOnAction(event -> GUIController.exitAction(stage));
+        no.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(continueText, 0, 0);
@@ -972,7 +975,7 @@ public class GUIView extends Application {
         });
         // create a button to stop creating parameters
         Button no = new Button("No");
-        no.setOnAction(event -> GUIController.exitAction(stage));
+        no.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(continueText, 0, 0);
@@ -1177,7 +1180,7 @@ public class GUIView extends Application {
         }
     }
 
-    public static void resizeMethod(Method meth, String className) {
+    public void resizeMethod(Method meth, String className) {
         ClassBox box = findClassBox(className);
 
         // Calculates pixel width of type

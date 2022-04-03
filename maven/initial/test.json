@@ -1,1 +1,1 @@
-{"relationshipList":[],"classList":[{"className":"student","methodList":[{"name":"changeName","parameters":[{"name":"newName","type":"string"},{"name":"oldName","type":"string"}],"returnType":"string"},{"name":"changeSeat","parameters":[{"name":"newSeat","type":"int"}],"returnType":"int"}],"fieldList":[{"name":"name","type":"string"},{"name":"seat","type":"int"}]},{"className":"teacher","methodList":[{"name":"changeName","parameters":[],"returnType":"string"},{"name":"bigBoobs","parameters":[],"returnType":"int"}],"fieldList":[]}]}
+{"relationshipList":[],"classList":[]}
