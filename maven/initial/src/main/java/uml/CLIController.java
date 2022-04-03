@@ -20,10 +20,12 @@ public class CLIController {
 
     private UMLModel model;
     private Caretaker caretaker;
+    private CLIView view;
 
-    public CLIController(UMLModel model, Caretaker caretaker) {
+    public CLIController(UMLModel model, Caretaker caretaker, CLIView view) {
         this.model = model;
         this.caretaker = caretaker;
+        this.view = view;
     }
   
     //creates a linereader
@@ -37,7 +39,7 @@ public class CLIController {
         clearScreen();
 
         //builds console from cli view
-        reader = CLIView.buildConsole();
+        reader = this.view.buildConsole();
         // intro to CLI for user
         String intro = "Welcome to ALARM Squad's UML editor!";
         intro += "\n\nType 'help' to list all commands and their accompanying descriptions.\n";
