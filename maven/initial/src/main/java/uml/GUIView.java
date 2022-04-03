@@ -1142,13 +1142,6 @@ public class GUIView extends Application {
             methType = meth.getReturnType();
         }
 
-        // Caculate pixel length of all parameters in the current method
-        String param = "";
-        for (Parameter tempParam : meth.getParamList())
-        {
-            param += tempParam.getAttName() + " : " + tempParam.getFieldType();
-        }
-
         // Increases box size if the method will extend past it
         if((int)(font.getStringBounds(meth.getAttName() + " : " + meth.getReturnType(), frc))
                 .getWidth() + 30 > box.getBoxWidth())
