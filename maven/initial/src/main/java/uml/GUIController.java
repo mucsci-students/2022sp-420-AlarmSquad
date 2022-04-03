@@ -752,6 +752,7 @@ public class GUIController {
                 methodListSize += 1;
                 GUIView.drawMethodBox(fieldListSize, methodListSize,
                         methodObj, classObj.getClassName());
+                GUIView.resizeMethod(methodObj, classObj.getClassName());
                 GUIView.findClassBox(classObj.getClassName()).addText(UMLModel.findClass(
                         classObj.getClassName()).findMethod(methodObj.getAttName()),
                         UMLModel.findClass(classObj.getClassName()).getFieldList().size(),
