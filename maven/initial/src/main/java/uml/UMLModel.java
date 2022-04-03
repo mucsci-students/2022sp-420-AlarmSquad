@@ -14,12 +14,15 @@ public class UMLModel {
         this.relationshipList = new ArrayList<>();
     }
 
+    public UMLModel(UMLModel modelToCopy) {
+        this.UMLClassList.addAll(modelToCopy.getClassList());
+        this.relationshipList.addAll(modelToCopy.getRelationshipList());
+    }
+
     // getter for class list
     public ArrayList<UMLClass> getClassList() { return UMLClassList; }
     // setter for class list
-    public void setClassList(ArrayList<UMLClass> UMLClassList) {
-        this.UMLClassList = UMLClassList;
-    }
+    public void setClassList(ArrayList<UMLClass> UMLClassList) { this.UMLClassList = UMLClassList; }
     // getter for relationship list
     public ArrayList<Relationship> getRelationshipList() {
         return this.relationshipList;
@@ -28,9 +31,7 @@ public class UMLModel {
     public void setRelationshipList(ArrayList<Relationship> relationshipList) { this.relationshipList = relationshipList; }
 
     // add a class to the class list
-    public void addClass(UMLClass newUMLClass) {
-        this.UMLClassList.add(newUMLClass);
-    }
+    public void addClass(UMLClass newUMLClass) { this.UMLClassList.add(newUMLClass); }
     // remove a class from the class list
     public void deleteClass(UMLClass delUMLClass) {
         this.UMLClassList.remove(delUMLClass);

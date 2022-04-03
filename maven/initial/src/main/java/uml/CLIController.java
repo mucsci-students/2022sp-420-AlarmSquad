@@ -15,15 +15,18 @@ public class CLIController {
     private static final Scanner scan = new Scanner(System.in);
 
     private UMLModel model;
+    private Caretaker caretaker;
 
-    public CLIController(UMLModel model) {
+    public CLIController(UMLModel model, Caretaker caretaker) {
         this.model = model;
+        this.caretaker = caretaker;
     }
 
     // Interprets user input
     public static void main(String[] args) {
+        Caretaker caretaker = new Caretaker();
         UMLModel model = new UMLModel();
-        CLIController controller = new CLIController(model);
+        CLIController controller = new CLIController(model, caretaker);
         controller.clearScreen();
 
         // intro to CLI for user
@@ -95,6 +98,14 @@ public class CLIController {
                             System.out.println(model.getCLIHelpMenu());
                             System.out.print(prompt);
                         }
+                        // undo case
+                        case "undo" -> {
+                            if (controller.undo()) {
+                                System.out.println("Last action undone.");
+                            } else {
+                                System.out.println("No actions to undo.");
+                            }
+                        }
 
                     //***************************************//
                     //************** Add cases **************//
@@ -118,7 +129,9 @@ public class CLIController {
                                 } else {
                                     // Adds class to class list then prompts confirmation to use
                                     UMLClass newUMLClass = new UMLClass(className);
-                                    model.getClassList().add(newUMLClass);
+                                    model.addClass(newUMLClass);
+                                    Memento state = new Memento(model);
+                                    caretaker.push(state);
                                     System.out.println("Added class \"" + className + "\"");
                                 }
                             }
@@ -202,7 +215,7 @@ public class CLIController {
                                             // If class exists...
                                             if (classToAddAtt != null) {
                                                 // Get name of attribute user wants to add
-                                                String attName = getAttName(attType);
+                                                String attName = controller.getAttName(attType);
                                                 // Ensure attribute name is valid
                                                 if (!model.isNotValidInput(attName)) {
                                                     // If attribute doesn't already exist in class, add it to class
@@ -530,7 +543,7 @@ public class CLIController {
                                             break;
                                         }
                                         String oldParamName = param.getAttName();
-                                        String newParamName = getAttName("parameter");
+                                        String newParamName = controller.getAttName("parameter");
                                         String newParamType = controller.getAttType("parameter");
                                         param = new Parameter(newParamName, newParamType);
                                         methodToChangeParam.changeParameter(oldParamName, param);
@@ -806,6 +819,20 @@ public class CLIController {
         }
     }
 
+    public boolean undo() {
+        Caretaker history = Caretaker.getInstance();
+        System.out.println("before the if");
+        if (history.stackIsEmpty()) {
+            System.out.println("it failed for some fucking reason");
+            return false;
+        } else {
+            UMLModel old = history.undo(new UMLModel(this.model));
+            this.model.setClassList(old.getClassList());
+            this.model.setRelationshipList(old.getRelationshipList());
+            return true;
+        }
+    }
+
     //***************************************//
     //****** Fields/Methods/Parameters ******//
     //***************************************//
@@ -816,7 +843,7 @@ public class CLIController {
      * @param attType the type of the attribute to be named
      * @return the user's given name for the attribute
      */
-    public static String getAttName(String attType) {
+    public String getAttName(String attType) {
         System.out.print("Enter " + attType + " name: ");
         return scan.next().trim();
     }
