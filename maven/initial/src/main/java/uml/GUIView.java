@@ -22,6 +22,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +53,9 @@ public class GUIView extends Application {
     static ArrayList<RelLine> lineList = new ArrayList<>();
     static ArrayList<ArrayList<Line>> arrowList = new ArrayList<>();
     static Map<String, List<Double>> coordinateMap = new HashMap<>();
+    static AffineTransform affineTransform = new AffineTransform();
+    static FontRenderContext frc = new FontRenderContext(affineTransform, true, true);
+    static Font font = new Font("Arial", Font.PLAIN, 12);
 
     /**
      * Starts the initial window for the diagram
@@ -956,6 +962,11 @@ public class GUIView extends Application {
             classBox.setX(classBox.getClassPane().getTranslateX());
             classBox.setY(classBox.getClassPane().getTranslateY());
         });
+        // Increases box width if className is too big for the default
+        if((int)(font.getStringBounds(className, frc)).getWidth() + 30 > classBox.getBoxWidth())
+        {
+            classBox.setBoxWidth((int)(font.getStringBounds(className, frc)).getWidth() + 30);
+        }
     }
 
     /**
@@ -977,12 +988,68 @@ public class GUIView extends Application {
         ClassBox box = findClassBox(className);
         box.setBoxHeight(box.getBoxHeight() + 15);
         box.addText(field, fieldListSize, methListSize, false);
+
+        // Increases box size if the field will extend past it
+        if((int)(font.getStringBounds(field.getAttName() + " : " + field.getFieldType(), frc)).getWidth() + 30
+                > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(field.getAttName() + " : " + field.getFieldType(), frc))
+                    .getWidth() + 30);
+        }
     }
 
     public static void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
         ClassBox box = findClassBox(className);
         box.setBoxHeight(box.getBoxHeight() + 15);
         box.addText(meth, fieldListSize, methListSize, false);
+
+        // Calculates pixel width of type
+        String methType = "";
+        if (!meth.getReturnType().equals("void"))
+        {
+            methType = meth.getReturnType();
+        }
+
+        // Caculate pixel length of all parameters in the current method
+        String param = "";
+        for (Parameter tempParam : meth.getParamList())
+        {
+            param += tempParam.getAttName() + " : " + tempParam.getFieldType();
+        }
+
+        // Increases box size if the method will extend past it
+        if((int)(font.getStringBounds(meth.getAttName() + " : " + meth.getReturnType(), frc))
+                .getWidth() + 30 > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + " : " +
+                    meth.getReturnType(), frc)).getWidth() + 30);
+        }
+    }
+
+    public static void resizeMethod(Method meth, String className) {
+        ClassBox box = findClassBox(className);
+
+        // Calculates pixel width of type
+        String methType = "";
+        if (!meth.getReturnType().equals("void"))
+        {
+            methType = meth.getReturnType();
+        }
+
+        // Caculate pixel length of all parameters in the current method
+        String param = "";
+        for (Parameter tempParam : meth.getParamList())
+        {
+            param += ", " + tempParam.getAttName() + " : " + tempParam.getFieldType();
+        }
+
+        // Increases box size if the method will extend past it
+        if((int)(font.getStringBounds(meth.getAttName() + "(" + param + ") " + meth.getReturnType(), frc))
+                .getWidth() > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + "(" + param + ") " +
+                    meth.getReturnType(), frc)).getWidth());
+        }
     }
 
     /**

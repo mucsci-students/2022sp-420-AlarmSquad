@@ -244,6 +244,7 @@ public class GUIController {
                     GUIView.findClassBox(className).addText(UMLModel.findClass(className).findMethod(methodName),
                             UMLModel.findClass(className).getFieldList().size(),
                             UMLModel.findClass(className).getMethodList().size(), true);
+                    GUIView.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
                 // if the method does exist, pop an error up
                 } else {
                     GUIView.popUpWindow("Error", "Field already exists");
@@ -604,6 +605,7 @@ public class GUIController {
                                             findMethod(methodName),
                                     UMLModel.findClass(className).getFieldList().size(),
                                     UMLModel.findClass(className).getMethodList().size(), true);
+                            GUIView.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
                         }
                     }
                     // otherwise, pop an error up
