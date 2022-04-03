@@ -5,6 +5,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.io.File;
 import java.util.ArrayList;
 
 @SuppressWarnings("DanglingJavadoc")
@@ -17,38 +19,30 @@ public class GUIController {
      ******************************************************************/
 
     /**
-     * Saves file if the given string is nonempty, pops an error up otherwise
+     * Saves file to the given file
      *
-     * @param fileName the name of the file to be saved
-     * @param stage    the working stage
+     * @param file the given file to be saved
+     * @param stage the working stage
      */
-    public static void saveAction(String fileName, Stage stage) {
-        // if the string is empty, pop an error up
-        if (fileName.isEmpty()) {
-            GUIView.popUpWindow("Error", "File name is required");
-            // otherwise, save the file and exit the window
-        } else {
-            JSON.save(fileName);
-            stage.close();
-        }
+    public static void saveAction(File file, Stage stage) {
+        JSON.saveGUI(file);
+        stage.close();
     }
 
     /**
-     * Load file if the given string is nonempty, pops an error up otherwise
+     * Load the given file
      *
-     * @param fileName the name of the file to be load
-     * @param stage    the working stage
+     * @param file the given file to be loaded
+     * @param stage the working stage
      */
-    public static void loadAction(String fileName, Stage stage) {
-        // if the string is empty, pop an error up
-        if (fileName.isEmpty()) {
-            GUIView.popUpWindow("Error", "File name is required");
-            // otherwise, load the file and exit the window
-        } else {
-            JSON.load(fileName);
+    public static void loadAction(File file, Stage stage) {
+        try {
+            JSON.loadGUI(file);
             clearDiagram();
             uploadDiagram(UMLModel.getClassList(), UMLModel.getRelationshipList());
             stage.close();
+        } catch (Exception e) {
+            GUIView.popUpWindow("Error", "File name is required");
         }
     }
 
@@ -661,15 +655,6 @@ public class GUIController {
         else if(!oldReltype.equals(newRelType)){
             // update the view
             GUIView.deleteRelLine(GUIView.findClassBox(src), GUIView.findClassBox(dest));
-            if(GUIView.arrowList.size() != 0) {
-                for (ArrayList<Line> arrows : GUIView.arrowList) {
-                    for (Line arrow : arrows) {
-                        GUIView.superRoot.getChildren().remove(arrow);
-                    }
-                    GUIView.superRoot.getChildren().remove(arrows);
-                }
-            }
-            GUIView.arrowList.clear();
             GUIView.drawLine(src, dest, newRelType);
             // set the relationship type
             UMLModel.findRelationship(src, dest, oldReltype).setRelType(newRelType);

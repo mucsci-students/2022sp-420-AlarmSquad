@@ -73,8 +73,7 @@ public class CLIController {
                         case "save" -> {
                             System.out.print("Save file name: ");
                             String saveFileName = scan.next();
-                            JSON.save(saveFileName);
-                            System.out.println("Diagram has been saved to \"" + saveFileName + ".json\"");
+                            JSON.saveCLI(saveFileName);
                         }
                         // load case
                         case "load" -> {
@@ -87,7 +86,7 @@ public class CLIController {
                             else {
                                 System.out.print("Load file name: ");
                                 String loadFileName = scan.next();
-                                JSON.load(loadFileName);
+                                JSON.loadCLI(loadFileName);
                             }
                         }
                         // help case

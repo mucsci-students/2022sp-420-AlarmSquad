@@ -18,8 +18,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -209,58 +212,33 @@ public class GUIView extends Application {
      * Creates a window for the save method and its data
      */
     private void saveWindow() {
-        // initialize the stage and root
         Stage stage = new Stage();
-        Group root = new Group();
-        stage.setAlwaysOnTop(true);
-        // create a label for the text box
-        Label label = new Label("File name: ");
-        // create a text box for user input
-        TextField text = new TextField();
-        text.setPrefColumnCount(17);
-        // create a button to save the diagram to a file with the inputted name
-        Button save = new Button("Save");
-        save.setOnAction(event -> GUIController.saveAction(text.getText(), stage));
-        // create a button to cancel out of the window and enable menu again
-        Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-        // create the pane for the objects and add them all
-        GridPane pane = new GridPane();
-        pane.add(label, 0, 0);
-        pane.add(text, 1, 0);
-        pane.add(save, 0, 1);
-        pane.add(cancel, 1, 1);
-        // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Save Project", 120, 300);
+        // create a file chooser and set the text to represent the right file
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        // get the selected file
+        File file = fileChooser.showSaveDialog(stage);
+        // if the file is not null, run the save action method
+        if (file != null) {
+            GUIController.saveAction(file, stage);
+        }
     }
 
     /**
      * Creates a window for the load method and its data
      */
     private void loadWindow() {
-        // initialize the stage and root
         Stage stage = new Stage();
-        Group root = new Group();
-        stage.setAlwaysOnTop(true);
-        // create a label for the text box
-        Label label = new Label("File name: ");
-        // create a text box for user input
-        TextField text = new TextField();
-        text.setPrefColumnCount(17);
-        // create a button to load the diagram of a file with the inputted name
-        Button load = new Button("Load");
-        load.setOnAction(event -> GUIController.loadAction(text.getText(), stage));
-        // create a button to cancel out of the window and enable menu again
-        Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-        // create the pane for the objects and add them all
-        GridPane pane = new GridPane();
-        pane.add(label, 0, 0);
-        pane.add(text, 1, 0);
-        pane.add(load, 0, 1);
-        pane.add(cancel, 1, 1);
-        // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Load Project", 120, 300);
+        // create a file chooser
+        FileChooser fileChooser = new FileChooser();
+        // get the selected file
+        File file = fileChooser.showOpenDialog(stage);
+        // if the file is not null, run the load action method and update the menus
+        if (file != null) {
+            GUIController.loadAction(file, stage);
+            updateMenus();
+        }
     }
 
     /**
@@ -1429,6 +1407,44 @@ public class GUIView extends Application {
     }
 
     /**
+     * Takes in the source and destination class box objects
+     * finds and returns the relationship line corresponding to
+     * the src and dest
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     * @return the relationship line
+     */
+    public static RelLine findRelLine(ClassBox src, ClassBox dest){
+        for(RelLine line : lineList){
+            if(line.getCBSrc().equals(src)) {
+                if (line.getCBDest().equals(dest)) {
+                    return line;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Takes in a relationship line
+     * returns the arrow shape (list of lines)
+     *
+     * @param line the relationship line
+     * @return the arrow shape
+     */
+    public static ArrayList<Line> findArrow(RelLine line){
+        for(ArrayList<Line> arrows : arrowList){
+            for(Line arrow : arrows){
+                if(arrow.getEndX() == line.getLine().getEndX()){
+                    return arrows;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Takes in a class name from the classlist, searches through the
      * class box list for a class box object with the same name as className
      *
@@ -1469,14 +1485,19 @@ public class GUIView extends Application {
      * @param dest the destination class box object
      */
     public static void deleteRelLine (ClassBox src, ClassBox dest){
-        for(int i = 0; i < lineList.size(); ++i){
-            if(lineList.get(i).getCBSrc().equals(src)){
-                if(lineList.get(i).getCBDest().equals(dest)){
-                    superRoot.getChildren().remove(lineList.get(i).getLine());
-                    lineList.remove(lineList.get(i));
+        for(ArrayList<Line> arrows : arrowList){
+            if(arrows.equals(findArrow(findRelLine(src, dest)))) {
+                for (Line arrow : arrows) {
+                    superRoot.getChildren().remove(arrow);
                 }
+                superRoot.getChildren().remove(arrows);
+                arrowList.remove(arrows);
+                break;
             }
         }
+        superRoot.getChildren().remove(findRelLine(src, dest).getLine());
+        lineList.remove(findRelLine(src, dest).getLine());
+        lineList.remove(findRelLine(src, dest));
     }
 
     /**
