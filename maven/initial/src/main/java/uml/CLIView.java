@@ -1,6 +1,5 @@
 package uml;
 
-
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -15,15 +14,18 @@ import java.io.IOException;
 
 public class CLIView {
 
+    private TerminalBuilder builder;
+    private Completer completer;
+    private Terminal terminal;
+    
+    public CLIView() {
+        this.builder = TerminalBuilder.builder();
+        this.completer = new ArgumentCompleter(new StringsCompleter("help", "exit", "add", "delete", "rename", "change", "list", "save", "load", "clear"));
+        this.terminal = null;
+    }
+    
     //a method to build the terminal using Jline linereader
-    public static LineReader buildConsole() {
-        //create a new termminal
-        TerminalBuilder builder = TerminalBuilder.builder();
-        //define completer
-        Completer completer = new ArgumentCompleter(new StringsCompleter("help", "exit", "add", "delete", "rename", "change", "list", "save", "load", "clear"));
-
-        Terminal terminal = null;
-
+    public LineReader buildConsole() {
         //build terminal as not dumb
         try {
             terminal = builder.system(true).dumb(false).build();
@@ -41,7 +43,6 @@ public class CLIView {
         reader.option(LineReader.Option.COMPLETE_IN_WORD, true);
         reader.option(LineReader.Option.RECOGNIZE_EXACT, true);
         reader.option(LineReader.Option.CASE_INSENSITIVE, true);
-
         return reader;
     }
 }
