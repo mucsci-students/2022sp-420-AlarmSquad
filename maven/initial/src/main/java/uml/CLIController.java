@@ -51,9 +51,8 @@ public class CLIController {
             //adds spaces between strings
             String[] input = line.split(" ");
             //passes input to switch statement
-            inputInterpreter(input);
+            run(input);
         }
-    }
             try {
 
                 // Check first word user inputted and act accordingly
@@ -753,7 +752,6 @@ public class CLIController {
                 System.out.println("Please enter a valid command");
                 System.out.print(prompt);
             }
-
     }
 
 
