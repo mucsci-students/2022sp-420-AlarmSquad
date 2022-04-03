@@ -15,15 +15,18 @@ import java.io.IOException;
 
 public class CLIView {
 
+    private TerminalBuilder builder;
+    private Completer completer;
+    private Terminal terminal;
+    
+    public CLIView() {
+        this.builder = TerminalBuilder.builder();
+        this.completer = new ArgumentCompleter(new StringsCompleter("help", "exit", "add", "delete", "rename", "change", "list", "save", "load", "clear"));
+        this.terminal = null;
+    }
+    
     //a method to build the terminal using Jline linereader
-    public static LineReader buildConsole() {
-        //create a new termminal
-        TerminalBuilder builder = TerminalBuilder.builder();
-        //define completer
-        Completer completer = new ArgumentCompleter(new StringsCompleter("help", "exit", "add", "delete", "rename", "change", "list", "save", "load", "clear"));
-
-        Terminal terminal = null;
-
+    public LineReader buildConsole() {
         //build terminal as not dumb
         try {
             terminal = builder.system(true).dumb(false).build();
