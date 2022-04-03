@@ -244,6 +244,7 @@ public class GUIController {
                     GUIView.findClassBox(className).addText(UMLModel.findClass(className).findMethod(methodName),
                             UMLModel.findClass(className).getFieldList().size(),
                             UMLModel.findClass(className).getMethodList().size(), true);
+                    GUIView.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
                     return true;
                 // if the method does exist, pop an error up
                 } else {
@@ -652,6 +653,7 @@ public class GUIController {
                                             findMethod(methodName),
                                     UMLModel.findClass(className).getFieldList().size(),
                                     UMLModel.findClass(className).getMethodList().size(), true);
+                            GUIView.resizeMethod(UMLModel.findClass(className).findMethod(methodName), className);
                         }
                     }
                     return true;
@@ -800,6 +802,7 @@ public class GUIController {
                 methodListSize += 1;
                 GUIView.drawMethodBox(fieldListSize, methodListSize,
                         methodObj, classObj.getClassName());
+                GUIView.resizeMethod(methodObj, classObj.getClassName());
                 GUIView.findClassBox(classObj.getClassName()).addText(UMLModel.findClass(
                         classObj.getClassName()).findMethod(methodObj.getAttName()),
                         UMLModel.findClass(classObj.getClassName()).getFieldList().size(),
