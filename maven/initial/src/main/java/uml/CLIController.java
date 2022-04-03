@@ -18,28 +18,28 @@ public class CLIController {
     // Creates a new scanner
     private static final Scanner scan = new Scanner(System.in);
 
-    private Terminal terminal;
-
+    //creates a linereader
     private static LineReader reader;
 
-    private static ParsedLine parsedLine;
-
+    //our prompt string
     private static String prompt = "> ";
 
-    private static Terminal terminal() {
-        return reader.getTerminal();
-    }
 
     public static void main(String[] args){
 
+        //builds console from cli view
         reader = CLIView.buildConsole();
         // intro to CLI for user
         String intro = "Welcome to ALARM Squad's UML editor!";
         intro += "\n\nType 'help' to list all commands and their accompanying descriptions.\n";
         System.out.println(intro);
+        //loop for reading and replacing input
         while (true) {
+            //matches strings to regex and replaces them
             String line = reader.readLine(prompt).replaceAll("\\s+", " ").trim();
+            //adds spaces between strings
             String[] input = line.split(" ");
+            //passes input to switch statement
             inputInterpreter(input);
         }
     }
@@ -48,14 +48,6 @@ public class CLIController {
     // Interprets user input
     public static void inputInterpreter(String[] inputList) {
         clearScreen();
-
-
-        // Enters the command loop
-            // Takes in the next line of user input
-            //String input = scan.nextLine().trim();            **comment for now**
-
-            // user input
-            //ArrayList<String> inputList = new ArrayList<>(Arrays.asList(input.split(" ")));       **comment for now**
 
             try {
 
