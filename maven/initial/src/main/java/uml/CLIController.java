@@ -815,36 +815,44 @@ public class CLIController {
         // prints the name of a class
         terminal.writer().println("Class name: " + copyClass.getClassName());
         // prints all the fields in a class
-        terminal.writer().print("Fields :");
-        for (int i = 0; i < copyFieldList.size(); ++i) {
-            Field field = copyFieldList.get(i);
-            if (i == 0) {
-                terminal.writer().printf(" [%s %s]", field.getFieldType(), field.getAttName());
-            } else {
-                terminal.writer().printf("\n\t\t [%s %s]", field.getFieldType(), field.getAttName());
+        if (copyFieldList.size() == 0) {
+            terminal.writer().print("This class has no fields\n");
+        } else { terminal.writer().print("-----------------\n");
+            for (int i = 0; i < copyFieldList.size(); ++i) {
+                Field field = copyFieldList.get(i);
+                if (i == 0) {
+                    terminal.writer().printf("  -%s %s", field.getFieldType(), field.getAttName());
+                } else {
+                    terminal.writer().printf("\n  -%s %s", field.getFieldType(), field.getAttName());
+                }
             }
         }
         // prints all the methods in class
-        terminal.writer().print("\nMethods");
-        terminal.writer().print(": ");
-        for (int i = 0; i < copyMethList.size(); ++i) {
-            Method method = copyMethList.get(i);
-            if (i == 0) {
-                terminal.writer().printf("[%s %s (",method.getReturnType(), method.getAttName());
-            } else {
-                terminal.writer().print("\t\t [" + method.getReturnType() + " " + copyMethList.get(i).getAttName() + " (");
-            }
-            // prints all the parameters of a method
-            for (int j = 0; j < copyMethList.get(i).getParamList().size(); ++j) {
-                Parameter param = copyMethList.get(i).getParamList().get(j);
-                if (j == 0) {
-                    terminal.writer().printf("%s %s", param.getFieldType(), param.getAttName());
+        if (copyFieldList.size() == 0) {
+            terminal.writer().print("This class has no methods\n");
+        } else {
+            terminal.writer().print("\n-----------------\n");
+            for (int i = 0; i < copyMethList.size(); ++i) {
+                Method method = copyMethList.get(i);
+                if (i == 0) {
+                    terminal.writer().printf("  +%s %s (", method.getReturnType(), method.getAttName());
                 } else {
-                    terminal.writer().printf(", %s %s", param.getFieldType(), param.getAttName());
+                    terminal.writer().print("\n  +" + method.getReturnType() + " " + copyMethList.get(i).getAttName() + " (");
                 }
+                // prints all the parameters of a method
+                for (int j = 0; j < copyMethList.get(i).getParamList().size(); ++j) {
+                    Parameter param = copyMethList.get(i).getParamList().get(j);
+                    if (j == 0) {
+                        terminal.writer().printf("%s %s", param.getFieldType(), param.getAttName());
+                    } else {
+                        terminal.writer().printf(", %s %s", param.getFieldType(), param.getAttName());
+                    }
+                }
+                terminal.writer().print(")");
             }
-            terminal.writer().print(")]");
+            terminal.writer().print("\n-----------------\n");
         }
+
     }
 
     /**
@@ -854,7 +862,7 @@ public class CLIController {
         // if there are classes to list, list them
         if (this.model.getClassList().size() != 0) {
             // Loops through classList and calls listClass on all elements
-            terminal.writer().print("\n--------------------\n");
+            terminal.writer().print("\n********************\n");
             if (this.model.getClassList().size() == 1) {
                 listClass(this.model.getClassList().get(0).getClassName());
             } else {
@@ -865,7 +873,7 @@ public class CLIController {
                     terminal.writer().print("\n");
                 }
             }
-            terminal.writer().println("\n--------------------\n");
+            terminal.writer().println("\n********************\n");
         }
         // if there are no classes to list, prompt user that there are no classes
         else {
