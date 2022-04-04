@@ -22,7 +22,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    
     - uses: actions/checkout@develop
     - name: Codecov
     - uses: codecov/codecov-action@v2
