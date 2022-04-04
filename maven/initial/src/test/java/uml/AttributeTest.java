@@ -1,6 +1,6 @@
 package uml;
 
-import uml.managers.ClassManager;
+//import uml.managers.ClassManager;
 
 /**
  * JUnit tests for Attribute
@@ -8,7 +8,7 @@ import uml.managers.ClassManager;
  * @authors Ryan Ganzke
  */
 public class AttributeTest {
-    private static ClassManager classManager = new ClassManager();
+    //private static ClassManager classManager = new ClassManager();
 
     //TODO
     // MAKE THIS FOR FIELDS AND METHODS

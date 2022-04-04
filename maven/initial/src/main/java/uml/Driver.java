@@ -8,13 +8,18 @@ package uml;
 public class Driver {
 
     public static void main(String[] args) {
+
         if (args.length == 0) {
-            GUIController.main(args);
+            GUIView.main(args);
         } else {
             if (args[0].equals("--cli")) {
-                CLIController.main(args);
+                UMLModel model = new UMLModel();
+                CLIView view = new CLIView();
+                Caretaker caretaker = new Caretaker();
+                CLIController controller = new CLIController(model, caretaker, view);
+                controller.run();
             } else if (args[0].equals("--gui")) {
-                GUIController.main(args);
+                GUIView.main(args);
             }
             else {
                 System.out.println("Invalid flag. Use either --cli to start the command line interface or --gui to start the GUI interface.");

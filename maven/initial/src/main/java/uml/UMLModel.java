@@ -1,58 +1,123 @@
 package uml;
 
-import javax.management.relation.Relation;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+// The project model; holds information on the project data
 public class UMLModel {
     // The arraylist of classes the diagram has
-    private static ArrayList<UMLClass> UMLClassList = new ArrayList<UMLClass>();
+    private ArrayList<UMLClass> UMLClassList;
     // The arraylist of relationships the diagram has
-    private static ArrayList<Relationship> relationshipList = new ArrayList<Relationship>();
+    private ArrayList<Relationship> relationshipList;
+    // the arrayList of coordinates the diagram has
+    private Map<String, List<Double>> coordinateMap;
 
-    public static ArrayList<UMLClass> getClassList() {
-        return UMLClassList;
+    /**
+     * Default constructor
+     */
+    public UMLModel() {
+        this.UMLClassList = new ArrayList<>();
+        this.relationshipList = new ArrayList<>();
+        this.coordinateMap = new HashMap<>();
     }
 
-    public static void setClassList(ArrayList<UMLClass> UMLClassList) {
-        UMLModel.UMLClassList = UMLClassList;
+    /**
+     * Parameterized constructor
+     *
+     * @param UMLClassList
+     * @param relationshipList
+     */
+    public UMLModel(ArrayList<UMLClass> UMLClassList, ArrayList<Relationship> relationshipList, HashMap<String, List<Double>> coordinateMap) {
+        // initialize the new array lists
+        this.UMLClassList = new ArrayList<>();
+        this.relationshipList = new ArrayList<>();
+        this.coordinateMap = new HashMap<>();
+        // iterate through the given class list
+        for (UMLClass classObj : UMLClassList) {
+            // make a new class object and populate it
+            UMLClass newClass = new UMLClass(classObj.getClassName());
+            // iterate through the class' field list
+            for (Field fieldObj : classObj.getFieldList()) {
+                // make a new field object and populate it, then add it to the class's field list
+                Field newField = new Field(fieldObj.getAttName(), fieldObj.getFieldType());
+                newClass.addField(newField);
+            }
+            // iterate through the class' method list
+            for (Method methObj : classObj.getMethodList()) {
+                // make a new method object and populate it, then add it to the class's method list
+                Method newMethod = new Method(methObj.getAttName(), methObj.getReturnType());
+                // iterate through the method's parameter list
+                for (Parameter paramObj : methObj.getParamList()) {
+                    // make a new parameter object and populate it, then add it to the method's parameter list
+                    Parameter newParameter = new Parameter(paramObj.getAttName(), paramObj.getFieldType());
+                    newMethod.addParameter(newParameter);
+                }
+                newClass.addMethod(methObj);
+            }
+            // add the new class object to the new class list
+            this.UMLClassList.add(newClass);
+        }
+        for (Relationship relObj : relationshipList) {
+            this.relationshipList.add(relObj);
+        }
+        for (String key : coordinateMap.keySet()) {
+            List<Double> values = new ArrayList<>();
+            for (Double value : coordinateMap.get(key)) {
+                values.add(value);
+            }
+            this.coordinateMap.put(key, values);
+        }
     }
 
-    public static ArrayList<Relationship> getRelationshipList() {
+    /**
+     * Copy constructor
+     *
+     * @param modelToCopy the model to copy from
+     */
+    public UMLModel(UMLModel modelToCopy) {
+        this(modelToCopy.getClassList(), modelToCopy.getRelationshipList(), modelToCopy.getCoordinateMap());
+    }
+
+    // getter for class list
+    public ArrayList<UMLClass> getClassList() { return UMLClassList; }
+    // setter for class list
+    public void setClassList(ArrayList<UMLClass> UMLClassList) { this.UMLClassList = UMLClassList; }
+    // getter for relationship list
+    public ArrayList<Relationship> getRelationshipList() {
         return relationshipList;
     }
+    // setter for relationship list
+    public void setRelationshipList(ArrayList<Relationship> relationshipList) { this.relationshipList = relationshipList; }
+    // getter for the coordinate map
+    public HashMap<String, List<Double>> getCoordinateMap() { return (HashMap<String, List<Double>>) coordinateMap; }
+    // setter for the coordinate map
+    public void setCoordinateMap(HashMap<String, List<Double>> coordinateMap) { this.coordinateMap = coordinateMap; }
 
-    public static void setRelationshipList(ArrayList<Relationship> relationshipList) {
-        UMLModel.relationshipList = relationshipList;
+    // add a class to the class list
+    public void addClass(UMLClass newUMLClass) { this.UMLClassList.add(newUMLClass); }
+    // remove a class from the class list
+    public void deleteClass(UMLClass delUMLClass) {
+        this.UMLClassList.remove(delUMLClass);
+    }
+    // clear the entire class list
+    public void clearClassList() {
+        this.UMLClassList.clear();
     }
 
-    public static void addClass(UMLClass newUMLClass) {
-        UMLClassList.add(newUMLClass);
+    // add a relationship to the rel list
+    public void addRel(Relationship newRel) {
+        this.relationshipList.add(newRel);
     }
-
-    public static void deleteClass(UMLClass delUMLClass) {
-        UMLClassList.remove(delUMLClass);
+    // remove a relationship from the rel list
+    public void deleteRel(Relationship delRel) {
+        this.relationshipList.remove(delRel);
     }
-
-    public static void addRel(Relationship newRel) {
-        relationshipList.add(newRel);
-    }
-
-    public static void deleteRel(Relationship delRel) {
-        relationshipList.remove(delRel);
-    }
-
-    /**
-     * Clears the classList
-     */
-    public static void clearClassList() {
-        UMLClassList.clear();
-    }
-
-    /**
-     * Clears the relationshipList
-     */
-    public static void clearRelationshipList() {
-        relationshipList.clear();
+    // clear the entire rel list
+    public void clearRelationshipList() {
+        this.relationshipList.clear();
     }
 
     /**
@@ -61,7 +126,7 @@ public class UMLModel {
      *
      * @return true if class exists in arraylist, false if not
      */
-    public static UMLClass findClass(String nameOfClass) {
+    public UMLClass findClass(String nameOfClass) {
         for (UMLClass aUMLClass : UMLClassList) {
             // if the name matches, return class
             if (nameOfClass.equals(aUMLClass.getClassName())) {
@@ -70,6 +135,10 @@ public class UMLModel {
         }
         return null;
     }
+
+    //***************************************//
+    //************ Relationship *************//
+    //***************************************//
 
     /**
      * Iterate through arraylist and return the relationship if relationship with
@@ -80,7 +149,7 @@ public class UMLModel {
      * @param relType type name
      * @return the relationship, null if not found
      */
-    public static Relationship findRelationship(String source, String dest, String relType) {
+    public Relationship findRelationship(String source, String dest, String relType) {
         for (Relationship relationship : relationshipList) {
             // If the name matches, return class
             if (relationship.getSource().getClassName().equals(source) &&
@@ -101,7 +170,7 @@ public class UMLModel {
      * @param dest class name
      * @return string of relationship type
      */
-    public static String findRelType(String source, String dest) {
+    public String findRelType(String source, String dest) {
         for(Relationship relationship : relationshipList){
             // if name matches, return relationship type
             if(relationship.getSource().getClassName().equals(source) &&
@@ -121,7 +190,7 @@ public class UMLModel {
      * @param dest the destination class name
      * @return true if two classes are related in src->dest order, false otherwise
      */
-    public static boolean isRelated(String source, String dest){
+    public boolean isRelated(String source, String dest){
         for(Relationship relationship : relationshipList){
             if(findRelationship(source, dest, findRelType(source,dest)) != null){
                 return true;
@@ -136,7 +205,7 @@ public class UMLModel {
      * @param relType the relationship type
      * @return false if none are correct, true otherwise
      */
-    public static boolean checkType(String relType){
+    public boolean checkType(String relType){
         return switch (relType){
             case "aggregation", "composition", "inheritance", "realization" -> true;
             default -> false;
@@ -150,7 +219,7 @@ public class UMLModel {
      * @param dest the destination name
      * @param newRelType the new relationship type
      */
-    public static void changeRelType(String src, String dest, String newRelType){
+    public void changeRelType(String src, String dest, String newRelType){
         // finds the relationship and changes the type
         for(Relationship r : relationshipList){
             if(r.getSource().getClassName().equals(src) &&
@@ -164,14 +233,18 @@ public class UMLModel {
      * If a class has been deleted, also delete any relationships associated
      * with that class
      *
-     * @param className
+     * @param className the name of the class associated with any relationship
      * @return updated relationship list
      */
-    public static ArrayList<Relationship> updateRelationshipList(String className) {
+    public ArrayList<Relationship> updateRelationshipList(String className) {
         relationshipList.removeIf(rel -> rel.getSource().getClassName().equals(className) ||
                 rel.getDestination().getClassName().equals(className));
         return relationshipList;
     }
+
+    //***************************************//
+    //******** User Input Correction ********//
+    //***************************************//
 
     /**
      * Takes a string and checks if it is a valid identifier
@@ -180,7 +253,7 @@ public class UMLModel {
      * @param input the string to check
      * @return true if valid, otherwise false
      */
-    public static boolean isValidIdentifier(String input) {
+    public boolean isValidIdentifier(String input) {
         if (input == null) {
             return false;
         }
@@ -202,35 +275,12 @@ public class UMLModel {
      * @param input the string to check
      * @return false if valid, otherwise true
      */
-    public static boolean isNotValidInput(String input) {
+    public boolean isNotValidInput(String input) {
         if (!isValidIdentifier(input)) {
-            System.out.printf("Input %s is not a valid identifier\n", input);
+            System.out.printf("Input \"%s\" is not a valid identifier\n", input);
             return true;
         }
         return false;
-    }
-
-    /**
-     * Takes a string and checks if it is a valid field type
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public static boolean isNotValidType(String input) {
-        return switch (input) {
-            case "string", "int", "double", "float", "char", "boolean", "short", "long" -> false;
-            default -> true;
-        };
-    }
-
-    /**
-     * Takes a string and checks if it is a valid field type
-     *
-     * @param input the string to check
-     * @return false if valid, otherwise true
-     */
-    public static boolean isNotValidReturnType(String input) {
-        return (isNotValidType(input) && !input.equals("void"));
     }
 
     /**
@@ -238,8 +288,8 @@ public class UMLModel {
      *
      * @return the help menu
      */
-    public static String getCLIHelpMenu() {
-        String helpMenu = """
+    public String getCLIHelpMenu() {
+        return """
                    Commands		       Description
                 --------------	    -----------------
                 add/a class			Add a new class
@@ -263,12 +313,13 @@ public class UMLModel {
                 list/l class        List a specific class in the diagram
                 list/l classes      List all the classes in the diagram
                 list/l rel          List all the relationships in the diagram
+                undo                erases most recent edit to diagram 
+                redo                reverts an undo
                 save			    Save the current UML diagram
                 load			    Load a previously saved UML diagram
                 clear			    Clear the command history
                 help			    Display list of commands
                 exit			    Exit the application""";
-        return helpMenu;
     }
 
 
@@ -278,8 +329,8 @@ public class UMLModel {
      *
      * @return the help menu
      */
-    public static String getGUIHelpMenu() {
-        String helpMenu = """
+    public String getGUIHelpMenu() {
+        return """
                  Commands\t\t\t\t\t\t\t\t\t   Description
                 --------------\t\t\t\t\t\t\t\t\t-----------------
                 Edit>Add>Add Class\t\t\t\t\t\t\tAdd a new class
@@ -293,12 +344,14 @@ public class UMLModel {
                 Edit>Rename>Rename Attribute>Rename Field\t\tRename a field from an existing class
                 Edit>Rename>Rename Attribute>Rename Method\tRename a method from an existing class
                 Edit>Change>Change Parameter(s)\t\t\t\tChange a parameter in an existing method
-                Edit>Change>Change Relationship Type\t\t\tChange a relationship type
+                Edit>Add>Add Relationship\t\t\t\t\t\tAdd a new relationship
                 Edit>Delete>Delete Relationship\t\t\t\t\tDelete an existing relationship
+                Edit>Change>Change Relationship Type\t\t\tChange a relationship type
+                Edit>Undo\t\t\t\t\t\t\t\t\tUndo a previous action
+                Edit>Redo\t\t\t\t\t\t\t\t\tRedo a previous action
                 File>Save\t\t\t\t\t\t\t\t\t\tSave the current UML diagram
                 File>Load\t\t\t\t\t\t\t\t\t\tLoad a previously saved UML diagram
                 Help>Show Commands\t\t\t\t\t\t\tDisplay list of commands
                 [X]\t\t\t\t\t\t\t\t\t\t\tExit the application""";
-        return helpMenu;
     }
 }

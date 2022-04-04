@@ -1,6 +1,9 @@
 package uml;
 
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.DoubleBinding;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -13,11 +16,22 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import java.util.ArrayList;
 
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings("DanglingJavadoc")
 /**
  * Creates the GUI environment for the user when using the GUI version of the diagram
  *
@@ -26,21 +40,34 @@ import java.util.ArrayList;
 public class GUIView extends Application {
 
     // create the menu bar
-    private final MenuBar menuBar = new MenuBar();
+    private MenuBar menuBar = new MenuBar();
     // initialize the root
-    static Group superRoot = new Group();
+    private Group superRoot = new Group();
+    // diagram width and height for window
+    private double DIAGRAM_WIDTH = 950;
+    private double DIAGRAM_HEIGHT = 640;
+    // coordinates for draging objects
+    private double startDragX;
+    private double startDragY;
+    // class box and relationship line lists
+    private ArrayList<ClassBox> classBoxList = new ArrayList<>();
+    private ArrayList<RelLine> lineList = new ArrayList<>();
+    private ArrayList<ArrayList<Line>> arrowList = new ArrayList<>();
+    private AffineTransform affineTransform = new AffineTransform();
+    private FontRenderContext frc = new FontRenderContext(affineTransform, true, true);
+    private Font font = new Font("Arial", Font.PLAIN, 12);
+    private GUIController controller;
+    private UMLModel model;
 
-    static final double DIAGRAM_WIDTH = 950;
-    static final double DIAGRAM_HEIGHT = 640;
+    public GUIView(UMLModel model) {
+        this.controller = new GUIController(this, model);
+        this.model = model;
+    }
 
-    static double boxWidth = 100;
-    static double boxHeight = 20;
-
-    static double startDragX;
-    static double startDragY;
-
-    static ArrayList<ClassBox> classBoxList = new ArrayList<>();
-    static ArrayList<RelLine> lineList = new ArrayList<RelLine>();
+    public GUIView() {
+        this.model = new UMLModel();
+        controller = new GUIController(this, model);
+    }
 
     /**
      * Starts the initial window for the diagram
@@ -49,7 +76,6 @@ public class GUIView extends Application {
      */
     @Override
     public void start(Stage stage) {
-
         // add the menu to the root
         superRoot.getChildren().add(createDiagramMenu());
         // initialize the window, and set the color
@@ -62,9 +88,25 @@ public class GUIView extends Application {
         // set the stage and show it
         stage.setScene(window);
         stage.setAlwaysOnTop(false);
-        menuBar.prefWidthProperty().bind(stage.widthProperty());
+        this.menuBar.prefWidthProperty().bind(stage.widthProperty());
         stage.show();
         stage.setResizable(false);
+    }
+
+    public Group getSuperRoot() {
+        return superRoot;
+    }
+
+    public ArrayList<ArrayList<Line>> getArrowList() {
+        return arrowList;
+    }
+
+    public ArrayList<RelLine> getLineList() {
+        return lineList;
+    }
+
+    public ArrayList<ClassBox> getClassBoxList() {
+        return classBoxList;
     }
 
     /**
@@ -126,13 +168,15 @@ public class GUIView extends Application {
         // if the delete method button is pressed, open a new window to delete method
         MenuItem deleteMethod = new MenuItem("Delete Method");
         deleteMethod.setOnAction(event -> deleteMethodWindow());
+        // if the delete method button is pressed, open a new window to delete method
+        MenuItem deleteParam = new MenuItem("Delete Parameter(s)");
+        deleteParam.setOnAction(event -> deleteParameterWindow());
         deleteAttribute.getItems().addAll(deleteField, deleteMethod);
         // Menu item for deleting a relationship,
         // when clicked, launch delete relationship window
         MenuItem deleteRel = new MenuItem("Delete Relationship");
         deleteRel.setOnAction(event -> deleteRelWindow());
-
-        delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel);
+        delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel, deleteParam);
 
         //***************************************//
         //******* Rename/Change Menu Items ******//
@@ -152,10 +196,8 @@ public class GUIView extends Application {
         MenuItem renameMethod = new MenuItem("Rename Method");
         renameMethod.setOnAction(event -> renameMethodWindow());
         renameAttribute.getItems().addAll(renameField, renameMethod);
-
         // adds all the rename menu items to rename option
         rename.getItems().addAll(renameClass, renameAttribute);
-
         Menu change = new Menu("Change");
         // open new window for changing a parameter when the option is pressed
         MenuItem changeParam = new MenuItem("Change Parameter(s)");
@@ -166,20 +208,39 @@ public class GUIView extends Application {
         // all of the change options as part of the edit menu
         change.getItems().addAll(changeParam, changeRelType);
 
+        // undoes the most recent action
+        MenuItem undo = new MenuItem("Undo");
+        undo.setOnAction(event -> controller.undoAction());
+        // redoes the most recent undo
+        MenuItem redo = new MenuItem("Redo");
+        redo.setOnAction(event -> controller.redoAction());
+
         // create the edit menu and add the 'add', 'delete', and 'rename' menus to it
         Menu edit = new Menu("Edit");
         // all of the options that are part of the edit menu
-        edit.getItems().addAll(add, delete, rename, change);
-
+        edit.getItems().addAll(add, delete, rename, change, undo, redo);
         // create the help menu and its menu item
         Menu help = new Menu("Help");
         MenuItem showCommands = new MenuItem("Show Commands");
         showCommands.setOnAction(event -> showCommandsWindow());
         help.getItems().add(showCommands);
-
         // adds all menus to the menu bar
         menuBar.getMenus().addAll(file, edit, help);
-
+        // disable all menu items that cannot be used until updateMenu is called
+        addField.setDisable(true);
+        addMethod.setDisable(true);
+        addRel.setDisable(true);
+        addParam.setDisable(true);
+        deleteClass.setDisable(true);
+        deleteField.setDisable(true);
+        deleteMethod.setDisable(true);
+        deleteRel.setDisable(true);
+        deleteParam.setDisable(true);
+        renameClass.setDisable(true);
+        renameField.setDisable(true);
+        renameMethod.setDisable(true);
+        changeParam.setDisable(true);
+        changeRelType.setDisable(true);
         // return the vbox using the menu bar
         return new VBox(menuBar);
     }
@@ -194,60 +255,33 @@ public class GUIView extends Application {
      * Creates a window for the save method and its data
      */
     private void saveWindow() {
-        // initialize the stage and root
         Stage stage = new Stage();
-        Group root = new Group();
-        stage.setAlwaysOnTop(true);
-        // create a label for the text box
-        Label label = new Label("File name: ");
-        // create a text box for user input
-        TextField text = new TextField();
-        text.setPrefColumnCount(17);
-        // create a button to save the diagram to a file with the inputted name
-        Button save = new Button("Save");
-        save.setOnAction(event -> GUIController.saveAction(text.getText(), stage));
-        // create a button to cancel out of the window and enable menu again
-        Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-        // create the pane for the objects and add them all
-        GridPane pane = new GridPane();
-        pane.add(label, 0, 0);
-        pane.add(text, 1, 0);
-        pane.add(save, 0, 1);
-        pane.add(cancel, 1, 1);
-
-        // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Save Project", 120, 300);
+        // create a file chooser and set the text to represent the right file
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        // get the selected file
+        File file = fileChooser.showSaveDialog(stage);
+        // if the file is not null, run the save action method
+        if (file != null) {
+            this.controller.saveAction(file, stage);
+        }
     }
 
     /**
      * Creates a window for the load method and its data
      */
     private void loadWindow() {
-        // initialize the stage and root
         Stage stage = new Stage();
-        Group root = new Group();
-        stage.setAlwaysOnTop(true);
-        // create a label for the text box
-        Label label = new Label("File name: ");
-        // create a text box for user input
-        TextField text = new TextField();
-        text.setPrefColumnCount(17);
-        // create a button to load the diagram of a file with the inputted name
-        Button load = new Button("Load");
-        load.setOnAction(event -> GUIController.loadAction(text.getText(), stage));
-        // create a button to cancel out of the window and enable menu again
-        Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-        // create the pane for the objects and add them all
-        GridPane pane = new GridPane();
-        pane.add(label, 0, 0);
-        pane.add(text, 1, 0);
-        pane.add(load, 0, 1);
-        pane.add(cancel, 1, 1);
-
-        // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Load Project", 120, 300);
+        // create a file chooser
+        FileChooser fileChooser = new FileChooser();
+        // get the selected file
+        File file = fileChooser.showOpenDialog(stage);
+        // if the file is not null, run the load action method and update the menus
+        if (file != null) {
+            this.controller.loadAction(file, stage);
+            updateMenus();
+        }
     }
 
     /**
@@ -265,17 +299,19 @@ public class GUIView extends Application {
         text.setPrefColumnCount(16);
         // create a button to add the class with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addClassAction(text.getText(), stage));
+        add.setOnAction(event -> {
+            this.controller.addClassAction(text.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(label, 0, 0);
         pane.add(text, 1, 0);
         pane.add(add, 0, 1);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Class", 120, 300);
     }
@@ -305,11 +341,13 @@ public class GUIView extends Application {
         fieldType.setPrefColumnCount(16);
         // create a button to add the field with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage));
+        add.setOnAction(event -> {
+            this.controller.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -320,7 +358,6 @@ public class GUIView extends Application {
         pane.add(fieldType, 1, 2);
         pane.add(add, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Field", 190, 300);
     }
@@ -350,11 +387,13 @@ public class GUIView extends Application {
         returnType.setPrefColumnCount(14);
         // create a button to add the method with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage));
+        add.setOnAction(event -> {
+            this.controller.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -365,7 +404,6 @@ public class GUIView extends Application {
         pane.add(returnType, 1, 2);
         pane.add(add, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Method", 190, 300);
     }
@@ -395,12 +433,14 @@ public class GUIView extends Application {
         relType.setPrefColumnCount(13);
         // create a button to add the relationship with the correct src and dest names
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addRelationshipAction(srcName.getText(),
-                                    destName.getText(), relType.getText(), stage));
+        add.setOnAction(event -> {
+            this.controller.addRelationshipAction(srcName.getText(),
+                    destName.getText(), relType.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(srcNameText, 0, 0);
@@ -411,7 +451,6 @@ public class GUIView extends Application {
         pane.add(relType, 1, 2);
         pane.add(add, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Relationship", 190, 300);
     }
@@ -446,12 +485,15 @@ public class GUIView extends Application {
         paramType.setPrefColumnCount(14);
         // create a button to add the method with the inputted name
         Button add = new Button("Add");
-        add.setOnAction(event -> GUIController.addParameterAction(className.getText(), methodName.getText(),
-                paramName.getText(), paramType.getText(), stage));
+        add.setOnAction(event -> {
+            if(this.controller.addParameterAction(className.getText(), methodName.getText(),
+                    paramName.getText(), paramType.getText(), stage))
+                addParameterWindowLoop ();
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -464,9 +506,33 @@ public class GUIView extends Application {
         pane.add(paramType, 1, 3);
         pane.add(add, 0, 4);
         pane.add(cancel, 1, 4);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Add Parameter(s)", 225, 300);
+    }
+
+    private void addParameterWindowLoop () {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label continueText = new Label("Add Another Parameter?");
+        // create a button to continue creating parameters
+        Button yes = new Button("Yes");
+        yes.setOnAction(event -> {
+            stage.close();
+            addParameterWindow();
+        });
+        // create a button to stop creating parameters
+        Button no = new Button("No");
+        no.setOnAction(event -> this.controller.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(continueText, 0, 0);
+        pane.add(yes, 0, 1);
+        pane.add(no, 1, 1);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Continue?", 110, 220);
     }
 
     /**
@@ -484,18 +550,19 @@ public class GUIView extends Application {
         text.setPrefColumnCount(16);
         // create a button to delete the class with the inputted name
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteClassAction(text.getText(), stage));
+        delete.setOnAction(event -> {
+            this.controller.deleteClassAction(text.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(label, 0, 0);
         pane.add(text, 1, 0);
         pane.add(delete, 0, 1);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Class", 120, 300);
     }
@@ -520,11 +587,13 @@ public class GUIView extends Application {
         fieldName.setPrefColumnCount(16);
         // create a button to add the field with the inputted name
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteFieldAction(className.getText(), fieldName.getText(), stage));
+        delete.setOnAction(event -> {
+            this.controller.deleteFieldAction(className.getText(), fieldName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -533,7 +602,6 @@ public class GUIView extends Application {
         pane.add(fieldName, 1, 1);
         pane.add(delete, 0, 2);
         pane.add(cancel, 1, 2);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Field", 155, 300);
     }
@@ -558,11 +626,13 @@ public class GUIView extends Application {
         methodName.setPrefColumnCount(15);
         // create a button to add the field with the inputted name
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteMethodAction(className.getText(), methodName.getText(), stage));
+        delete.setOnAction(event -> {
+            this.controller.deleteMethodAction(className.getText(), methodName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classNameText, 0, 0);
@@ -571,9 +641,84 @@ public class GUIView extends Application {
         pane.add(methodName, 1, 1);
         pane.add(delete, 0, 2);
         pane.add(cancel, 1, 2);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Method", 155, 300);
+    }
+
+    /**
+     * Creates a window for the delete parameter method and its data
+     */
+    private void deleteParameterWindow() {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label classNameText = new Label("Class name: ");
+        // create a label for the text box for the method name
+        Label methodNameText = new Label("Method name: ");
+        // create a label for the text box for the parameter name
+        Label paramText = new Label("Parameter name: ");
+        // create the text box for the class name
+        TextField className = new TextField();
+        className.setPrefColumnCount(15);
+        // create the text box for the method name
+        TextField methodName = new TextField();
+        methodName.setPrefColumnCount(15);
+        // create the text box for the class name
+        TextField paramName = new TextField();
+        paramName.setPrefColumnCount(15);
+        // create the text box for the class name
+        TextField paramType = new TextField();
+        paramType.setPrefColumnCount(15);
+        // create a button to add the field with the inputted name
+        Button delete = new Button("Delete");
+        delete.setOnAction(event -> {
+            if(this.controller.deleteParamAction(className.getText(), methodName.getText(), paramName.getText(),
+                    stage))
+                deleteParameterWindowLoop();
+            updateMenus();
+        });
+        // create a button to cancel out of the window and enable menu again
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(classNameText, 0, 0);
+        pane.add(methodNameText, 0, 1);
+        pane.add(paramText, 0, 2);
+        pane.add(className, 1, 0);
+        pane.add(methodName, 1, 1);
+        pane.add(paramName, 1, 2);
+        pane.add(delete, 0, 3);
+        pane.add(cancel, 1, 3);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Delete Parameter(s)", 185, 320);
+    }
+
+    private void deleteParameterWindowLoop () {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label continueText = new Label("Delete Another Parameter?");
+        // create a button to continue creating parameters
+        Button yes = new Button("Yes");
+        yes.setOnAction(event -> {
+            stage.close();
+            deleteParameterWindow();
+        });
+        // create a button to stop creating parameters
+        Button no = new Button("No");
+        no.setOnAction(event -> this.controller.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(continueText, 0, 0);
+        pane.add(yes, 0, 1);
+        pane.add(no, 1, 1);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Continue?", 110, 220);
     }
 
     /**
@@ -596,12 +741,14 @@ public class GUIView extends Application {
         destName.setPrefColumnCount(13);
         // create a button to delete the relationship with the correct src and dest names
         Button delete = new Button("Delete");
-        delete.setOnAction(event -> GUIController.deleteRelAction(srcName.getText(),
-                destName.getText(), stage));
+        delete.setOnAction(event -> {
+            this.controller.deleteRelAction(srcName.getText(),
+                    destName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(srcNameText, 0, 0);
@@ -610,7 +757,6 @@ public class GUIView extends Application {
         pane.add(destName, 1, 1);
         pane.add(delete, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Delete Relationship", 165, 300);
     }
@@ -635,11 +781,13 @@ public class GUIView extends Application {
         newClassName.setPrefColumnCount(14);
         // create a button to add the class with the inputted name
         Button rename = new Button("Rename");
-        rename.setOnAction(event -> GUIController.renameClassAction(classToRename.getText(), newClassName.getText(), stage));
+        rename.setOnAction(event -> {
+            this.controller.renameClassAction(classToRename.getText(), newClassName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(classLabel, 0, 0);
@@ -648,7 +796,6 @@ public class GUIView extends Application {
         pane.add(newClassName, 1, 1);
         pane.add(rename, 0, 2);
         pane.add(cancel, 1, 2);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Rename Class", 155, 300);
     }
@@ -683,13 +830,15 @@ public class GUIView extends Application {
         newFieldName.setPrefColumnCount(14);
         // create a button to add the field with the inputted name
         Button rename = new Button("Rename");
-        rename.setOnAction(event -> GUIController.renameFieldAction(givenClass.getText(),
-                                    fieldToRename.getText(),
-                                    newFieldName.getText(), stage));
+        rename.setOnAction(event -> {
+            this.controller.renameFieldAction(givenClass.getText(),
+                    fieldToRename.getText(),
+                    newFieldName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(givenClassLabel, 0, 0);
@@ -702,7 +851,6 @@ public class GUIView extends Application {
         pane.add(newFieldName, 1, 2);
         pane.add(rename, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Rename Field", 190, 300);
     }
@@ -732,12 +880,14 @@ public class GUIView extends Application {
         newMethodName.setPrefColumnCount(12);
         // create a button to add the method with the inputted name
         Button rename = new Button("Rename");
-        rename.setOnAction(event -> GUIController.renameMethodAction(givenClass.getText(),
-                methodToRename.getText(), newMethodName.getText(), stage));
+        rename.setOnAction(event -> {
+            this.controller.renameMethodAction(givenClass.getText(),
+                    methodToRename.getText(), newMethodName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(givenClassLabel, 0, 0);
@@ -748,7 +898,6 @@ public class GUIView extends Application {
         pane.add(newMethodName, 1, 2);
         pane.add(rename, 0, 3);
         pane.add(cancel, 1, 3);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Rename Method", 190, 300);
     }
@@ -788,12 +937,15 @@ public class GUIView extends Application {
         newParamType.setPrefColumnCount(11);
         // create a button to add the method with the inputted name
         Button change = new Button("Change");
-        change.setOnAction(event -> GUIController.changeParameterAction(givenClass.getText(), givenMethod.getText(),
-                paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage));
+        change.setOnAction(event -> {
+            if(this.controller.changeParameterAction(givenClass.getText(), givenMethod.getText(),
+                    paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage))
+                changeParameterWindowLoop();
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(givenClassLabel, 0, 0);
@@ -808,9 +960,33 @@ public class GUIView extends Application {
         pane.add(newParamType, 1, 4);
         pane.add(change, 0, 5);
         pane.add(cancel, 1, 5);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Change Parameter(s)", 260, 300);
+    }
+
+    private void changeParameterWindowLoop () {
+        // initialize the stage and root
+        Stage stage = new Stage();
+        Group root = new Group();
+        stage.setAlwaysOnTop(true);
+        // create a label for the text box for the class
+        Label continueText = new Label("Change Another Parameter?");
+        // create a button to continue creating parameters
+        Button yes = new Button("Yes");
+        yes.setOnAction(event -> {
+            stage.close();
+            changeParamWindow();
+        });
+        // create a button to stop creating parameters
+        Button no = new Button("No");
+        no.setOnAction(event -> this.controller.exitAction(stage));
+        // create the pane for the objects and add them all
+        GridPane pane = new GridPane();
+        pane.add(continueText, 0, 0);
+        pane.add(yes, 0, 1);
+        pane.add(no, 1, 1);
+        // finalize the window with standard formatting
+        finalizeWindow(stage, root, pane, "Continue?", 110, 220);
     }
 
     /**
@@ -843,12 +1019,14 @@ public class GUIView extends Application {
         newRelTypeName.setPrefColumnCount(16);
         // create a button to add the class with the inputted name
         Button rename = new Button("Change");
-        rename.setOnAction(event -> GUIController.changeRelTypeAction(srcName.getText(),
-                        destName.getText(), oldRelTypeName.getText(), newRelTypeName.getText(), stage));
+        rename.setOnAction(event -> {
+            this.controller.changeRelTypeAction(srcName.getText(),
+                    destName.getText(), oldRelTypeName.getText(), newRelTypeName.getText(), stage);
+            updateMenus();
+        });
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(srcLabel, 0, 0);
@@ -861,7 +1039,6 @@ public class GUIView extends Application {
         pane.add(newRelTypeName, 1, 3);
         pane.add(rename, 0, 4);
         pane.add(cancel, 1, 4);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, "Change Relationship Type", 225, 300);
     }
@@ -875,18 +1052,16 @@ public class GUIView extends Application {
         Group root = new Group();
         stage.setAlwaysOnTop(true);
         // create a label for the command list
-        Text commandList = new Text(UMLModel.getGUIHelpMenu());
+        Text commandList = new Text(this.model.getGUIHelpMenu());
         // create a button to cancel out of the window and enable menu again
         Button cancel = new Button("Cancel");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the object and adds it
         GridPane pane = new GridPane();
         pane.add(commandList, 0, 0);
         pane.add(cancel, 1, 1);
-
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Show Commands", 400, 615);
+        finalizeWindow(stage, root, pane, "Show Commands", 445, 615);
     }
 
     /**
@@ -895,7 +1070,7 @@ public class GUIView extends Application {
      * @param title the title of the popup window
      * @param text  the text to be displayed in the popup
      */
-    public static void popUpWindow(String title, String text) {
+    public void popUpWindow(String title, String text) {
         // initialize the stage and root
         Stage stage = new Stage();
         Group root = new Group();
@@ -904,13 +1079,11 @@ public class GUIView extends Application {
         Label message = new Label(text);
         // create a button to cancel out of the window
         Button cancel = new Button("Okay");
-        cancel.setOnAction(event -> GUIController.exitAction(stage));
-
+        cancel.setOnAction(event -> this.controller.exitAction(stage));
         // create the pane for the objects and add them all
         GridPane pane = new GridPane();
         pane.add(message, 0, 0);
         pane.add(cancel, 1, 0);
-
         // finalize the window with standard formatting
         finalizeWindow(stage, root, pane, title, 100, 300);
     }
@@ -920,6 +1093,766 @@ public class GUIView extends Application {
      * End of window methods & Start of helper methods
      *
      ******************************************************************/
+
+    //***************************************//
+    //*********** Drawing Objects ***********//
+    //***************************************//
+
+    /**
+     * Takes in a class name and draws a new class box object
+     *
+     * @param className the name of the class
+     */
+    public void drawClassBox(String className, int xOffset, int yOffset)  {
+        // create a class box object, add it to the class box list and the super root
+        ClassBox classBox = new ClassBox(className);
+        superRoot.getChildren().add(classBox.getClassPane());
+        classBoxList.add(classBox);
+        // place class box in correct area
+        classBox.getClassPane().setTranslateX(classBox.getBoxWidth() + xOffset);
+        classBox.getClassPane().setTranslateY(classBox.getBoxHeight() + yOffset);
+        // set the x and y to the right coordinates
+        classBox.setX(classBox.getClassPane().getTranslateX());
+        classBox.setY(classBox.getClassPane().getTranslateY());
+        // when the box is clicked on begin drag with mouse
+        classBox.getClassPane().setOnMouseDragEntered(event -> {
+            startDragX = event.getSceneX();
+            startDragY = event.getSceneY();
+        });
+        // keep box under mouse as the mouse continues to drag
+        classBox.getClassPane().setOnMouseDragged(event -> {
+            classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);
+            classBox.getClassPane().setTranslateY(event.getSceneY() - startDragY);
+            // set the x and y to the right coordinates
+            classBox.setX(classBox.getClassPane().getTranslateX());
+            classBox.setY(classBox.getClassPane().getTranslateY());
+            addToCoordinateMap(className, classBox.getX(), classBox.getY());
+        });
+        // Increases box width if className is too big for the default
+        if((int)(font.getStringBounds(className, frc)).getWidth() + 30 > classBox.getBoxWidth())
+        {
+            classBox.setBoxWidth((int)(font.getStringBounds(className, frc)).getWidth() + 30);
+        }
+    }
+
+    /**
+     * Moves all the classes in the diagram to their saved x and y fields
+     */
+    public void moveClassBoxes() {
+        // iterate through the class box list and set the translate x and y to the right value
+        for (ClassBox cbObj : classBoxList) {
+            double X = this.model.getCoordinateMap().get(cbObj.getClassBoxName()).get(0);
+            double Y = this.model.getCoordinateMap().get(cbObj.getClassBoxName()).get(1);
+            cbObj.setX(X);
+            cbObj.setY(Y);
+            cbObj.getClassPane().setTranslateX(cbObj.getX());
+            cbObj.getClassPane().setTranslateY(cbObj.getY());
+        }
+    }
+
+    public void drawFieldBox(int fieldListSize, int methListSize, Field field, String className) {
+        ClassBox box = findClassBox(className);
+        box.setBoxHeight(box.getBoxHeight() + 15);
+        box.addText(field, fieldListSize, methListSize, false);
+
+        // Increases box size if the field will extend past it
+        if((int)(font.getStringBounds(field.getAttName() + " : " + field.getFieldType(), frc)).getWidth() + 30
+                > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(field.getAttName() + " : " + field.getFieldType(), frc))
+                    .getWidth() + 30);
+        }
+    }
+
+    public void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
+        ClassBox box = findClassBox(className);
+        box.setBoxHeight(box.getBoxHeight() + 15);
+        box.addText(meth, fieldListSize, methListSize, false);
+
+        // Calculates pixel width of type
+        String methType = "";
+        if (!meth.getReturnType().equals("void"))
+        {
+            methType = meth.getReturnType();
+        }
+
+        // Increases box size if the method will extend past it
+        if((int)(font.getStringBounds(meth.getAttName() + " : " + meth.getReturnType(), frc))
+                .getWidth() + 30 > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + " : " +
+                    meth.getReturnType(), frc)).getWidth() + 30);
+        }
+    }
+
+    public void resizeMethod(Method meth, String className) {
+        ClassBox box = findClassBox(className);
+
+        // Calculates pixel width of type
+        String methType = "";
+        if (!meth.getReturnType().equals("void"))
+        {
+            methType = meth.getReturnType();
+        }
+
+        // Caculate pixel length of all parameters in the current method
+        String param = "";
+        for (Parameter tempParam : meth.getParamList())
+        {
+            param += ", " + tempParam.getAttName() + " : " + tempParam.getFieldType();
+        }
+
+        // Increases box size if the method will extend past it
+        if((int)(font.getStringBounds(meth.getAttName() + "(" + param + ") " + meth.getReturnType(), frc))
+                .getWidth() > box.getBoxWidth())
+        {
+            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + "(" + param + ") " +
+                    meth.getReturnType(), frc)).getWidth());
+        }
+    }
+
+    /**
+     * Takes in the source and destination class names and a type
+     * Draws a line with a style depending on the type of relationship
+     *  @param src the source class name
+     * @param dest the destination class name
+     * @param relType the relationship type
+     */
+    public void drawLine(String src, String dest, String relType){
+        ClassBox source = null;
+        ClassBox destination = null;
+        // search through the class box list for the source and destination classes
+        for(ClassBox box : classBoxList){
+            if(box.getClassBoxName().equals(src)){
+                source = box;
+            }
+            if(box.getClassBoxName().equals(dest)){
+                destination = box;
+            }
+        }
+        assert source != null;
+        assert destination != null;
+        // draw a new line that connects to the source and destination class boxes
+        RelLine newRelLine = new RelLine(source, destination, relType);
+        // create dashed line with empty arrowhead
+        switch (relLineStyle(newRelLine.getRelType())) {
+            case "EA" -> {
+                newRelLine.getLine().setStrokeWidth(0);
+                arrowList.add(emptyArrow(newRelLine));
+            }
+            // create line with filled in arrowhead
+            case "FA" -> arrowList.add(filledArrow(newRelLine));
+
+            // create line with filled in diamond
+            case "FD" -> arrowList.add(filledDiamond(newRelLine));
+
+            // create line with empty diamond
+            case "ED" -> {
+                newRelLine.getLine().setStrokeWidth(0);
+                arrowList.add(emptyDiamond(newRelLine));
+            }
+        }
+        // add the new line to the line list and the super root
+        lineList.add(newRelLine);
+        superRoot.getChildren().add(0, newRelLine.getLine());
+    }
+
+    //***************************************//
+    //******* Manipulation of Objects *******//
+    //***************************************//
+
+    /**
+     * Takes in a relationship line
+     * Draws an empty arrowhead shape
+     * (Realization)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList<Line> emptyArrow(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(5);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(5);
+        bottomArrow.setStroke(Color.BLACK);
+        // completes the arrow and fills in diamond
+        Line middleArrow = new Line();
+        middleArrow.setStrokeWidth(5);
+        middleArrow.setStroke(Color.BLACK);
+        // for replacement line bindings setup
+        Line tBackArrow = new Line();
+        tBackArrow.setStrokeWidth(0);
+        // Set up arrow's shape
+        InvalidationListener update = observable -> {
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 9 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            //replacement variables to get dashed line closer to arrow
+            double rLength = 7 / Math.hypot(startX - endX, startY - endY);
+            double rDirX = (startX - endX) * rLength;
+            double rDirY = (startY - endY) * rLength;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            tBackArrow.setStartX(topArrow.getStartX());
+            tBackArrow.setStartY(topArrow.getStartY());
+            tBackArrow.setEndX(topArrow.getStartX() + rDirX + orthY);
+            tBackArrow.setEndY(topArrow.getStartY() + rDirY - orthX);
+            middleArrow.setStartX(bottomArrow.getStartX() - .5);
+            middleArrow.setStartY(bottomArrow.getStartY() - .5);
+            middleArrow.setEndX(topArrow.getStartX() - .5);
+            middleArrow.setEndY(topArrow.getStartY() - .5);
+        };
+        // bindings for replacement line to invisible original line
+        DoubleBinding startXBind = line.getCBSrc().getClassPane().translateXProperty().add(line.getCBSrc()
+                .getClassPane().widthProperty().divide(2));
+        DoubleBinding startYBind = line.getCBSrc().getClassPane().translateYProperty().add(line.getCBSrc()
+                .getClassPane().heightProperty().divide(2));
+        DoubleBinding endXBind = tBackArrow.translateXProperty().add(tBackArrow.endXProperty());
+        DoubleBinding endYBind = tBackArrow.translateYProperty().add(tBackArrow.endYProperty());
+        // replacement line for real line, set bindings
+        Line rLine = new Line();
+        rLine.setStroke(Color.BLACK);
+        rLine.setStrokeWidth(9.5);
+        rLine.setStrokeLineCap(StrokeLineCap.BUTT);
+        rLine.getStrokeDashArray().addAll(15d);
+        rLine.setStrokeDashOffset(10);
+        rLine.startXProperty().bind(startXBind);
+        rLine.startYProperty().bind(startYBind);
+        rLine.endXProperty().bind(endXBind);
+        rLine.endYProperty().bind(endYBind);
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update);
+        line.getLine().startYProperty().addListener(update);
+        line.getLine().endXProperty().addListener(update);
+        line.getLine().endYProperty().addListener(update);
+        //same update listener for replacement lines
+        rLine.startXProperty().addListener(update);
+        rLine.startYProperty().addListener(update);
+        rLine.endXProperty().addListener(update);
+        rLine.endYProperty().addListener(update);
+        update.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, middleArrow);
+        superRoot.getChildren().add(4, tBackArrow);
+        superRoot.getChildren().add(5, rLine);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(middleArrow);
+        arrowShape.add(tBackArrow);
+        arrowShape.add(rLine);
+        return arrowShape;
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in arrowhead shape
+     * (Inheritance)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList<Line> filledArrow(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(6);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(6);
+        bottomArrow.setStroke(Color.BLACK);
+        // completes the arrow and fills in diamond
+        Line middleArrow = new Line();
+        middleArrow.setStrokeWidth(6);
+        middleArrow.setStroke(Color.BLACK);
+        // for filled in arrow or diamond
+        Line fillArrow = new Line();
+        fillArrow.setStrokeWidth(7);
+        fillArrow.setStroke(Color.BLACK);
+        // Set up arrow's shape
+        InvalidationListener update1 = observable -> {
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 9 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            middleArrow.setStartX(bottomArrow.getStartX() - .5);
+            middleArrow.setStartY(bottomArrow.getStartY() - .5);
+            middleArrow.setEndX(topArrow.getStartX() - .5);
+            middleArrow.setEndY(topArrow.getStartY() - .5);
+            fillArrow.setStartX(((middleArrow.getStartX() + middleArrow.getEndX()) / 2));
+            fillArrow.setStartY(((middleArrow.getStartY() + middleArrow.getEndY()) / 2));
+            fillArrow.setEndX(topArrow.getEndX());
+            fillArrow.setEndY(topArrow.getEndY());
+        };
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update1);
+        line.getLine().startYProperty().addListener(update1);
+        line.getLine().endXProperty().addListener(update1);
+        line.getLine().endYProperty().addListener(update1);
+        update1.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, middleArrow);
+        superRoot.getChildren().add(4, fillArrow);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(middleArrow);
+        arrowShape.add(fillArrow);
+        return arrowShape;
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in diamond shape
+     * (Composition)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList<Line> filledDiamond(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(8);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(8);
+        bottomArrow.setStroke(Color.BLACK);
+        // for filled in arrow or diamond
+        Line fillArrow = new Line();
+        fillArrow.setStrokeWidth(7);
+        fillArrow.setStroke(Color.BLACK);
+        // for diamond Shape
+        Line tBackArrow = new Line();
+        tBackArrow.setStrokeWidth(8);
+        tBackArrow.setStroke(Color.BLACK);
+        Line bBackArrow = new Line();
+        bBackArrow.setStrokeWidth(8);
+        bBackArrow.setStroke(Color.BLACK);
+        // Set up arrow's shape
+        InvalidationListener update2 = observable -> {
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 20 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 9 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            tBackArrow.setStartX(topArrow.getStartX());
+            tBackArrow.setStartY(topArrow.getStartY());
+            tBackArrow.setEndX(topArrow.getStartX() + dirX + orthY);
+            tBackArrow.setEndY(topArrow.getStartY() + dirY - orthX);
+            bBackArrow.setStartX(bottomArrow.getStartX());
+            bBackArrow.setStartY(bottomArrow.getStartY());
+            bBackArrow.setEndX(bottomArrow.getStartX() + dirX - orthY);
+            bBackArrow.setEndY(bottomArrow.getStartY() + dirY + orthX);
+            fillArrow.setStartX(tBackArrow.getEndX());
+            fillArrow.setStartY(tBackArrow.getEndY());
+            fillArrow.setEndX(topArrow.getEndX());
+            fillArrow.setEndY(topArrow.getEndY());
+
+        };
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update2);
+        line.getLine().startYProperty().addListener(update2);
+        line.getLine().endXProperty().addListener(update2);
+        line.getLine().endYProperty().addListener(update2);
+        update2.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, fillArrow);
+        superRoot.getChildren().add(4, tBackArrow);
+        superRoot.getChildren().add(5, bBackArrow);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(fillArrow);
+        arrowShape.add(tBackArrow);
+        arrowShape.add(bBackArrow);
+        return arrowShape;
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in diamond shape
+     * (Aggregation)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList<Line> emptyDiamond(RelLine line){
+        // top(right) and bottom(left) arrows
+        Line topArrow = new Line();
+        topArrow.setStrokeWidth(6);
+        topArrow.setStroke(Color.BLACK);
+        Line bottomArrow = new Line();
+        bottomArrow.setStrokeWidth(6);
+        bottomArrow.setStroke(Color.BLACK);
+        // for diamond Shape
+        Line tBackArrow = new Line();
+        tBackArrow.setStrokeWidth(6);
+        tBackArrow.setStroke(Color.BLACK);
+        Line bBackArrow = new Line();
+        bBackArrow.setStrokeWidth(6);
+        bBackArrow.setStroke(Color.BLACK);
+        // Set up arrow's shape
+        InvalidationListener update3 = observable -> {
+            double endX = line.getLine().getEndX();
+            double endY = line.getLine().getEndY();
+            double startX = line.getLine().getStartX();
+            double startY = line.getLine().getStartY();
+            // end of arrow head is the end of the line
+            topArrow.setEndX(endX);
+            topArrow.setEndY(endY);
+            bottomArrow.setEndX(endX);
+            bottomArrow.setEndY(endY);
+            // get arrowhead angle
+            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);
+            double widthM = 11 / Math.hypot(startX - endX, startY - endY);
+            // arrow shape regarding direction of main line
+            double dirX = (startX - endX) * lengthM;
+            double dirY = (startY - endY) * lengthM;
+            // arrow shape regarding orthogonal of main line
+            double orthX = (startX - endX) * widthM;
+            double orthY = (startY - endY) * widthM;
+            // set proper arrow shape
+            topArrow.setStartX(endX + dirX - orthY);
+            topArrow.setStartY(endY + dirY + orthX);
+            bottomArrow.setStartX(endX + dirX + orthY);
+            bottomArrow.setStartY(endY + dirY - orthX);
+            tBackArrow.setStartX(topArrow.getStartX());
+            tBackArrow.setStartY(topArrow.getStartY());
+            tBackArrow.setEndX(topArrow.getStartX() + dirX + orthY);
+            tBackArrow.setEndY(topArrow.getStartY() + dirY - orthX);
+            bBackArrow.setStartX(bottomArrow.getStartX());
+            bBackArrow.setStartY(bottomArrow.getStartY());
+            bBackArrow.setEndX(bottomArrow.getStartX() + dirX - orthY);
+            bBackArrow.setEndY(bottomArrow.getStartY() + dirY + orthX);
+        };
+        // bindings for replacement line to invisible original line
+        DoubleBinding startXBind = line.getCBSrc().getClassPane().translateXProperty().add(line.getCBSrc()
+                .getClassPane().widthProperty().divide(2));
+        DoubleBinding startYBind = line.getCBSrc().getClassPane().translateYProperty().add(line.getCBSrc()
+                .getClassPane().heightProperty().divide(2));
+        DoubleBinding endXBind = tBackArrow.translateXProperty().add(tBackArrow.endXProperty());
+        DoubleBinding endYBind = tBackArrow.translateYProperty().add(tBackArrow.endYProperty());
+        // replacement line for real line, set bindings
+        Line rLine = new Line();
+        rLine.setStroke(Color.BLACK);
+        rLine.setStrokeWidth(9.5);
+        rLine.startXProperty().bind(startXBind);
+        rLine.startYProperty().bind(startYBind);
+        rLine.endXProperty().bind(endXBind);
+        rLine.endYProperty().bind(endYBind);
+        // update to arrow shape when moving line
+        line.getLine().startXProperty().addListener(update3);
+        line.getLine().startYProperty().addListener(update3);
+        line.getLine().endXProperty().addListener(update3);
+        line.getLine().endYProperty().addListener(update3);
+        //same update listener for replacement lines
+        rLine.startXProperty().addListener(update3);
+        rLine.startYProperty().addListener(update3);
+        rLine.endXProperty().addListener(update3);
+        rLine.endYProperty().addListener(update3);
+        update3.invalidated(null);
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+        superRoot.getChildren().add(1, topArrow);
+        superRoot.getChildren().add(2, bottomArrow);
+        superRoot.getChildren().add(3, tBackArrow);
+        superRoot.getChildren().add(4, bBackArrow);
+        superRoot.getChildren().add(5, rLine);
+        // add lines to array list to be manipulated(accessed or deleted)
+        ArrayList<Line> arrowShape = new ArrayList<>();
+        arrowShape.add(topArrow);
+        arrowShape.add(bottomArrow);
+        arrowShape.add(tBackArrow);
+        arrowShape.add(bBackArrow);
+        arrowShape.add(rLine);
+        return arrowShape;
+    }
+
+    /**
+     * Takes in the source and destination class box objects
+     * finds and returns the relationship line corresponding to
+     * the src and dest
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     * @return the relationship line
+     */
+    public RelLine findRelLine(ClassBox src, ClassBox dest){
+        for(RelLine line : lineList){
+            if(line.getCBSrc().equals(src)) {
+                if (line.getCBDest().equals(dest)) {
+                    return line;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Takes in a relationship line
+     * returns the arrow shape (list of lines)
+     *
+     * @param line the relationship line
+     * @return the arrow shape
+     */
+    public ArrayList<Line> findArrow(RelLine line){
+        for(ArrayList<Line> arrows : arrowList){
+            for(Line arrow : arrows){
+                if(arrow.getEndX() == line.getLine().getEndX()){
+                    return arrows;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Takes in a class name from the classlist, searches through the
+     * class box list for a class box object with the same name as className
+     *
+     * @param className the name of the class
+     * @return the classbox object with the same class name
+     */
+    public ClassBox findClassBox(String className){
+        ClassBox classbox = null;
+        for(ClassBox box : classBoxList) {
+            if (box.getClassBoxName().equals(className)) {
+                classbox = box;
+            }
+        }
+        return classbox;
+    }
+
+    /**
+     * Takes in a class box name(class name) and removes it from the super root
+     * and class box list(removes the class from the view)
+     *
+     * @param classBoxName the name of the class box(name of class)
+     */
+    public void deleteClassBox (String classBoxName){
+        for (ClassBox cbObj : classBoxList) {
+            if(cbObj.getClassBoxName().equals(classBoxName)) {
+                superRoot.getChildren().remove(cbObj.getClassPane());
+            }
+        }
+        classBoxList.remove(findClassBox(classBoxName));
+    }
+
+    /**
+     * Takes in a source class box object and a destination class
+     * box object, searches through the list of relationship lines
+     * and deletes the line that matches the source and destination
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     */
+    public void deleteRelLine (ClassBox src, ClassBox dest){
+        for(ArrayList<Line> arrows : arrowList){
+            if(arrows.equals(findArrow(findRelLine(src, dest)))) {
+                for (Line arrow : arrows) {
+                    superRoot.getChildren().remove(arrow);
+                }
+                superRoot.getChildren().remove(arrows);
+                arrowList.remove(arrows);
+                break;
+            }
+        }
+        superRoot.getChildren().remove(findRelLine(src, dest).getLine());
+        lineList.remove(findRelLine(src, dest).getLine());
+        lineList.remove(findRelLine(src, dest));
+    }
+
+    /**
+     * Takes in a relLine and a relType
+     * Styles the relationship line depending on the relationship type
+     *
+     * @param relType the relationship type
+     * @return the type of arrowhead shape (arrow or diamond, filled or empty)
+     */
+    public String relLineStyle(String relType){
+        switch (relType) {
+            case "aggregation" -> {
+                return "ED"; // empty diamond
+            }
+            case "composition" -> {
+                return "FD"; // filled in diamond
+            }
+            case "inheritance" -> {
+                return "FA"; // filled in arrow
+            }
+            case "realization" -> {
+                return "EA"; // empty arrow
+            }
+        }
+        return null;
+    }
+
+    private void updateMenus() {
+        // get the list of items in the edit menu object
+        ObservableList<MenuItem> editList = menuBar.getMenus().get(1).getItems();
+        // get the add menu object
+        Menu add = (Menu) editList.get(0);
+        // get the add attribute menu object
+        Menu addAttribute = (Menu) add.getItems().get(1);
+        // get the delete menu object
+        Menu delete = (Menu) editList.get(1);
+        // get the delete attribute menu object
+        Menu deleteAttribute = (Menu) delete.getItems().get(1);
+        // get the rename menu object
+        Menu rename = (Menu) editList.get(2);
+        // get the rename attribute menu object
+        Menu renameAttribute = (Menu) rename.getItems().get(1);
+        // get the change menu object
+        Menu change = (Menu) editList.get(3);
+
+        // enable/disable
+        if (!this.controller.getClassList().isEmpty()) {
+            // enable the add field menu item
+            addAttribute.getItems().get(0).setDisable(false);
+            // enable the add method menu item
+            addAttribute.getItems().get(1).setDisable(false);
+            // enable add relationship
+            add.getItems().get(2).setDisable(false);
+            // enable the delete class menu item
+            delete.getItems().get(0).setDisable(false);
+            // enable the rename class menu item
+            rename.getItems().get(0).setDisable(false);
+
+            boolean fieldExists = false;
+            boolean methodExists = false;
+            boolean paramExists = false;
+            // check every object and see if at least one of them has either a field or method
+            for (UMLClass classObj : this.controller.getClassList()) {
+                if (!classObj.getFieldList().isEmpty()) {
+                    fieldExists = true;
+                }
+                if (!classObj.getMethodList().isEmpty()) {
+                    methodExists = true;
+                    for (Method methObj : classObj.getMethodList()) {
+                        if (!methObj.getParamList().isEmpty()) {
+                            paramExists = true;
+                        }
+                    }
+                }
+            }
+            // if there is at least one field in the list, enable the menu items
+            // otherwise, disable them
+            if (fieldExists) {
+                deleteAttribute.getItems().get(0).setDisable(false);
+                renameAttribute.getItems().get(0).setDisable(false);
+            } else {
+                deleteAttribute.getItems().get(0).setDisable(true);
+                renameAttribute.getItems().get(0).setDisable(true);
+            }
+            // if there is at least one method in the list, enable the menu items
+            // otherwise, disable them
+            if (methodExists) {
+                deleteAttribute.getItems().get(1).setDisable(false);
+                deleteAttribute.getItems().get(1).setDisable(false);
+                renameAttribute.getItems().get(1).setDisable(false);
+                add.getItems().get(3).setDisable(false);
+            } else {
+                deleteAttribute.getItems().get(1).setDisable(true);
+                renameAttribute.getItems().get(1).setDisable(true);
+                add.getItems().get(3).setDisable(true);
+            }
+            // if there is at least one parameter in the list, enable the menu items
+            // otherwise, disable them
+            if (paramExists) {
+                delete.getItems().get(3).setDisable(false);
+                change.getItems().get(0).setDisable(false);
+            } else {
+                delete.getItems().get(3).setDisable(true);
+                change.getItems().get(0).setDisable(true);
+            }
+            // if there are at least one relationship in the relationship list, enable the menu items
+            // otherwise, disable them
+            if (!this.controller.getRelationshipList().isEmpty()) {
+                delete.getItems().get(2).setDisable(false);
+                change.getItems().get(1).setDisable(false);
+            } else {
+                delete.getItems().get(2).setDisable(true);
+                change.getItems().get(1).setDisable(true);
+            }
+        } else {
+            // disable all the menu items
+            addAttribute.getItems().get(0).setDisable(true);
+            addAttribute.getItems().get(1).setDisable(true);
+            add.getItems().get(2).setDisable(true);
+            delete.getItems().get(0).setDisable(true);
+            rename.getItems().get(0).setDisable(true);
+            deleteAttribute.getItems().get(0).setDisable(true);
+            renameAttribute.getItems().get(0).setDisable(true);
+            deleteAttribute.getItems().get(1).setDisable(true);
+            renameAttribute.getItems().get(1).setDisable(true);
+            add.getItems().get(3).setDisable(true);
+            change.getItems().get(0).setDisable(true);
+        }
+    }
 
     /**
      * Takes in many parameters from the window and gives it standardized formatting,
@@ -932,7 +1865,7 @@ public class GUIView extends Application {
      * @param height the height of the window
      * @param width the width of the window
      */
-    private static void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
+    private void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
         stage.initModality(Modality.APPLICATION_MODAL);
         pane.setHgap(5);
         pane.setVgap(10);
@@ -948,130 +1881,19 @@ public class GUIView extends Application {
     }
 
     /**
-     * Takes in the source and destination class names and a line color
+     * Adds a key value pair to the coordinate map, where the value is a list of the x and y
      *
-     * @param src the source class name
-     * @param dest the destination class name
-     * @param color the line color
+     * @param className the key, the name of the class
+     * @param X the x value for the class box
+     * @param Y the y value for the class box
      */
-    public static void drawLine(String src, String dest, Color color){
-        ClassBox source = null;
-        ClassBox destination = null;
-        // search through the class box list for the source and destination classes
-        for(ClassBox box : classBoxList){
-            if(box.getClassBoxName().equals(src)){
-                source = box;
-            }
-            if(box.getClassBoxName().equals(dest)){
-                destination = box;
-            }
-        }
-
-        assert source != null;
-        assert destination != null;
-        //source.getClassPane().setTranslateX(source.getBoxWidth() / 2);
-        //destination.getClassPane().setTranslateX(destination.getBoxWidth() / 2);
-        // draw a new line that connects to the source and destination class boxes
-        RelLine newRelLine = new RelLine(source, destination, color);
-        // add the new line to the line list and the super root
-        lineList.add(newRelLine);
-        superRoot.getChildren().add(0, newRelLine.getLine());
+    public void addToCoordinateMap(String className, Double X, Double Y) {
+        List<Double> coordinateList = new ArrayList<Double>();
+        coordinateList.add(X);
+        coordinateList.add(Y);
+        this.model.getCoordinateMap().put(className, coordinateList);
     }
 
-    /**
-     * Takes in a class name and draws a new class box object
-     *
-     * @param className the name of the class
-     */
-    public static void drawClassBox(String className, int xOffset, int yOffset)  {
-        // create a class box object, add it to the class box list and the super root
-        ClassBox classBox = new ClassBox(className);
-        superRoot.getChildren().add(classBox.getClassPane());
-        classBoxList.add(classBox);
-
-        classBox.getClassPane().setTranslateX(classBox.getBoxWidth() + xOffset);
-        classBox.getClassPane().setTranslateY(classBox.getBoxHeight() + yOffset);
-        // when the box is clicked on begin drag with mouse
-        classBox.getClassPane().setOnMouseDragEntered(event -> {
-            startDragX = event.getSceneX();
-            startDragY = event.getSceneY();
-        });
-
-        // keep box under mouse as the mouse continues to drag
-        classBox.getClassPane().setOnMouseDragged(event -> {
-            classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);
-            classBox.getClassPane().setTranslateY(event.getSceneY() - startDragY);
-        });
-    }
-
-    public static void drawFieldBox(int fieldListSize, int methListSize, Field field, String className) {
-        ClassBox box = findClassBox(className);
-        box.setBoxHeight(box.getBoxHeight() + 15);
-        box.addText(field, fieldListSize, methListSize, false);
-    }
-
-    public static void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
-        ClassBox box = findClassBox(className);
-        box.setBoxHeight(box.getBoxHeight() + 15);
-        box.addText(meth, fieldListSize, methListSize, false);
-    }
-
-    /**
-     * Takes in a class name from the classlist, searches through the
-     * class box list for a class box object with the same name as className
-     *
-     * @param className the name of the class
-     * @return the classbox object with the same class name
-     */
-    public static ClassBox findClassBox(String className){
-        ClassBox classbox = null;
-        for(ClassBox box : classBoxList) {
-            if (box.getClassBoxName().equals(className)) {
-                classbox = box;
-            }
-        }
-        return classbox;
-    }
-
-    /**
-     * Takes in a source class box object and a destination class
-     * box object, searches through the list of relationship lines
-     * and deletes the line that matches the source and destination
-     *
-     * @param src the source class box object
-     * @param dest the destination class box object
-     */
-    public static void deleteRelLine (ClassBox src, ClassBox dest){
-        for(int i = 0; i < lineList.size(); ++i){
-            if(lineList.get(i).getCBSrc().equals(src)){
-                if(lineList.get(i).getCBDest().equals(dest)){
-                    superRoot.getChildren().remove(lineList.get(i).getLine());
-                    lineList.remove(lineList.get(i));
-                }
-            }
-        }
-    }
-
-    /**
-     * Takes in a class box name(class name) and removes it from the super root
-     * and class box list(removes the class from the view)
-     *
-     * @param classBoxName the name of the class box(name of class)
-     */
-    public static void deleteClassBox (String classBoxName){
-        for (ClassBox cbObj : GUIView.classBoxList) {
-            if(cbObj.getClassBoxName().equals(classBoxName)) {
-                GUIView.superRoot.getChildren().remove(cbObj.getClassPane());
-            }
-        }
-        classBoxList.remove(findClassBox(classBoxName));
-    }
-
-    //***************************************//
-    //*********** GUI View Main *************//
-    //***************************************//
-
-    // launch the gui
     public static void main(String[] args) {
         launch(args);
     }
