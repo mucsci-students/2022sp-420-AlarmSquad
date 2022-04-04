@@ -19,15 +19,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-coverage:
-  runs-on: windows-latest
-  - uses: actions/checkout@v3
+    #- uses: actions/checkout@v3
     - name: Codecov
     - uses: codecov/codecov-action@v2
       with:
-        version: "v0.1.15"
-        env_vars: 138be7b0-845b-4c07-8979-89a6ae0caadd
-        files: ./coverage1.xml,./coverage2.xml
+        # env_vars: 138be7b0-845b-4c07-8979-89a6ae0caadd
+        files: maven/initial/pom.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: true 
