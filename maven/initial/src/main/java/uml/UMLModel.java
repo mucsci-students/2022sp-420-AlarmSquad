@@ -294,6 +294,8 @@ public class UMLModel {
                 list/l class        List a specific class in the diagram
                 list/l classes      List all the classes in the diagram
                 list/l rel          List all the relationships in the diagram
+                undo                erases most recent edit to diagram 
+                redo                reverts an undo
                 save			    Save the current UML diagram
                 load			    Load a previously saved UML diagram
                 clear			    Clear the command history
