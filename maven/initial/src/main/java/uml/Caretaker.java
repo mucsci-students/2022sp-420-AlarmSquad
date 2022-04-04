@@ -69,4 +69,5 @@ public class Caretaker {
         undoStack.push(currState);
         return redoStack.pop();
     }
+
 }

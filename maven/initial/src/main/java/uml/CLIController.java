@@ -885,7 +885,7 @@ public class CLIController {
      * Creates a memento object using the current state and puts it onto the state stack
      */
     private void setState() {
-        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList()));
+        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
         caretaker.pushToUndoStack(currState);
     }
 
@@ -896,16 +896,16 @@ public class CLIController {
      */
     private boolean undo() {
         // if the stack is empty, return false, otherwise perform the undo and return
-        if (this.caretaker.undoStackIsEmpty()) {
-            return false;
-        } else {
-            // get the current state the model is in
-            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList()));
-            // get the previous state on the state stack, and pass the helper the current state for the redo stack
-            Memento prevState = caretaker.undoHelper(currState);
-            // make this current model the previous model
-            this.model = prevState.getState();
-            return true;
+            if (this.caretaker.undoStackIsEmpty()) {
+                return false;
+            } else {
+                // get the current state the model is in
+                Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
+                // get the previous state on the state stack, and pass the helper the current state for the redo stack
+                Memento prevState = caretaker.undoHelper(currState);
+                // make this current model the previous model
+                this.model = prevState.getState();
+                return true;
         }
     }
 
@@ -920,7 +920,7 @@ public class CLIController {
             return false;
         } else {
             // get the current state the model is in
-            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList()));
+            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
             // get the previous state on the state stack, and pass the helper the current state for the undo stack
             Memento prevState = caretaker.redoHelper(currState);
             // make this current model the previous model

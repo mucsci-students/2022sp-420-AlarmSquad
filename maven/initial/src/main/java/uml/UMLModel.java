@@ -1,6 +1,10 @@
 package uml;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // The project model; holds information on the project data
 public class UMLModel {
@@ -8,6 +12,8 @@ public class UMLModel {
     private ArrayList<UMLClass> UMLClassList;
     // The arraylist of relationships the diagram has
     private ArrayList<Relationship> relationshipList;
+    // the arrayList of coordinates the diagram has
+    private Map<String, List<Double>> coordinateMap;
 
     /**
      * Default constructor
@@ -15,6 +21,7 @@ public class UMLModel {
     public UMLModel() {
         this.UMLClassList = new ArrayList<>();
         this.relationshipList = new ArrayList<>();
+        this.coordinateMap = new HashMap<>();
     }
 
     /**
@@ -23,10 +30,11 @@ public class UMLModel {
      * @param UMLClassList
      * @param relationshipList
      */
-    public UMLModel(ArrayList<UMLClass> UMLClassList, ArrayList<Relationship> relationshipList) {
+    public UMLModel(ArrayList<UMLClass> UMLClassList, ArrayList<Relationship> relationshipList, HashMap<String, List<Double>> coordinateMap) {
         // initialize the new array lists
         this.UMLClassList = new ArrayList<>();
         this.relationshipList = new ArrayList<>();
+        this.coordinateMap = new HashMap<>();
         // iterate through the given class list
         for (UMLClass classObj : UMLClassList) {
             // make a new class object and populate it
@@ -55,6 +63,13 @@ public class UMLModel {
         for (Relationship relObj : relationshipList) {
             this.relationshipList.add(relObj);
         }
+        for (String key : coordinateMap.keySet()) {
+            List<Double> values = new ArrayList<>();
+            for (Double value : coordinateMap.get(key)) {
+                values.add(value);
+            }
+            this.coordinateMap.put(key, values);
+        }
     }
 
     /**
@@ -63,7 +78,7 @@ public class UMLModel {
      * @param modelToCopy the model to copy from
      */
     public UMLModel(UMLModel modelToCopy) {
-        this(modelToCopy.getClassList(), modelToCopy.getRelationshipList());
+        this(modelToCopy.getClassList(), modelToCopy.getRelationshipList(), modelToCopy.getCoordinateMap());
     }
 
     // getter for class list
@@ -76,6 +91,10 @@ public class UMLModel {
     }
     // setter for relationship list
     public void setRelationshipList(ArrayList<Relationship> relationshipList) { this.relationshipList = relationshipList; }
+    // getter for the coordinate map
+    public HashMap<String, List<Double>> getCoordinateMap() { return (HashMap<String, List<Double>>) coordinateMap; }
+    // setter for the coordinate map
+    public void setCoordinateMap(HashMap<String, List<Double>> coordinateMap) { this.coordinateMap = coordinateMap; }
 
     // add a class to the class list
     public void addClass(UMLClass newUMLClass) { this.UMLClassList.add(newUMLClass); }
@@ -325,9 +344,11 @@ public class UMLModel {
                 Edit>Rename>Rename Attribute>Rename Field\t\tRename a field from an existing class
                 Edit>Rename>Rename Attribute>Rename Method\tRename a method from an existing class
                 Edit>Change>Change Parameter(s)\t\t\t\tChange a parameter in an existing method
-                Edit>Add>Add Relationship\t\t\t\t\tAdd a new relationship
+                Edit>Add>Add Relationship\t\t\t\t\t\tAdd a new relationship
                 Edit>Delete>Delete Relationship\t\t\t\t\tDelete an existing relationship
                 Edit>Change>Change Relationship Type\t\t\tChange a relationship type
+                Edit>Undo\t\t\t\t\t\t\t\t\tUndo a previous action
+                Edit>Redo\t\t\t\t\t\t\t\t\tRedo a previous action
                 File>Save\t\t\t\t\t\t\t\t\t\tSave the current UML diagram
                 File>Load\t\t\t\t\t\t\t\t\t\tLoad a previously saved UML diagram
                 Help>Show Commands\t\t\t\t\t\t\tDisplay list of commands
