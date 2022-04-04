@@ -53,7 +53,6 @@ public class GUIView extends Application {
     private ArrayList<ClassBox> classBoxList = new ArrayList<>();
     private ArrayList<RelLine> lineList = new ArrayList<>();
     private ArrayList<ArrayList<Line>> arrowList = new ArrayList<>();
-    private Map<String, List<Double>> coordinateMap = new HashMap<>();
     private AffineTransform affineTransform = new AffineTransform();
     private FontRenderContext frc = new FontRenderContext(affineTransform, true, true);
     private Font font = new Font("Arial", Font.PLAIN, 12);
@@ -197,9 +196,6 @@ public class GUIView extends Application {
         MenuItem renameMethod = new MenuItem("Rename Method");
         renameMethod.setOnAction(event -> renameMethodWindow());
         renameAttribute.getItems().addAll(renameField, renameMethod);
-
-        //TODO refactor rename attribute to change?
-
         // adds all the rename menu items to rename option
         rename.getItems().addAll(renameClass, renameAttribute);
         Menu change = new Menu("Change");
@@ -211,10 +207,18 @@ public class GUIView extends Application {
         changeRelType.setOnAction(event -> changeRelTypeWindow());
         // all of the change options as part of the edit menu
         change.getItems().addAll(changeParam, changeRelType);
+
+        // undoes the most recent action
+        MenuItem undo = new MenuItem("Undo");
+        undo.setOnAction(event -> controller.undoAction());
+        // redoes the most recent undo
+        MenuItem redo = new MenuItem("Redo");
+        redo.setOnAction(event -> controller.redoAction());
+
         // create the edit menu and add the 'add', 'delete', and 'rename' menus to it
         Menu edit = new Menu("Edit");
         // all of the options that are part of the edit menu
-        edit.getItems().addAll(add, delete, rename, change);
+        edit.getItems().addAll(add, delete, rename, change, undo, redo);
         // create the help menu and its menu item
         Menu help = new Menu("Help");
         MenuItem showCommands = new MenuItem("Show Commands");
@@ -1057,7 +1061,7 @@ public class GUIView extends Application {
         pane.add(commandList, 0, 0);
         pane.add(cancel, 1, 1);
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Show Commands", 400, 615);
+        finalizeWindow(stage, root, pane, "Show Commands", 445, 615);
     }
 
     /**
@@ -1122,6 +1126,7 @@ public class GUIView extends Application {
             // set the x and y to the right coordinates
             classBox.setX(classBox.getClassPane().getTranslateX());
             classBox.setY(classBox.getClassPane().getTranslateY());
+            addToCoordinateMap(className, classBox.getX(), classBox.getY());
         });
         // Increases box width if className is too big for the default
         if((int)(font.getStringBounds(className, frc)).getWidth() + 30 > classBox.getBoxWidth())
@@ -1136,8 +1141,8 @@ public class GUIView extends Application {
     public void moveClassBoxes() {
         // iterate through the class box list and set the translate x and y to the right value
         for (ClassBox cbObj : classBoxList) {
-            Double X = coordinateMap.get(cbObj.getClassBoxName()).get(0);
-            Double Y = coordinateMap.get(cbObj.getClassBoxName()).get(1);
+            double X = this.model.getCoordinateMap().get(cbObj.getClassBoxName()).get(0);
+            double Y = this.model.getCoordinateMap().get(cbObj.getClassBoxName()).get(1);
             cbObj.setX(X);
             cbObj.setY(Y);
             cbObj.getClassPane().setTranslateX(cbObj.getX());
@@ -1770,6 +1775,8 @@ public class GUIView extends Application {
             addAttribute.getItems().get(0).setDisable(false);
             // enable the add method menu item
             addAttribute.getItems().get(1).setDisable(false);
+            // enable add relationship
+            add.getItems().get(2).setDisable(false);
             // enable the delete class menu item
             delete.getItems().get(0).setDisable(false);
             // enable the rename class menu item
@@ -1822,13 +1829,6 @@ public class GUIView extends Application {
                 delete.getItems().get(3).setDisable(true);
                 change.getItems().get(0).setDisable(true);
             }
-            // if there are at least 2 classes in the class list, enable add relationship
-            // otherwise, disable it
-            if (this.controller.getClassList().size() > 1) {
-                add.getItems().get(2).setDisable(false);
-            } else {
-                add.getItems().get(2).setDisable(true);
-            }
             // if there are at least one relationship in the relationship list, enable the menu items
             // otherwise, disable them
             if (!this.controller.getRelationshipList().isEmpty()) {
@@ -1842,6 +1842,7 @@ public class GUIView extends Application {
             // disable all the menu items
             addAttribute.getItems().get(0).setDisable(true);
             addAttribute.getItems().get(1).setDisable(true);
+            add.getItems().get(2).setDisable(true);
             delete.getItems().get(0).setDisable(true);
             rename.getItems().get(0).setDisable(true);
             deleteAttribute.getItems().get(0).setDisable(true);
@@ -1890,7 +1891,7 @@ public class GUIView extends Application {
         List<Double> coordinateList = new ArrayList<Double>();
         coordinateList.add(X);
         coordinateList.add(Y);
-        coordinateMap.put(className, coordinateList);
+        this.model.getCoordinateMap().put(className, coordinateList);
     }
 
     public static void main(String[] args) {

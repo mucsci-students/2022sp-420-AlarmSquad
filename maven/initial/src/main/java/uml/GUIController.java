@@ -14,10 +14,12 @@ public class GUIController {
 
     private GUIView view;
     private UMLModel model;
+    private Caretaker caretaker;
 
     public GUIController(GUIView view, UMLModel model) {
         this.view = view;
         this.model = model;
+        this.caretaker = new Caretaker();
     }
 
     /******************************************************************
@@ -47,6 +49,7 @@ public class GUIController {
     public void loadAction(File file, Stage stage) {
         try {
             JSON json = new JSON(this.model, this.view);
+            setState();
             this.model = json.loadGUI(file);
             clearDiagram();
             uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());
@@ -80,6 +83,7 @@ public class GUIController {
                 // if the class does not exist, add it and close
                 if (this.model.findClass(className) == null) {
                     UMLClass newClass = new UMLClass(className);
+                    setState();
                     this.model.addClass(newClass);
                     stage.close();
                     int multiplier = ((this.model.getClassList().size() - 1) / 8);
@@ -120,6 +124,7 @@ public class GUIController {
                 // if the field does not exist, add it and close
                 if (this.model.findClass(className).findField(fieldName) == null) {
                     Field newField = new Field(fieldName, fieldType);
+                    setState();
                     this.model.findClass(className).addField(newField);
                     stage.close();
                     this.view.drawFieldBox(this.model.findClass(className).getFieldList().size(),
@@ -157,6 +162,7 @@ public class GUIController {
                 // if the method does not exist, add it and close
                 if (this.model.findClass(className).findMethod(methodName) == null) {
                     Method newMethod = new Method(methodName, returnType);
+                    setState();
                     this.model.findClass(className).addMethod(newMethod);
                     stage.close();
                     this.view.drawMethodBox(this.model.findClass(className).getFieldList().size(),
@@ -197,6 +203,7 @@ public class GUIController {
                     UMLClass src = this.model.findClass(srcName);
                     UMLClass dest = this.model.findClass(destName);
                     Relationship newRel = new Relationship(src, dest, relType);
+                    setState();
                     this.model.addRel(newRel);
                     this.view.drawLine(srcName, destName, this.model.findRelType(srcName, destName));
                     stage.close();
@@ -240,6 +247,7 @@ public class GUIController {
                 // if the parameter does not exist, add it and close
                 if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {
                     Parameter newParam = new Parameter(paramName, paramType);
+                    setState();
                     this.model.findClass(className).findMethod(methodName).addParameter(newParam);
                     stage.close();
                     this.view.findClassBox(className).addText(this.model.findClass(className).findMethod(methodName),
@@ -278,6 +286,7 @@ public class GUIController {
             // if the class does exist, delete it and close
             } else {
                 UMLClass classToDelete = this.model.findClass(className);
+                setState();
                 // update the view
                 stage.close();
                 // for each relationship object in the relationship list
@@ -329,6 +338,7 @@ public class GUIController {
             // if the field does exist, delete it and close
             } else {
                 Field fieldToDelete = this.model.findClass(className).findField(fieldName);
+                setState();
                 this.model.findClass(className).deleteField(fieldToDelete);
                 // go through fieldList in ClassBox, remove the field from the fieldList, then
                 // remove field from flow
@@ -367,6 +377,7 @@ public class GUIController {
             // if the method does exist, delete it and close
             } else {
                 Method methodToDelete = this.model.findClass(className).findMethod(methodName);
+                setState();
                 this.model.findClass(className).deleteMethod(methodToDelete);
                 // go through fieldList in ClassBox, remove the field from the fieldList, then
                 // remove field from flow
@@ -408,6 +419,7 @@ public class GUIController {
                 this.view.popUpWindow("Error", "Parameter does not exist");
                 // if the parameter name is not a valid string, pop an error up
             } else {
+                setState();
                 Parameter paramToDelete = this.model.findClass(className).findMethod(methodName).findParameter(paramName);
                 this.model.findClass(className).findMethod(methodName).deleteParameter(paramToDelete);
                 // go through methlist in ClassBox, edit text of method in that methlist, remove the
@@ -448,6 +460,7 @@ public class GUIController {
             this.view.popUpWindow("Error", "Relationship does not exist");
         // delete the relationship, update the view and close
         } else {
+            setState();
             Relationship relToDelete = this.model.findRelationship(srcName, destName,
                     this.model.findRelType(srcName, destName));
             // update view
@@ -484,6 +497,7 @@ public class GUIController {
             } else {
                 // if the class name is not already in use, rename the field
                 if (this.model.findClass(newClassName) == null) {
+                    setState();
                     // update model
                     this.model.findClass(className).setClassName(newClassName);
                     // update view
@@ -529,6 +543,7 @@ public class GUIController {
             }
             // if the field name is not already in use, rename the field
             if (this.model.findClass(className).findField(newFieldName) == null) {
+                setState();
                 // update model
                 this.model.findClass(className).findField(fieldName).setAttName(newFieldName);
                 // update view
@@ -580,6 +595,7 @@ public class GUIController {
             } else {
                 // if the method name is not already in use, rename the method
                 if (this.model.findClass(className).findMethod(newMethodName) == null) {
+                    setState();
                     this.model.findClass(className).findMethod(methodName).setAttName(newMethodName);
                     stage.close();
                     // go through methlist in ClassBox, edit text of method in that methlist, remove the
@@ -636,6 +652,7 @@ public class GUIController {
             } else {
                 // if the parameter name is not already in use, change the parameter
                 if (this.model.findClass(className).findMethod(methodName).findParameter(newParamName) == null) {
+                    setState();
                     this.model.findClass(className).findMethod(methodName).findParameter(paramName).
                             setAttName(newParamName);
                     this.model.findClass(className).findMethod(methodName).findParameter(newParamName)
@@ -703,6 +720,7 @@ public class GUIController {
         }
         // if the old type and the new type are not the same, change the type
         else if(!oldReltype.equals(newRelType)){
+            setState();
             // update the view
             this.view.deleteRelLine(this.view.findClassBox(src), this.view.findClassBox(dest));
             this.view.drawLine(src, dest, newRelType);
@@ -716,6 +734,45 @@ public class GUIController {
         }
     }
 
+    /**
+     * Stores the current state in the state stack
+     */
+    public void setState() {
+        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
+        caretaker.pushToUndoStack(currState);
+    }
+
+    public void undoAction() {
+        // if the stack is empty, return false, otherwise perform the undo and return
+        if (this.caretaker.undoStackIsEmpty()) {
+            this.view.popUpWindow("Error", "No actions to undo.");
+        } else {
+            // get the current state the model is in
+            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
+            // get the previous state on the state stack, and pass the helper the current state for the redo stack
+            Memento prevState = caretaker.undoHelper(currState);
+            // make this current model the previous model
+            this.model = prevState.getState();
+            clearDiagram();
+            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());
+        }
+    }
+
+    public void redoAction() {
+        // if the stack is empty, return false, otherwise perform the redo and return
+        if (this.caretaker.redoStackIsEmpty()) {
+            this.view.popUpWindow("Error", "No actions to redo.");
+        } else {
+            // get the current state the model is in
+            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
+            // get the previous state on the state stack, and pass the helper the current state for the undo stack
+            Memento prevState = caretaker.redoHelper(currState);
+            // make this current model the previous model
+            this.model = prevState.getState();
+            clearDiagram();
+            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());
+        }
+    }
 
     /******************************************************************
      *

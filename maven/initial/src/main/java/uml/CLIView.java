@@ -11,7 +11,6 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 
-
 public class CLIView {
 
     private TerminalBuilder builder;
