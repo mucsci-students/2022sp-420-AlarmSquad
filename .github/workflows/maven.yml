@@ -25,6 +25,7 @@ jobs:
     - uses: actions/checkout@master
     - uses: codecov/codecov-action@v2
       with:
+        version: "v0.1.15"
         files: ./coverage1.xml,./coverage2.xml
         flags: unittests
         name: codecov-umbrella
