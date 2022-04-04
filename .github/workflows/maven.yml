@@ -19,16 +19,5 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - uses: actions/checkout@develop
-    - name: Codecov
-    - uses: codecov/codecov-action@v2
-      with:
-        version: "v0.1.15"
-        env_vars: 138be7b0-845b-4c07-8979-89a6ae0caadd
-        files: ./coverage1.xml,./coverage2.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true 
-        verbose: true 
     - name: Build with Maven
       run: mvn -B package --file maven/initial/pom.xml
