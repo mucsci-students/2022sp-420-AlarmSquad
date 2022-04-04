@@ -25,7 +25,6 @@ jobs:
     - uses: actions/checkout@master
     - uses: codecov/codecov-action@v2
       with:
-        token: 138be7b0-845b-4c07-8979-89a6ae0caadd
         files: ./coverage1.xml,./coverage2.xml
         flags: unittests
         name: codecov-umbrella
