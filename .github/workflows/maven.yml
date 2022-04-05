@@ -24,10 +24,9 @@ jobs:
       run: mvn -B package --file maven/initial/pom.xml
     - uses: actions/checkout@v3
     - name: Codecov
-      uses: codecov/codecov-action@v2.1.0
+      uses: codecov/codecov-action@v2
       with:
         file: maven/initial/target/site/jacoco/jacoco.xml
         token: 138be7b0-845b-4c07-8979-89a6ae0caadd
-        version: "v2.1.0"
         fail_ci_if_error: true 
         verbose: true 
