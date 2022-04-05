@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Relationship.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">Relationship.java</span></div><h1>Relationship.java</h1><pre class="source lang-java linenums">package uml;
+
+/**
+ * A class for the relationship object between two UML Class objects
+ *
+ * @authors
+ */
+public class Relationship {
+
+    // The source of the relationship
+    private final UMLClass source;
+    // The destination of the relationship
+    private final UMLClass destination;
+    // The type of the relationship
+    private String relType;
+
+
+    /**
+     * Default constructor
+     * @param source      the source of the relationship
+     * @param destination the destination of the relationship
+     * @param relType     the type of the relationship
+     * */
+
+<span class="fc" id="L25">    public Relationship(UMLClass source, UMLClass destination, String relType) {</span>
+<span class="fc" id="L26">        this.source = source;</span>
+<span class="fc" id="L27">        this.destination = destination;</span>
+<span class="fc" id="L28">        this.relType = relType;</span>
+<span class="fc" id="L29">    }</span>
+
+    /**
+     * Gets the source of the relationship
+     *
+     * @return the source of the relationship
+     */
+    public UMLClass getSource() {
+<span class="fc" id="L37">        return this.source;</span>
+    }
+
+    /**
+     * Gets the destination of the relationship
+     *
+     * @return the destination of the relationship
+     */
+    public UMLClass getDestination() {
+<span class="fc" id="L46">        return this.destination;</span>
+    }
+
+    /**
+     * Gets the type of the relationship
+     *
+     * @return the relationship type
+     */
+<span class="fc" id="L54">    public String getRelType() { return this.relType; }</span>
+
+    /**
+     * Sets the type of the relationship
+     *
+     * @return the new relationship type
+     */
+<span class="fc" id="L61">    public void setRelType(String newReltype) { this.relType = newReltype; }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

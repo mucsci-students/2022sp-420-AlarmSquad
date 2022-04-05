@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Method.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">Method.java</span></div><h1>Method.java</h1><pre class="source lang-java linenums">package uml;
+
+import java.util.ArrayList;
+
+public class Method extends Attribute {
+
+    private String returnType;
+    private ArrayList&lt;Parameter&gt; paramList;
+
+    /**
+     * Method constructor
+     *
+     * @param methodName the name of the method
+     * @param returnType the return type of the method
+     */
+    public Method(String methodName, String returnType) {
+<span class="nc" id="L17">        super(methodName);</span>
+<span class="nc" id="L18">        this.returnType = returnType;</span>
+<span class="nc" id="L19">        paramList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L20">    }</span>
+
+    // getter for return type
+    public String getReturnType(){
+<span class="nc" id="L24">        return this.returnType;</span>
+    }
+
+    // getter for param list
+    public ArrayList&lt;Parameter&gt; getParamList() {
+<span class="nc" id="L29">        return paramList;</span>
+    }
+    // adds a parameter to the param list
+    public void addParameter(Parameter param) {
+<span class="nc" id="L33">        paramList.add(param);</span>
+<span class="nc" id="L34">    }</span>
+    // removes a parameter from the param list
+    public void deleteParameter(Parameter param) {
+<span class="nc" id="L37">        paramList.remove(param);</span>
+<span class="nc" id="L38">    }</span>
+
+    /**
+     * Iterates through paramList, returns with .get()
+     *
+     * @param paramToFind the name of the parameter
+     * @return param if found, null if not found
+     */
+    public Parameter findParameter(String paramToFind) {
+        // iterates through the arraylist
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        for (Parameter parameter : paramList) {</span>
+            // if the name matches, return class
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            if (paramToFind.equals(parameter.getAttName())) {</span>
+<span class="nc" id="L51">                return parameter;</span>
+            }
+<span class="nc" id="L53">        }</span>
+<span class="nc" id="L54">        return null;</span>
+    }
+
+    /**
+     * Iterates through paramList, returns with .get()
+     *
+     * @param paramToFind the name of the parameter
+     */
+    public void changeParameter(String paramToFind, Parameter paramToChange) {
+        // iterates through the arraylist
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        for (int i = 0; i &lt; paramList.size(); ++i) {</span>
+            // if the name matches, return class
+<span class="nc bnc" id="L66" title="All 2 branches missed.">            if (paramToFind.equals(paramList.get(i).getAttName())) {</span>
+<span class="nc" id="L67">                paramList.set(i, paramToChange);</span>
+<span class="nc" id="L68">                return;</span>
+            }
+        }
+<span class="nc" id="L71">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
