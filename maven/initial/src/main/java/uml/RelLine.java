@@ -28,7 +28,6 @@ public class RelLine {
         // line style
         line.setStrokeWidth(9.5);
         line.setStroke(Color.BLACK);
-
         // set middle of rectangle bindings
         DoubleBinding startXBind = source.getClassPane().
                 translateXProperty().add(source.getClassPane().widthProperty().divide(2));
@@ -38,6 +37,7 @@ public class RelLine {
                 translateXProperty().add(destination.getClassPane().widthProperty().divide(2));
         DoubleBinding endYBind = destination.getClassPane().
                 translateYProperty().add(destination.getClassPane().heightProperty().subtract(16));
+
         // bind the line to the two class box rectangles
         line.startXProperty().bind(startXBind);
         line.startYProperty().bind(startYBind);
@@ -72,6 +72,5 @@ public class RelLine {
      * @return the relationship type
      */
     public String getRelType() { return this.relType; }
-
 
 }

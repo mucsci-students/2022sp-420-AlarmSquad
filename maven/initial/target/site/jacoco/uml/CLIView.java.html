@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CLIView.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">CLIView.java</span></div><h1>CLIView.java</h1><pre class="source lang-java linenums">package uml;
+
+import org.jline.reader.Completer;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.completer.ArgumentCompleter;
+import org.jline.reader.impl.completer.StringsCompleter;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+
+
+import java.io.IOException;
+
+public class CLIView {
+
+    private TerminalBuilder builder;
+    private Completer completer;
+    private Terminal terminal;
+    
+<span class="nc" id="L20">    public CLIView() {</span>
+<span class="nc" id="L21">        this.builder = TerminalBuilder.builder();</span>
+<span class="nc" id="L22">        this.completer = new ArgumentCompleter(new StringsCompleter(&quot;help&quot;, &quot;exit&quot;, &quot;add&quot;, &quot;delete&quot;, &quot;rename&quot;, &quot;change&quot;, &quot;list&quot;, &quot;save&quot;, &quot;load&quot;, &quot;clear&quot;));</span>
+<span class="nc" id="L23">        this.terminal = null;</span>
+<span class="nc" id="L24">    }</span>
+    
+    //a method to build the terminal using Jline linereader
+    public LineReader buildConsole() {
+        //build terminal as not dumb
+        try {
+<span class="nc" id="L30">            terminal = builder.system(true).dumb(false).build();</span>
+<span class="nc" id="L31">        } catch (IOException e) {</span>
+<span class="nc" id="L32">           e.printStackTrace();</span>
+<span class="nc" id="L33">        }</span>
+
+        //create a virtual terminal
+<span class="nc" id="L36">        LineReader reader = LineReaderBuilder.builder()</span>
+<span class="nc" id="L37">                .terminal(terminal)</span>
+<span class="nc" id="L38">                .completer(completer)</span>
+<span class="nc" id="L39">                .build();</span>
+
+        //options for reader object
+<span class="nc" id="L42">        reader.option(LineReader.Option.COMPLETE_IN_WORD, true);</span>
+<span class="nc" id="L43">        reader.option(LineReader.Option.RECOGNIZE_EXACT, true);</span>
+<span class="nc" id="L44">        reader.option(LineReader.Option.CASE_INSENSITIVE, true);</span>
+<span class="nc" id="L45">        return reader;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

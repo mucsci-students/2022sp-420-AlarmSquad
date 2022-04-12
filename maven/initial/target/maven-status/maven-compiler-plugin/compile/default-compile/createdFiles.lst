@@ -1,0 +1,9 @@
+uml\UMLModel.class
+uml\JSON.class
+uml\CLIView.class
+uml\GUIView.class
+uml\GUIController.class
+uml\Caretaker.class
+uml\UMLClass.class
+uml\CLIController.class
+uml\Memento.class

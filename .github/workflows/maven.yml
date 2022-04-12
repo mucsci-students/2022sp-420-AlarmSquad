@@ -26,9 +26,7 @@ jobs:
     - name: Codecov
       uses: codecov/codecov-action@v2
       with:
-        # env_vars: 138be7b0-845b-4c07-8979-89a6ae0caadd
-        files: maven/initial/pom.xml
-        flags: unittests
-        name: codecov-umbrella
+        file: maven/initial/target/site/jacoco/jacoco.xml
+        token: 138be7b0-845b-4c07-8979-89a6ae0caadd
         fail_ci_if_error: true 
         verbose: true 
