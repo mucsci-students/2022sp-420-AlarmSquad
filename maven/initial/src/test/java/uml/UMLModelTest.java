@@ -2,6 +2,9 @@ package uml;
 
 import org.junit.Test;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class UMLModelTest {
@@ -10,6 +13,20 @@ public class UMLModelTest {
     private UMLClass teacher = new UMLClass("teacher");
     private Relationship stuTea = new Relationship(student, teacher, "aggregation");
     private Relationship teaStu = new Relationship(teacher, student, "realization");
+
+    @Test
+    public void UMLModel() {
+        ArrayList<UMLClass> umlList = new ArrayList<>();
+        ArrayList<Relationship> relList = new ArrayList<>();
+        HashMap<String, List<Double>> coordinateMap = new HashMap<>();
+        UMLModel model = new UMLModel(umlList, relList, coordinateMap);
+        UMLModel modelCopy = model;
+        assertEquals(model.getClassList(), new UMLModel(umlList, relList, coordinateMap).getClassList());
+        assertEquals(model.getRelationshipList(), new UMLModel(umlList, relList, coordinateMap).getRelationshipList());
+        assertEquals(model.getCoordinateMap(), new UMLModel(umlList, relList, coordinateMap).getCoordinateMap());
+        assertEquals(model.getClassList(), new UMLModel(umlList, relList, coordinateMap).getClassList());
+        assertEquals(model, modelCopy);
+    }
 
     @Test
     public void getClassList() {
@@ -118,6 +135,7 @@ public class UMLModelTest {
         model.addClass(teacher);
         assertEquals("student", model.findClass("student").getClassName());
         assertEquals("teacher", model.findClass("teacher").getClassName());
+        assertEquals(null, model.findClass("principal"));
     }
 
     @Test
@@ -173,15 +191,22 @@ public class UMLModelTest {
         model.deleteClass(student);
         model.updateRelationshipList("student");
         assertEquals("[]", "" + model.getRelationshipList());
+        model.addClass(student);
+        model.addRel(stuTea);
+        model.deleteClass(teacher);
+        model.updateRelationshipList("teacher");
+        assertEquals("[]", "" + model.getRelationshipList());
     }
 
     @Test
     public void isValidIdentifier() {
         UMLModel model = new UMLModel();
+        assertEquals(false, model.isValidIdentifier(null));
         assertEquals(true, model.isValidIdentifier("string"));
         assertEquals(false, model.isValidIdentifier("123String"));
         assertEquals(true, model.isValidIdentifier("string123"));
         assertEquals(false, model.isValidIdentifier("&string"));
+        assertEquals(false, model.isValidIdentifier("string&"));
     }
 
     @Test
