@@ -258,7 +258,7 @@ public class UMLModel {
         if (Character.isJavaIdentifierStart(c[0])) {
             for (int i = 1; i < input.length(); i++) {
                 if (!Character.isJavaIdentifierPart(c[i])) {
-                    return true;
+                    return false;
                 }
             }
             return true;
