@@ -6,7 +6,7 @@
 
 ## Setup:
 
-1. Open Terminal for Linux and M  acOS, Command Prompt for Windows
+1. Open Terminal for Linux and MacOS, Command Prompt for Windows
 
 2. Clone the repository
 
