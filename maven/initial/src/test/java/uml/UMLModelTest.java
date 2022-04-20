@@ -2,14 +2,46 @@ package uml;
 
 import org.junit.Test;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class UMLModelTest {
-
     private UMLClass student = new UMLClass("student");
     private UMLClass teacher = new UMLClass("teacher");
+    private Field name = new Field ("name", "String");
+    private Method setName = new Method ("setName", "void");
+    private Parameter newName = new Parameter("newName", "String");
     private Relationship stuTea = new Relationship(student, teacher, "aggregation");
     private Relationship teaStu = new Relationship(teacher, student, "realization");
+    String coordinateName = "key";
+    List<Double> coordinateList = new ArrayList<>();
+
+    @Test
+    public void UMLModel() {
+        ArrayList<UMLClass> umlList = new ArrayList<>();
+        student.addField(name);
+        setName.addParameter(newName);
+        student.addMethod(setName);
+        umlList.add(student);
+        umlList.add(teacher);
+        ArrayList<Relationship> relList = new ArrayList<>();
+        relList.add(stuTea);
+        relList.add(teaStu);
+        HashMap<String, List<Double>> coordinateMap = new HashMap<>();
+        coordinateList.add (5.0);
+        coordinateList.add (15.0);
+        coordinateMap.put(coordinateName, coordinateList);
+
+        UMLModel model = new UMLModel(umlList, relList, coordinateMap);
+        UMLModel modelCopy = new UMLModel(model);
+        assertEquals(model.getClassList().get(0).getClassName(), new UMLModel(umlList, relList, coordinateMap).getClassList().get(0).getClassName());
+        assertEquals(model.getRelationshipList().get(0).getSource(), new UMLModel(umlList, relList, coordinateMap).getRelationshipList().get(0).getSource());
+        assertEquals(model.getCoordinateMap(), new UMLModel(umlList, relList, coordinateMap).getCoordinateMap());
+        assertEquals(model.getClassList().get(1).getClassName(), new UMLModel(umlList, relList, coordinateMap).getClassList().get(1).getClassName());
+        assertEquals(model.getClassList().get(1).getClassName(), modelCopy.getClassList().get(1).getClassName());
+    }
 
     @Test
     public void getClassList() {
@@ -51,10 +83,16 @@ public class UMLModelTest {
 
     @Test
     public void getCoordinateMap() {
+        UMLModel model = new UMLModel();
+        assertEquals (new HashMap<>(), model.getCoordinateMap());
     }
 
     @Test
     public void setCoordinateMap() {
+        UMLModel model = new UMLModel();
+        HashMap<String, List<Double>> coordinateMap = new HashMap<>();
+        coordinateMap.put(coordinateName, coordinateList);
+        model.setCoordinateMap(coordinateMap);
     }
 
     @Test
@@ -118,6 +156,7 @@ public class UMLModelTest {
         model.addClass(teacher);
         assertEquals("student", model.findClass("student").getClassName());
         assertEquals("teacher", model.findClass("teacher").getClassName());
+        assertEquals(null, model.findClass("principal"));
     }
 
     @Test
@@ -173,24 +212,29 @@ public class UMLModelTest {
         model.deleteClass(student);
         model.updateRelationshipList("student");
         assertEquals("[]", "" + model.getRelationshipList());
+        model.addClass(student);
+        model.addRel(stuTea);
+        model.deleteClass(teacher);
+        model.updateRelationshipList("teacher");
+        assertEquals("[]", "" + model.getRelationshipList());
     }
 
     @Test
     public void isValidIdentifier() {
         UMLModel model = new UMLModel();
+        assertEquals(false, model.isValidIdentifier(null));
         assertEquals(true, model.isValidIdentifier("string"));
         assertEquals(false, model.isValidIdentifier("123String"));
         assertEquals(true, model.isValidIdentifier("string123"));
         assertEquals(false, model.isValidIdentifier("&string"));
+        assertEquals(false, model.isValidIdentifier("string&"));
     }
 
     @Test
     public void isNotValidInput() {
         UMLModel model = new UMLModel();
-        assertEquals(true, model.isValidIdentifier("string"));
-        assertEquals(false, model.isValidIdentifier("123String"));
-        assertEquals(true, model.isValidIdentifier("string123"));
-        assertEquals(false, model.isValidIdentifier("&string"));
+        assertEquals(true, model.isNotValidInput("123String"));
+        assertEquals(false, model.isNotValidInput("string123"));
     }
 
     @Test
