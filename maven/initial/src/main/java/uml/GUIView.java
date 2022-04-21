@@ -27,9 +27,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("DanglingJavadoc")
 /**
@@ -117,13 +115,22 @@ public class GUIView extends Application {
     private VBox createDiagramMenu() {
         // create the file menu and its menu items
         Menu file = new Menu("File");
-        MenuItem save = new MenuItem("Save");
+        MenuItem saveAsFile = new MenuItem("Save as File");
         // if the save button is pressed, open a new window to save
-        save.setOnAction(event -> saveWindow());
+        saveAsFile.setOnAction(event -> saveFileWindow());
+        MenuItem saveAsImage = new MenuItem("Save as Image");
+        // if the save as image button is pressed, save the diagram to an image
+        saveAsImage.setOnAction(event -> {
+            if (classBoxList.isEmpty()) {
+                popUpWindow("Error", "There is nothing to display in the image.");
+            } else {
+                saveImageWindow();
+            }
+        });
         MenuItem load = new MenuItem("Load");
         // if the load button is pressed, open a new window to load
         load.setOnAction(event -> loadWindow());
-        file.getItems().addAll(save, load);
+        file.getItems().addAll(saveAsFile, saveAsImage, load);
 
         //***************************************//
         //********** Add Menu Items *************//
@@ -252,19 +259,36 @@ public class GUIView extends Application {
      ******************************************************************/
 
     /**
-     * Creates a window for the save method and its data
+     * Creates a window for the save file method and its data
      */
-    private void saveWindow() {
+    private void saveFileWindow() {
         Stage stage = new Stage();
         // create a file chooser and set the text to represent the right file
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save");
+        fileChooser.setTitle("Save as File");
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
         // get the selected file
         File file = fileChooser.showSaveDialog(stage);
         // if the file is not null, run the save action method
         if (file != null) {
-            this.controller.saveAction(file, stage);
+            this.controller.saveFileAction(file, stage);
+        }
+    }
+
+    /**
+     * Creates a window for the save image method and its data
+     */
+    private void saveImageWindow() {
+        Stage stage = new Stage();
+        // create a file chooser and set the text to represent the right file
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save as Image");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JPG Files", "*.jpg"));
+        // get the selected file
+        File file = fileChooser.showSaveDialog(stage);
+        // if the file is not null, run the save action method
+        if (file != null) {
+            this.controller.saveImageAction(file, stage, superRoot);
         }
     }
 
@@ -815,8 +839,6 @@ public class GUIView extends Application {
         // create a label for the text box for the new field name
         Label nameLabel = new Label("New field name: ");
         // create a label for the text box for the field type
-//        Label fieldTypeText = new Label("Field type: ");
-//        // create the text box for the class with the field
         TextField givenClass = new TextField();
         givenClass.setPrefColumnCount(14);
         // create the text box for the field to be renamed
