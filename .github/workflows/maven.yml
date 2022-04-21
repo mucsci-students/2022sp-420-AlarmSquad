@@ -21,7 +21,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file maven/initial/pom.xml
+      run: mvn -B package test --file maven/initial/pom.xml
     - uses: actions/checkout@v3
     - name: Codecov
       uses: codecov/codecov-action@v2
