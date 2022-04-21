@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RelLine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">RelLine.java</span></div><h1>RelLine.java</h1><pre class="source lang-java linenums">package uml;
+
+import javafx.beans.binding.DoubleBinding;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+
+public class RelLine {
+
+    // class box source class
+    private ClassBox source;
+    // class box destination class
+    private ClassBox destination;
+    // relationship type
+    private String relType;
+    // the line
+    private Line line;
+
+    // line constructor, needs a startX coord,
+    // a startY coord, endX coord, endY coord,
+    // and a color
+<span class="nc" id="L21">    public RelLine(ClassBox source, ClassBox destination, String relType){</span>
+<span class="nc" id="L22">        this.source = source;</span>
+<span class="nc" id="L23">        this.destination = destination;</span>
+<span class="nc" id="L24">        this.relType = relType;</span>
+        // creates the new line that connects form a source class to a destination class
+<span class="nc" id="L26">        this.line = new Line(source.getClassPane().getTranslateX(), source.getClassPane().getTranslateY(),</span>
+<span class="nc" id="L27">                destination.getClassPane().getTranslateX(), destination.getClassPane().getTranslateY());</span>
+        // line style
+<span class="nc" id="L29">        line.setStrokeWidth(9.5);</span>
+<span class="nc" id="L30">        line.setStroke(Color.BLACK);</span>
+        // set middle of rectangle bindings
+<span class="nc" id="L32">        DoubleBinding startXBind = source.getClassPane().</span>
+<span class="nc" id="L33">                translateXProperty().add(source.getClassPane().widthProperty().divide(2));</span>
+<span class="nc" id="L34">        DoubleBinding startYBind = source.getClassPane().</span>
+<span class="nc" id="L35">                translateYProperty().add(source.getClassPane().heightProperty().divide(2));</span>
+<span class="nc" id="L36">        DoubleBinding endXBind = destination.getClassPane().</span>
+<span class="nc" id="L37">                translateXProperty().add(destination.getClassPane().widthProperty().divide(2));</span>
+<span class="nc" id="L38">        DoubleBinding endYBind = destination.getClassPane().</span>
+<span class="nc" id="L39">                translateYProperty().add(destination.getClassPane().heightProperty().subtract(16));</span>
+
+        // bind the line to the two class box rectangles
+<span class="nc" id="L42">        line.startXProperty().bind(startXBind);</span>
+<span class="nc" id="L43">        line.startYProperty().bind(startYBind);</span>
+<span class="nc" id="L44">        line.endXProperty().bind(endXBind);</span>
+<span class="nc" id="L45">        line.endYProperty().bind(endYBind);</span>
+<span class="nc" id="L46">    }</span>
+
+    /**
+     * get the class box source class
+     *
+     * @return the source class box object
+     */
+<span class="nc" id="L53">    public ClassBox getCBSrc() { return this.source; }</span>
+
+    /**
+     * get the class box destination class
+     *
+     * @return the destination class box object
+     */
+<span class="nc" id="L60">    public ClassBox getCBDest() { return this.destination; }</span>
+
+    /**
+     * get the line from RelLine
+     *
+     * @return the relationship line
+     */
+<span class="nc" id="L67">    public Line getLine() { return this.line; }</span>
+
+    /**
+     * get the relationship type
+     *
+     * @return the relationship type
+     */
+<span class="nc" id="L74">    public String getRelType() { return this.relType; }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

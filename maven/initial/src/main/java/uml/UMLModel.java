@@ -80,7 +80,6 @@ public class UMLModel {
     public UMLModel(UMLModel modelToCopy) {
         this(modelToCopy.getClassList(), modelToCopy.getRelationshipList(), modelToCopy.getCoordinateMap());
     }
-
     // getter for class list
     public ArrayList<UMLClass> getClassList() { return UMLClassList; }
     // setter for class list
@@ -95,7 +94,6 @@ public class UMLModel {
     public HashMap<String, List<Double>> getCoordinateMap() { return (HashMap<String, List<Double>>) coordinateMap; }
     // setter for the coordinate map
     public void setCoordinateMap(HashMap<String, List<Double>> coordinateMap) { this.coordinateMap = coordinateMap; }
-
     // add a class to the class list
     public void addClass(UMLClass newUMLClass) { this.UMLClassList.add(newUMLClass); }
     // remove a class from the class list
@@ -106,7 +104,6 @@ public class UMLModel {
     public void clearClassList() {
         this.UMLClassList.clear();
     }
-
     // add a relationship to the rel list
     public void addRel(Relationship newRel) {
         this.relationshipList.add(newRel);
@@ -261,7 +258,7 @@ public class UMLModel {
         if (Character.isJavaIdentifierStart(c[0])) {
             for (int i = 1; i < input.length(); i++) {
                 if (!Character.isJavaIdentifierPart(c[i])) {
-                    return true;
+                    return false;
                 }
             }
             return true;
