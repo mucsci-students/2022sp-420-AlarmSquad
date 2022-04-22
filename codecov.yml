@@ -5,6 +5,23 @@ coverage:
   precision: 2
   round: down
   range: "80...100"
+  
+ignore:
+  - "maven/initial/src/main/java/uml/Attribute.java"
+  - "maven/initial/src/main/java/uml/Caretaker.java"
+  - "maven/initial/src/main/java/uml/ClassBox.java"
+  - "maven/initial/src/main/java/uml/CLIController.java"
+  - "maven/initial/src/main/java/uml/CLIView.java"
+  - "maven/initial/src/main/java/uml/Driver.java"
+  - "maven/initial/src/main/java/uml/Field.java"
+  - "maven/initial/src/main/java/uml/GUIController.java"
+  - "maven/initial/src/main/java/uml/GUIView.java"
+  - "maven/initial/src/main/java/uml/JSON.java"
+  - "maven/initial/src/main/java/uml/Memento.java"
+  - "maven/initial/src/main/java/uml/Parameter.java"
+  - "maven/initial/src/main/java/uml/Relationship.java"
+  - "maven/initial/src/main/java/uml/RelLine.java"
+  - "maven/initial/src/main/java/uml/UMLClass.java"
 
 parsers:
   gcov:
