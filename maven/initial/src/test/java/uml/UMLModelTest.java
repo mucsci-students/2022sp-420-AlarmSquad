@@ -10,11 +10,13 @@ import static org.junit.Assert.assertEquals;
 public class UMLModelTest {
     private UMLClass student = new UMLClass("student");
     private UMLClass teacher = new UMLClass("teacher");
+    private UMLClass principal = new UMLClass("principal");
     private Field name = new Field ("name", "String");
     private Method setName = new Method ("setName", "void");
     private Parameter newName = new Parameter("newName", "String");
     private Relationship stuTea = new Relationship(student, teacher, "aggregation");
     private Relationship teaStu = new Relationship(teacher, student, "realization");
+    private Relationship prinTea = new Relationship(principal, teacher, "composition");
     String coordinateName = "key";
     List<Double> coordinateList = new ArrayList<>();
 
@@ -210,6 +212,12 @@ public class UMLModelTest {
         assertEquals("composition", model.findRelationship("student", "teacher", "composition")
                 .getRelType());
         model.addRel(teaStu);
+        model.changeRelType("teacher", "teacher", "generalization");
+        assertEquals("realization", model.findRelationship("teacher", "student", "realization")
+                .getRelType());
+        model.changeRelType("principal", "teacher", "generalization");
+        assertEquals("realization", model.findRelationship("teacher", "student", "realization")
+                .getRelType());
         model.changeRelType("teacher", "student", "generalization");
         assertEquals(null, model.findRelationship("teacher", "student", "realization"));
         assertEquals("generalization", model.findRelationship("teacher", "student", "generalization")
@@ -221,20 +229,13 @@ public class UMLModelTest {
         UMLModel model = new UMLModel();
         model.addClass(student);
         model.addClass(teacher);
+        model.addClass(principal);
         model.addRel(stuTea);
+        model.addRel(teaStu);
+        model.addRel(prinTea);
         model.deleteClass(student);
         model.updateRelationshipList("student");
-        assertEquals("[]", "" + model.getRelationshipList());
-        model.addClass(student);
-        model.addRel(stuTea);
-        model.deleteClass(teacher);
-        model.updateRelationshipList("teacher");
-        assertEquals("[]", "" + model.getRelationshipList());
-        model.addClass(teacher);
-        model.addRel(teaStu);
-        model.deleteClass(student);
-        model.updateRelationshipList("teacher");
-        assertEquals("[]", "" + model.getRelationshipList());
+        assertEquals("principal", "" + model.getRelationshipList().get(0).getSource().getClassName());
     }
 
     @Test
