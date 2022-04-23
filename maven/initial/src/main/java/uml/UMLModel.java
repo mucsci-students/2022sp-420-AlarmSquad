@@ -346,8 +346,9 @@ public class UMLModel {
                 Edit>Change>Change Relationship Type\t\t\tChange a relationship type
                 Edit>Undo\t\t\t\t\t\t\t\t\tUndo a previous action
                 Edit>Redo\t\t\t\t\t\t\t\t\tRedo a previous action
-                File>Save\t\t\t\t\t\t\t\t\t\tSave the current UML diagram
                 File>Load\t\t\t\t\t\t\t\t\t\tLoad a previously saved UML diagram
+                File>Save as File\t\t\t\t\t\t\t\tSave the current UML diagram to JSON
+                File>Save as Image\t\t\t\t\t\t\t\tSave the current UML diagram to JPG
                 Help>Show Commands\t\t\t\t\t\t\tDisplay list of commands
                 [X]\t\t\t\t\t\t\t\t\t\t\tExit the application""";
     }
