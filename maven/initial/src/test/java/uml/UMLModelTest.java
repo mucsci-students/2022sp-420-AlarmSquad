@@ -166,8 +166,13 @@ public class UMLModelTest {
         model.addRel(teaStu);
         assertEquals("student", model.findRelationship("student", "teacher", "aggregation")
                 .getSource().getClassName());
-        assertEquals("teacher", model.findRelationship("teacher", "student", "realization")
-                .getSource().getClassName());
+        assertEquals("student", model.findRelationship("teacher", "student", "realization")
+                .getDestination().getClassName());
+        assertEquals("realization", model.findRelationship("teacher", "student", "realization")
+                .getRelType());
+        assertEquals(null, model.findRelationship("professor", "student", "realization"));
+        assertEquals(null, model.findRelationship("teacher", "parent", "realization"));
+        assertEquals(null, model.findRelationship("student", "teacher", "realization"));
     }
 
     @Test
@@ -177,6 +182,8 @@ public class UMLModelTest {
         model.addRel(teaStu);
         assertEquals("aggregation", model.findRelType("student", "teacher"));
         assertEquals("realization", model.findRelType("teacher", "student"));
+        assertEquals(null, model.findRelType("parent", "teacher"));
+        assertEquals(null, model.findRelType("student", "professor"));
     }
 
     @Test
@@ -199,7 +206,13 @@ public class UMLModelTest {
         UMLModel model = new UMLModel();
         model.addRel(stuTea);
         model.changeRelType("student", "teacher", "composition");
+        assertEquals(null, model.findRelationship("teacher", "student", "aggregation"));
         assertEquals("composition", model.findRelationship("student", "teacher", "composition")
+                .getRelType());
+        model.addRel(teaStu);
+        model.changeRelType("teacher", "student", "generalization");
+        assertEquals(null, model.findRelationship("teacher", "student", "realization"));
+        assertEquals("generalization", model.findRelationship("teacher", "student", "generalization")
                 .getRelType());
     }
 
@@ -215,6 +228,11 @@ public class UMLModelTest {
         model.addClass(student);
         model.addRel(stuTea);
         model.deleteClass(teacher);
+        model.updateRelationshipList("teacher");
+        assertEquals("[]", "" + model.getRelationshipList());
+        model.addClass(teacher);
+        model.addRel(teaStu);
+        model.deleteClass(student);
         model.updateRelationshipList("teacher");
         assertEquals("[]", "" + model.getRelationshipList());
     }
