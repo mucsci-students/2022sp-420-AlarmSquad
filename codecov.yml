@@ -16,6 +16,7 @@ ignore:
   - ".*/GUIView.java"
   - ".*/JSON.java"
   - ".*/RelLine.java"
+  - ".*/DynamicCompleter.java"
 
 parsers:
   gcov:

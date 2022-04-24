@@ -1,5 +1,6 @@
 uml\UMLModel.class
 uml\JSON.class
+uml\DynamicCompleter.class
 uml\CLIView.class
 uml\GUIView.class
 uml\GUIController.class

@@ -1,7 +1,6 @@
 package uml;
 
 import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
 import org.jline.terminal.Terminal;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ public class CLIController {
         this.caretaker = caretaker;
         this.view = view;
     }
-  
+
     //creates a line reader and a terminal
     private LineReader reader;
     private Terminal terminal;
@@ -56,6 +55,8 @@ public class CLIController {
                 //passes input to switch statement
                 interpretInput(input);
             }
+
+
         }
     }
     // Interprets user input
@@ -68,59 +69,59 @@ public class CLIController {
                 //********* Terminal Commands ***********//
                 //***************************************//
 
-                    // clear screen
-                    case "clear" -> {
-                        clearScreen();
+                // clear screen
+                case "clear" -> {
+                    clearScreen();
+                }
+                // save case
+                case "save" -> {
+                    terminal.writer().print("Save file name: ");
+                    String saveFileName = reader.readLine().trim();
+                    JSON json = new JSON(this.model);
+                    json.saveCLI(saveFileName);
+                }
+                // load case
+                case "load" -> {
+                    JSON json = new JSON(this.model);
+                    // if no files exist
+                    if (json.ifDirIsEmpty()) {
+                        terminal.writer().println("No save files found");
                     }
-                    // save case
-                    case "save" -> {
-                        terminal.writer().print("Save file name: ");
-                        String saveFileName = reader.readLine().trim();
-                        JSON json = new JSON(this.model);
-                        json.saveCLI(saveFileName);
-                    }
-                    // load case
-                    case "load" -> {
-                        JSON json = new JSON(this.model);
-                        // if no files exist
-                        if (json.ifDirIsEmpty()) {
-                            terminal.writer().println("No save files found");
-                        }
-                        // load the file
-                        else {
-                            terminal.writer().print("Load file name: ");
-                            String loadFileName = reader.readLine().trim();
-                            UMLModel newModel = json.loadCLI(loadFileName);
-                            if (newModel != null) {
-                                // inform the user that the load succeeded
-                                terminal.writer().println("Diagram has been loaded from \"" + loadFileName + "\"");
-                                setState();
-                                this.model = newModel;
-                            } else {
-                                terminal.writer().println("File does not exist");
-                            }
-                        }
-                    }
-                    // help case
-                    case "help" -> {
-                        terminal.writer().println(model.getCLIHelpMenu());
-                    }
-                    // undo case
-                    case "undo" -> {
-                        if (!undo()) {
-                            terminal.writer().println("No actions to undo.");
+                    // load the file
+                    else {
+                        terminal.writer().print("Load file name: ");
+                        String loadFileName = reader.readLine().trim();
+                        UMLModel newModel = json.loadCLI(loadFileName);
+                        if (newModel != null) {
+                            // inform the user that the load succeeded
+                            terminal.writer().println("Diagram has been loaded from \"" + loadFileName + "\"");
+                            setState();
+                            this.model = newModel;
                         } else {
-                            terminal.writer().println("Last action undone.");
+                            terminal.writer().println("File does not exist");
                         }
                     }
-                    // undo case
-                    case "redo" -> {
-                        if (!redo()) {
-                            terminal.writer().println("No actions to redo.");
-                        } else {
-                            terminal.writer().println("Last action redone.");
-                        }
+                }
+                // help case
+                case "help" -> {
+                    terminal.writer().println(model.getCLIHelpMenu());
+                }
+                // undo case
+                case "undo" -> {
+                    if (!undo()) {
+                        terminal.writer().println("No actions to undo.");
+                    } else {
+                        terminal.writer().println("Last action undone.");
                     }
+                }
+                // undo case
+                case "redo" -> {
+                    if (!redo()) {
+                        terminal.writer().println("No actions to redo.");
+                    } else {
+                        terminal.writer().println("Last action redone.");
+                    }
+                }
 
                 //***************************************//
                 //************** Add cases **************//
@@ -147,6 +148,11 @@ public class CLIController {
                                 setState();
                                 model.addClass(newUMLClass);
                                 terminal.writer().println("Added class \"" + className + "\"");
+
+                                this.view.editCompleter(model.getClassList());
+
+                                //terminal.writer().printf("************TEST: %s\n", Arrays.toString(clStrsArr));
+
                             }
                         }
                         // add relationship
@@ -237,6 +243,8 @@ public class CLIController {
                                                         .noneMatch(attObj -> attObj.getAttName().equals(attName))){
                                                     setState();
                                                     addAttribute(classToAddAtt, attType, attName);
+
+                                                    this.view.editCompleter(model.getClassList());
                                                 }
                                                 // If attribute user entered already exists in class, inform user
                                                 // and break
@@ -281,6 +289,7 @@ public class CLIController {
                                         Parameter param = new Parameter(paramName, paramType);
                                         setState();
                                         methodToAddParam.addParameter(param);
+                                        this.view.editCompleter(model.getClassList());
                                         terminal.writer().printf("Add another? [y/n]: ");
                                         answer = reader.readLine().toLowerCase().trim();
                                     }
@@ -315,6 +324,8 @@ public class CLIController {
                                 setState();
                                 model.setClassList(deleteClass(classDeleteInput));
                             }
+
+                            this.view.editCompleter(model.getClassList());
                         }
                         // delete relationship
                         case "rel" -> {
@@ -376,6 +387,8 @@ public class CLIController {
                                             setState();
                                             // Delete attribute within specified class
                                             delAttribute(classToDelAtt, flagName);
+
+                                            this.view.editCompleter(model.getClassList());
                                         }
                                         // If class was not found, inform user and break
                                         else {
@@ -410,9 +423,11 @@ public class CLIController {
                                         if (answer.equalsIgnoreCase("y")) {
                                             setState();
                                             methodToDeleteParam.deleteParameter(param);
+                                            this.view.editCompleter(model.getClassList());
                                             if (methodToDeleteParam.getParamList().size() <= 0) {
                                                 break;
                                             }
+
                                             terminal.writer().printf("Parameter \"%s\" has been deleted." +
                                                     " Delete another? [y/N]: ", paramName);
                                             answer = reader.readLine().trim();
@@ -894,16 +909,17 @@ public class CLIController {
      */
     private boolean undo() {
         // if the stack is empty, return false, otherwise perform the undo and return
-            if (this.caretaker.undoStackIsEmpty()) {
-                return false;
-            } else {
-                // get the current state the model is in
-                Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
-                // get the previous state on the state stack, and pass the helper the current state for the redo stack
-                Memento prevState = caretaker.undoHelper(currState);
-                // make this current model the previous model
-                this.model = prevState.getState();
-                return true;
+        if (this.caretaker.undoStackIsEmpty()) {
+            return false;
+        } else {
+            // get the current state the model is in
+            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));
+            // get the previous state on the state stack, and pass the helper the current state for the redo stack
+            Memento prevState = caretaker.undoHelper(currState);
+            // make this current model the previous model
+            this.model = prevState.getState();
+            this.view.editCompleter(model.getClassList());
+            return true;
         }
     }
 
@@ -923,6 +939,7 @@ public class CLIController {
             Memento prevState = caretaker.redoHelper(currState);
             // make this current model the previous model
             this.model = prevState.getState();
+            this.view.editCompleter(model.getClassList());
             return true;
         }
     }
