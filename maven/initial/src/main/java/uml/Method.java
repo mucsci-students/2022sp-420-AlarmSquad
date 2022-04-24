@@ -58,16 +58,18 @@ public class Method extends Attribute {
      * Iterates through paramList, returns with .get()
      *
      * @param paramToFind the name of the parameter
+     * @return param if found, null if not found
      */
-    public void changeParameter(String paramToFind, Parameter paramToChange) {
+    public Parameter changeParameter(String paramToFind, Parameter paramToChange) {
         // iterates through the arraylist
         for (int i = 0; i < paramList.size(); ++i) {
             // if the name matches, return class
             if (paramToFind.equals(paramList.get(i).getAttName())) {
                 paramList.set(i, paramToChange);
-                return;
+                return paramToChange;
             }
         }
+        return null;
     }
 }
 

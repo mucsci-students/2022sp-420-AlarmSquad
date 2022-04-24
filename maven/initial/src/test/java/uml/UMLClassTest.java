@@ -1,91 +1,145 @@
-//package uml;
-//
-//import org.junit.Test;
-//import uml.managers.ClassManager;
-//
-//import static org.junit.Assert.assertEquals;
-//
-///**
-// * JUnit tests for Class
-// *
-// * @authors Ryan Ganzke
-// */
-//public class UMLClassTest {
-//    private static ClassManager classManager = new ClassManager();
-//
-//    //TODO
-//    // MAKE THIS FOR FIELDS AND METHODS
-////    @Test
-////    public void testClassConstruction() {
-////        UMLClass studentUMLClass = new UMLClass("Student");
-////        assertEquals(true, studentUMLClass.getClassName().equals("Student"));
-////        assertEquals(true, studentUMLClass.getAttributeList().isEmpty());
-////    }
-//
-//    @Test
-//    public void testAddClass() {
-//        classManager.addClass("Student");
-//        classManager.addClass("Teacher");
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
-//    }
-//
-//    @Test
-//    public void testAddInvalid() {
-//        classManager.addClass("Student");
-//        assertEquals("\"5Teacher\" is not a valid identifier\n", classManager.addClass("5Teacher"));
-//        assertEquals("\"@Child\" is not a valid identifier\n", classManager.addClass("@Child"));
-//    }
-//
-//
-//    @Test
-//    public void testAddDuplicateClass() {
-//        classManager.addClass("Student");
-//        classManager.addClass("Teacher");
-//        assertEquals("Class \"Student\" already exists\n", classManager.addClass("Student"));
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
-//        assertEquals(1, classManager.numOfClasses("Student"));
-//    }
-//
-//    @Test
-//    public void testDeleteClass() {
-//        classManager.addClass("Student");
-//        classManager.addClass("Teacher");
-//        classManager.deleteClass("Student");
-//        assertEquals(false, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
-//    }
-//
-//    @Test
-//    public void testDeleteNonExistantClass() {
-//        classManager.addClass("Student");
-//        assertEquals("Class \"Professor\" was not found\n", classManager.deleteClass("Professor"));
-//    }
-//
-//    @Test
-//    public void testRenameClass() {
-//        classManager.addClass("Student");
-//        classManager.addClass("Teacher");
-//        classManager.renameClass("Teacher", "Professor");
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
-//        assertEquals(false, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Professor")));
-//    }
-//
-//    @Test
-//    public void testRenameInvalid() {
-//        classManager.addClass("Student");
-//        classManager.addClass("Teacher");
-//        assertEquals("\"5Teacher\" is not a valid identifier\n", classManager.renameClass("Teacher", "5Teacher"));
-//        assertEquals("\"(Teacher)\" is not a valid identifier\n", classManager.renameClass("Teacher", "(Teacher)"));
-//    }
-//
-//    @Test
-//    public void testRenameDuplicateClass() {
-//        classManager.addClass("Student");
-//        classManager.addClass("Teacher");
-//        assertEquals("Class \"Student\" already exists\n", classManager.renameClass("Teacher", "Student"));
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Student")));
-//        assertEquals(true, classManager.getClassList().stream().anyMatch(o -> o.getClassName().equals("Teacher")));
-//    }
-//}
+package uml;
+
+import junit.framework.TestCase;
+
+public class UMLClassTest extends TestCase {
+
+    UMLClass student = new UMLClass("student");
+    Field id = new Field("id", "int");
+    Field name = new Field("name", "String");
+    Field hairColor = new Field("hairColor", "String");
+    Method setName = new Method("setName", "void");
+    Method getName = new Method("getName", "String");
+    Method moveDesk = new Method("moveDesk", "void");
+
+    public void testGetClassName() {
+        assertEquals("student", student.getClassName());
+    }
+
+    public void testSetClassName() {
+        student.setClassName("teacher");
+        assertEquals("teacher", student.getClassName());
+    }
+
+    public void testGetAttList() {
+        student.addField(id);
+        student.addField(name);
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("id, name", student.getAttList("field").get(0).getAttName() + ", " +
+                student.getAttList("field").get(1).getAttName());
+        assertEquals("setName, getName", student.getAttList("method").get(0).getAttName() + ", " +
+                student.getAttList("method").get(1).getAttName());
+        assertEquals(null, student.getAttList("parameter"));
+    }
+
+    public void testFindAtt() {
+        student.addField(id);
+        student.addField(name);
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("name", student.findAtt("name", "field").getAttName());
+        assertEquals(null, student.findAtt("hairColor", "field"));
+        assertEquals("getName", student.findAtt("getName", "method").getAttName());
+        assertEquals(null, student.findAtt("moveDesk", "method"));
+        assertEquals(null, student.findAtt("newName", "parameter"));
+
+    }
+
+    public void testDeleteAttribute() {
+        student.addField(id);
+        student.addField(name);
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("name", student.findAtt("name", "field").getAttName());
+        student.deleteAttribute(name);
+        assertEquals(null, student.findAtt("name", "field"));
+        assertEquals("getName", student.findAtt("getName", "method").getAttName());
+        student.deleteAttribute(getName);
+        student.deleteAttribute(moveDesk);
+        assertEquals(null, student.findAtt("getName", "method"));
+    }
+
+    public void testGetFieldList() {
+        student.addField(id);
+        student.addField(name);
+        assertEquals("id, name", student.getFieldList().get(0).getAttName() + ", " +
+                student.getFieldList().get(1).getAttName());
+    }
+
+    public void testAddField() {
+        student.addField(id);
+        assertEquals("id", student.getFieldList().get(0).getAttName());
+    }
+
+    public void testDeleteField() {
+        student.addField(id);
+        student.addField(name);
+        assertEquals("name", student.findField("name").getAttName());
+        student.deleteField(name);
+        assertEquals(null, student.findField("name"));
+    }
+
+    public void testGetMethodList() {
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("setName, getName", student.getMethodList().get(0).getAttName() + ", " +
+                student.getMethodList().get(1).getAttName());
+    }
+
+    public void testAddMethod() {
+        student.addMethod(setName);
+        assertEquals("setName", student.getMethodList().get(0).getAttName());
+    }
+
+    public void testDeleteMethod() {
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("getName", student.findMethod("getName").getAttName());
+        student.deleteMethod(getName);
+        assertEquals(null, student.findMethod("getName"));
+    }
+
+    public void testFindField() {
+        student.addField(id);
+        student.addField(name);
+        assertEquals("name", student.findField("name").getAttName());
+        assertEquals(null, student.findField("hairColor"));
+    }
+
+    public void testFindMethod() {
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("getName", student.findMethod("getName").getAttName());
+        assertEquals(null, student.findMethod("moveDesk"));
+    }
+
+    public void testFindMethodNoPrint() {
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("getName", student.findMethodNoPrint("getName").getAttName());
+        assertEquals(null, student.findMethodNoPrint("moveDesk"));
+    }
+
+    public void testChangeField() {
+        student.addField(id);
+        student.addField(name);
+        assertEquals("name", student.findField("name").getAttName());
+        assertEquals(null, student.findField("hairColor"));
+        student.changeField("name", hairColor);
+        assertEquals(null, student.findField("name"));
+        assertEquals("hairColor", student.findField("hairColor").getAttName());
+        assertEquals(null, student.changeField("name", name));
+    }
+
+    public void testChangeMethod() {
+        student.addMethod(setName);
+        student.addMethod(getName);
+        assertEquals("getName", student.findMethodNoPrint("getName").getAttName());
+        assertEquals(null, student.findMethodNoPrint("moveDesk"));
+        student.changeMethod("getName", moveDesk);
+        assertEquals(null, student.findMethodNoPrint("getName"));
+        assertEquals("moveDesk", student.findMethodNoPrint("moveDesk").getAttName());
+        assertEquals(null, student.changeMethod("getName", getName));
+    }
+}
