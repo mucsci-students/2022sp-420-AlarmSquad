@@ -51,6 +51,7 @@ public class UMLClassTest extends TestCase {
         student.addField(name);
         student.addMethod(setName);
         student.addMethod(getName);
+        assertEquals("moveDesk", student.findAtt("moveDesk", "method"));
         assertEquals("name", student.findAtt("name", "field").getAttName());
         student.deleteAttribute(name);
         assertEquals(null, student.findAtt("name", "field"));
