@@ -83,12 +83,15 @@ public class UMLClass {
      *
      * @param attToDel attribute to be deleted
      */
-    public void deleteAttribute(Attribute attToDel) {
+    public boolean deleteAttribute(Attribute attToDel) {
         if (attToDel instanceof Field fieldToDel) {
             deleteField(fieldToDel);
+            return true;
         } else if (attToDel instanceof Method methToDel) {
             deleteMethod(methToDel);
+            return true;
         }
+        return false;
     }
 
     /**
