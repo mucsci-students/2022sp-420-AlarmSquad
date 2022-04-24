@@ -56,9 +56,9 @@ public class GUIController {
      * @param file the given file to be saved
      * @param root the super root
      */
-    public void saveImageAction(File file, Stage stage, Group root) {
+    public void saveImageAction(File file, Stage stage, Group root, double width, double height) {
         try {
-            WritableImage writableImage = new WritableImage(950, 640);
+            WritableImage writableImage = new WritableImage((int) width, (int) height);
             root.snapshot(null, writableImage);
             RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
             ImageIO.write(renderedImage, "png", file);

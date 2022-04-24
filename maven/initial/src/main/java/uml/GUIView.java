@@ -42,8 +42,8 @@ public class GUIView extends Application {
     // initialize the root
     private Group superRoot = new Group();
     // diagram width and height for window
-    private double DIAGRAM_WIDTH = 950;
-    private double DIAGRAM_HEIGHT = 640;
+    private double diagram_width = 950;
+    private double diagram_height = 640;
     // coordinates for draging objects
     private double startDragX;
     private double startDragY;
@@ -80,15 +80,24 @@ public class GUIView extends Application {
         Scene window = new Scene(superRoot, Color.DIMGRAY);
         // set the title, height, and width of the window
         stage.setTitle("UML Editor");
-        stage.setWidth(DIAGRAM_WIDTH);
-        stage.setHeight(DIAGRAM_HEIGHT);
-        stage.setResizable(false);
+        stage.setWidth(diagram_width);
+        stage.setHeight(diagram_height);
+        stage.setResizable(true);
         // set the stage and show it
         stage.setScene(window);
         stage.setAlwaysOnTop(false);
         this.menuBar.prefWidthProperty().bind(stage.widthProperty());
+        // constantly updates the width of the stage whenever the window is resized
+        stage.widthProperty().addListener((observableValue, oldWidth, newWidth) -> {
+            stage.setWidth(newWidth.doubleValue());
+            diagram_width = stage.getWidth();
+        });
+        // constantly updates the height of the stage whenever the window is resized
+        stage.heightProperty().addListener((observableValue, oldWidth, newHeight) -> {
+            stage.setHeight(newHeight.doubleValue());
+            diagram_height = stage.getHeight();
+        });
         stage.show();
-        stage.setResizable(false);
     }
 
     public Group getSuperRoot() {
@@ -130,7 +139,7 @@ public class GUIView extends Application {
         MenuItem load = new MenuItem("Load");
         // if the load button is pressed, open a new window to load
         load.setOnAction(event -> loadWindow());
-        file.getItems().addAll(saveAsFile, saveAsImage, load);
+        file.getItems().addAll(saveAsFile, saveAsImage);
 
         //***************************************//
         //********** Add Menu Items *************//
@@ -288,8 +297,9 @@ public class GUIView extends Application {
         File file = fileChooser.showSaveDialog(stage);
         // if the file is not null, run the save action method
         if (file != null) {
-            this.controller.saveImageAction(file, stage, superRoot);
+            this.controller.saveImageAction(file, stage, superRoot, diagram_width, diagram_height);
         }
+
     }
 
     /**
@@ -1083,7 +1093,7 @@ public class GUIView extends Application {
         pane.add(commandList, 0, 0);
         pane.add(cancel, 1, 1);
         // finalize the window with standard formatting
-        finalizeWindow(stage, root, pane, "Show Commands", 445, 615);
+        finalizeWindow(stage, root, pane, "Show Commands", 460, 615);
     }
 
     /**
