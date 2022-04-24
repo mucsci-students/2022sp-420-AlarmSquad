@@ -717,9 +717,7 @@ public class CLIController {
                             terminal.writer().println("\n--------------------\n");
                         }
                         // If the user's command is not valid
-                        default -> {
-                            terminal.writer().println("Please enter a valid command");
-                        }
+                        default -> terminal.writer().println("Please enter a valid command");
                     }
                 }
                 // If the user's command is not valid
