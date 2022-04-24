@@ -8,6 +8,7 @@ public class MethodTest extends TestCase {
     Method getName = new Method("getName", "String");
     Parameter newName = new Parameter("newName", "String");
     Parameter approval = new Parameter("approval", "bool");
+    Parameter denial = new Parameter("denial", "bool");
 
     public void testGetReturnType() {
         assertEquals("void", setName.getReturnType());
@@ -41,11 +42,13 @@ public class MethodTest extends TestCase {
     }
 
     public void testChangeParameter() {
+        setName.addParameter(newName);
         setName.addParameter(approval);
         assertEquals("approval", setName.findParameter("approval").getAttName());
-        assertEquals(null, setName.findParameter("newName"));
-        setName.changeParameter("approval", newName);
+        assertEquals(null, setName.findParameter("denial"));
+        setName.changeParameter("approval", denial);
         assertEquals(null, setName.findParameter("approval"));
-        assertEquals("newName", setName.findParameter("newName").getAttName());
+        assertEquals("newName", setName.findParameter("denial").getAttName());
+        assertEquals(null, setName.findParameter("approval"));
     }
 }
