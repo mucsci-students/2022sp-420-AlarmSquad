@@ -41,8 +41,8 @@ public class UMLClass {
      * @param className the new name for the class
      */
     public void setClassName(String className) {
-<span class="nc" id="L44">        this.className = className;</span>
-<span class="nc" id="L45">    }</span>
+<span class="fc" id="L44">        this.className = className;</span>
+<span class="fc" id="L45">    }</span>
 
     /**
      * Gets the method or field list of the class. Returns null if list
@@ -52,12 +52,12 @@ public class UMLClass {
      * @return methodList or fieldList or null if
      */
     public ArrayList&lt;? extends Attribute&gt; getAttList(String attType) {
-<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (attType.equalsIgnoreCase(&quot;method&quot;))</span>
-<span class="nc" id="L56">            return this.methodList;</span>
-<span class="nc bnc" id="L57" title="All 2 branches missed.">        else if (attType.equalsIgnoreCase(&quot;field&quot;))</span>
-<span class="nc" id="L58">            return this.fieldList;</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (attType.equalsIgnoreCase(&quot;method&quot;))</span>
+<span class="fc" id="L56">            return this.methodList;</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        else if (attType.equalsIgnoreCase(&quot;field&quot;))</span>
+<span class="fc" id="L58">            return this.fieldList;</span>
         else
-<span class="nc" id="L60">            return null;</span>
+<span class="fc" id="L60">            return null;</span>
     }
 
     /**
@@ -70,12 +70,12 @@ public class UMLClass {
      * attribute is found with passed String
      */
     public Attribute findAtt(String attToFind, String attType) {
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (attType.equalsIgnoreCase(&quot;field&quot;)) {</span>
-<span class="nc" id="L74">            return findField(attToFind);</span>
-<span class="nc bnc" id="L75" title="All 2 branches missed.">        } else if (attType.equalsIgnoreCase(&quot;method&quot;)) {</span>
-<span class="nc" id="L76">            return findMethod(attToFind);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (attType.equalsIgnoreCase(&quot;field&quot;)) {</span>
+<span class="fc" id="L74">            return findField(attToFind);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        } else if (attType.equalsIgnoreCase(&quot;method&quot;)) {</span>
+<span class="fc" id="L76">            return findMethod(attToFind);</span>
         } else
-<span class="nc" id="L78">            return null;</span>
+<span class="fc" id="L78">            return null;</span>
     }
 
     /**
@@ -84,12 +84,12 @@ public class UMLClass {
      * @param attToDel attribute to be deleted
      */
     public void deleteAttribute(Attribute attToDel) {
-<span class="nc bnc" id="L87" title="All 2 branches missed.">        if (attToDel instanceof Field fieldToDel) {</span>
-<span class="nc" id="L88">            deleteField(fieldToDel);</span>
-<span class="nc bnc" id="L89" title="All 2 branches missed.">        } else if (attToDel instanceof Method methToDel) {</span>
-<span class="nc" id="L90">            deleteMethod(methToDel);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (attToDel instanceof Field fieldToDel) {</span>
+<span class="fc" id="L88">            deleteField(fieldToDel);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        } else if (attToDel instanceof Method methToDel) {</span>
+<span class="fc" id="L90">            deleteMethod(methToDel);</span>
         }
-<span class="nc" id="L92">    }</span>
+<span class="fc" id="L92">    }</span>
 
     /**
      * Gets the field list of the class
@@ -97,7 +97,7 @@ public class UMLClass {
      * @return the list of fields
      */
     public ArrayList&lt;Field&gt; getFieldList() {
-<span class="nc" id="L100">        return this.fieldList;</span>
+<span class="fc" id="L100">        return this.fieldList;</span>
     }
 
     /**
@@ -106,8 +106,8 @@ public class UMLClass {
      * @param field the attribute to be added
      */
     public void addField(Field field) {
-<span class="nc" id="L109">        this.fieldList.add(field);</span>
-<span class="nc" id="L110">    }</span>
+<span class="fc" id="L109">        this.fieldList.add(field);</span>
+<span class="fc" id="L110">    }</span>
 
     /**
      * Deletes the first occurrence of the field from the field list
@@ -115,8 +115,8 @@ public class UMLClass {
      * @param field the field to be deleted
      */
     public void deleteField(Field field) {
-<span class="nc" id="L118">        this.fieldList.remove(field);</span>
-<span class="nc" id="L119">    }</span>
+<span class="fc" id="L118">        this.fieldList.remove(field);</span>
+<span class="fc" id="L119">    }</span>
 
     /**
      * Gets the method list of the class
@@ -124,7 +124,7 @@ public class UMLClass {
      * @return the list of methods
      */
     public ArrayList&lt;Method&gt; getMethodList() {
-<span class="nc" id="L127">        return this.methodList;</span>
+<span class="fc" id="L127">        return this.methodList;</span>
     }
 
     /**
@@ -133,8 +133,8 @@ public class UMLClass {
      * @param method the attribute to be added
      */
     public void addMethod(Method method) {
-<span class="nc" id="L136">        this.methodList.add(method);</span>
-<span class="nc" id="L137">    }</span>
+<span class="fc" id="L136">        this.methodList.add(method);</span>
+<span class="fc" id="L137">    }</span>
 
     /**
      * Deletes the first occurrence of the Method from the Method list
@@ -142,8 +142,8 @@ public class UMLClass {
      * @param method the Method to be deleted
      */
     public void deleteMethod(Method method) {
-<span class="nc" id="L145">        this.methodList.remove(method);</span>
-<span class="nc" id="L146">    }</span>
+<span class="fc" id="L145">        this.methodList.remove(method);</span>
+<span class="fc" id="L146">    }</span>
 
     /**
      * Iterates through fieldList, returns with .get()
@@ -153,13 +153,13 @@ public class UMLClass {
      */
     public Field findField(String fieldToFind) {
         // iterates through the arraylist
-<span class="nc bnc" id="L156" title="All 2 branches missed.">        for (Field field : fieldList) {</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        for (Field field : fieldList) {</span>
             // if the name matches, return class
-<span class="nc bnc" id="L158" title="All 2 branches missed.">            if (fieldToFind.equals(field.getAttName())) {</span>
-<span class="nc" id="L159">                return field;</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            if (fieldToFind.equals(field.getAttName())) {</span>
+<span class="fc" id="L159">                return field;</span>
             }
-<span class="nc" id="L161">        }</span>
-<span class="nc" id="L162">        return null;</span>
+<span class="fc" id="L161">        }</span>
+<span class="fc" id="L162">        return null;</span>
     }
 
     /**
@@ -170,13 +170,13 @@ public class UMLClass {
      */
     public Method findMethod(String methodToFind) {
         // iterates through the arraylist
-<span class="nc bnc" id="L173" title="All 2 branches missed.">        for (Method method : methodList) {</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        for (Method method : methodList) {</span>
             // if the name matches, return class
-<span class="nc bnc" id="L175" title="All 2 branches missed.">            if (methodToFind.equals(method.getAttName())) {</span>
-<span class="nc" id="L176">                return method;</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">            if (methodToFind.equals(method.getAttName())) {</span>
+<span class="fc" id="L176">                return method;</span>
             }
-<span class="nc" id="L178">        }</span>
-<span class="nc" id="L179">        return null;</span>
+<span class="fc" id="L178">        }</span>
+<span class="fc" id="L179">        return null;</span>
     }
 
     /**
@@ -187,13 +187,13 @@ public class UMLClass {
      */
     public Method findMethodNoPrint(String methodToFind) {
         // iterates through the arraylist
-<span class="nc bnc" id="L190" title="All 2 branches missed.">        for (Method method : methodList) {</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">        for (Method method : methodList) {</span>
             // if the name matches, return class
-<span class="nc bnc" id="L192" title="All 2 branches missed.">            if (methodToFind.equals(method.getAttName())) {</span>
-<span class="nc" id="L193">                return method;</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">            if (methodToFind.equals(method.getAttName())) {</span>
+<span class="fc" id="L193">                return method;</span>
             }
-<span class="nc" id="L195">        }</span>
-<span class="nc" id="L196">        return null;</span>
+<span class="fc" id="L195">        }</span>
+<span class="fc" id="L196">        return null;</span>
     }
 
     /**
@@ -204,14 +204,14 @@ public class UMLClass {
      */
     public Field changeField(String fieldToFind, Field fieldToChange) {
         // iterates through the arraylist
-<span class="nc bnc" id="L207" title="All 2 branches missed.">        for (int i = 0; i &lt; fieldList.size(); ++i) {</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        for (int i = 0; i &lt; fieldList.size(); ++i) {</span>
             // if the name matches, return class
-<span class="nc bnc" id="L209" title="All 2 branches missed.">            if (fieldToFind.equals(fieldList.get(i).getAttName())) {</span>
-<span class="nc" id="L210">                fieldList.set(i, fieldToChange);</span>
-<span class="nc" id="L211">                return fieldToChange;</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">            if (fieldToFind.equals(fieldList.get(i).getAttName())) {</span>
+<span class="fc" id="L210">                fieldList.set(i, fieldToChange);</span>
+<span class="fc" id="L211">                return fieldToChange;</span>
             }
         }
-<span class="nc" id="L214">        return null;</span>
+<span class="fc" id="L214">        return null;</span>
     }
 
     /**
@@ -222,14 +222,14 @@ public class UMLClass {
      */
     public Method changeMethod(String methodToFind, Method methodToChange) {
         // iterates through the arraylist
-<span class="nc bnc" id="L225" title="All 2 branches missed.">        for (int i = 0; i &lt; methodList.size(); ++i) {</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">        for (int i = 0; i &lt; methodList.size(); ++i) {</span>
             // if the name matches, return class
-<span class="nc bnc" id="L227" title="All 2 branches missed.">            if (methodToFind.equals(methodList.get(i).getAttName())) {</span>
-<span class="nc" id="L228">                methodList.set(i, methodToChange);</span>
-<span class="nc" id="L229">                return methodToChange;</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">            if (methodToFind.equals(methodList.get(i).getAttName())) {</span>
+<span class="fc" id="L228">                methodList.set(i, methodToChange);</span>
+<span class="fc" id="L229">                return methodToChange;</span>
             }
         }
-<span class="nc" id="L232">        return null;</span>
+<span class="fc" id="L232">        return null;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

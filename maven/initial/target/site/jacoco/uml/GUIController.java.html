@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GUIController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">GUIController.java</span></div><h1>GUIController.java</h1><pre class="source lang-java linenums">package uml;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.WritableImage;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.*;
 import java.util.ArrayList;
 
 @SuppressWarnings(&quot;DanglingJavadoc&quot;)
@@ -16,11 +25,11 @@ public class GUIController {
     private UMLModel model;
     private Caretaker caretaker;
 
-<span class="nc" id="L19">    public GUIController(GUIView view, UMLModel model) {</span>
-<span class="nc" id="L20">        this.view = view;</span>
-<span class="nc" id="L21">        this.model = model;</span>
-<span class="nc" id="L22">        this.caretaker = new Caretaker();</span>
-<span class="nc" id="L23">    }</span>
+<span class="nc" id="L28">    public GUIController(GUIView view, UMLModel model) {</span>
+<span class="nc" id="L29">        this.view = view;</span>
+<span class="nc" id="L30">        this.model = model;</span>
+<span class="nc" id="L31">        this.caretaker = new Caretaker();</span>
+<span class="nc" id="L32">    }</span>
 
     /******************************************************************
      *
@@ -34,11 +43,30 @@ public class GUIController {
      * @param file the given file to be saved
      * @param stage the working stage
      */
-    public void saveAction(File file, Stage stage) {
-<span class="nc" id="L38">        JSON json = new JSON(this.model, this.view);</span>
-<span class="nc" id="L39">        json.saveGUI(file);</span>
-<span class="nc" id="L40">        stage.close();</span>
-<span class="nc" id="L41">    }</span>
+    public void saveFileAction(File file, Stage stage) {
+<span class="nc" id="L47">        JSON json = new JSON(this.model, this.view);</span>
+<span class="nc" id="L48">        json.saveGUI(file);</span>
+<span class="nc" id="L49">        stage.close();</span>
+<span class="nc" id="L50">    }</span>
+
+    /**
+     *
+     * Saves an image to the given file
+     *
+     * @param file the given file to be saved
+     * @param root the super root
+     */
+    public void saveImageAction(File file, Stage stage, Group root, double width, double height) {
+        try {
+<span class="nc" id="L61">            WritableImage writableImage = new WritableImage((int) width, (int) height);</span>
+<span class="nc" id="L62">            root.snapshot(null, writableImage);</span>
+<span class="nc" id="L63">            RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);</span>
+<span class="nc" id="L64">            ImageIO.write(renderedImage, &quot;png&quot;, file);</span>
+<span class="nc" id="L65">        } catch (IOException ex) {</span>
+<span class="nc" id="L66">            ex.printStackTrace();</span>
+<span class="nc" id="L67">        }</span>
+<span class="nc" id="L68">        stage.close();</span>
+<span class="nc" id="L69">    }</span>
 
     /**
      * Load the given file
@@ -48,16 +76,16 @@ public class GUIController {
      */
     public void loadAction(File file, Stage stage) {
         try {
-<span class="nc" id="L51">            JSON json = new JSON(this.model, this.view);</span>
-<span class="nc" id="L52">            setState();</span>
-<span class="nc" id="L53">            this.model = json.loadGUI(file);</span>
-<span class="nc" id="L54">            clearDiagram();</span>
-<span class="nc" id="L55">            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());</span>
-<span class="nc" id="L56">            stage.close();</span>
-<span class="nc" id="L57">        } catch (Exception e) {</span>
-<span class="nc" id="L58">            this.view.popUpWindow(&quot;Error&quot;, &quot;File name is required&quot;);</span>
-<span class="nc" id="L59">        }</span>
-<span class="nc" id="L60">    }</span>
+<span class="nc" id="L79">            JSON json = new JSON(this.model, this.view);</span>
+<span class="nc" id="L80">            setState();</span>
+<span class="nc" id="L81">            this.model = json.loadGUI(file);</span>
+<span class="nc" id="L82">            clearDiagram();</span>
+<span class="nc" id="L83">            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());</span>
+<span class="nc" id="L84">            stage.close();</span>
+<span class="nc" id="L85">        } catch (Exception e) {</span>
+<span class="nc" id="L86">            this.view.popUpWindow(&quot;Error&quot;, &quot;File name is required&quot;);</span>
+<span class="nc" id="L87">        }</span>
+<span class="nc" id="L88">    }</span>
 
     //***************************************//
     //************ Add Actions **************//
@@ -72,32 +100,32 @@ public class GUIController {
      */
     public void addClassAction(String className, Stage stage) {
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (className.isEmpty()) {</span>
-<span class="nc" id="L76">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (className.isEmpty()) {</span>
+<span class="nc" id="L104">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class name is not a valid input, pop an error up
-<span class="nc bnc" id="L79" title="All 2 branches missed.">            if (this.model.isNotValidInput(className)) {</span>
-<span class="nc" id="L80">                this.view.popUpWindow(&quot;Error&quot;, &quot;The class name is invalid&quot;);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            if (this.model.isNotValidInput(className)) {</span>
+<span class="nc" id="L108">                this.view.popUpWindow(&quot;Error&quot;, &quot;The class name is invalid&quot;);</span>
             // check if the class exists
             } else {
                 // if the class does not exist, add it and close
-<span class="nc bnc" id="L84" title="All 2 branches missed.">                if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L85">                    UMLClass newClass = new UMLClass(className);</span>
-<span class="nc" id="L86">                    setState();</span>
-<span class="nc" id="L87">                    this.model.addClass(newClass);</span>
-<span class="nc" id="L88">                    stage.close();</span>
-<span class="nc" id="L89">                    int multiplier = ((this.model.getClassList().size() - 1) / 8);</span>
-<span class="nc" id="L90">                    int yOffset = 20 + (multiplier * 200);</span>
-<span class="nc" id="L91">                    int xOffset = (-85) + (((this.model.getClassList().size() - 1) % 8) * 115);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">                if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L113">                    UMLClass newClass = new UMLClass(className);</span>
+<span class="nc" id="L114">                    setState();</span>
+<span class="nc" id="L115">                    this.model.addClass(newClass);</span>
+<span class="nc" id="L116">                    stage.close();</span>
+<span class="nc" id="L117">                    int multiplier = ((this.model.getClassList().size() - 1) / 8);</span>
+<span class="nc" id="L118">                    int yOffset = 20 + (multiplier * 200);</span>
+<span class="nc" id="L119">                    int xOffset = (-85) + (((this.model.getClassList().size() - 1) % 8) * 115);</span>
                     // Draw the new box for the class
-<span class="nc" id="L93">                    this.view.drawClassBox(className, xOffset, yOffset);</span>
+<span class="nc" id="L121">                    this.view.drawClassBox(className, xOffset, yOffset);</span>
                     // if the class does exist, pop an error up
-<span class="nc" id="L95">                } else {</span>
-<span class="nc" id="L96">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Class already exists&quot;);</span>
+<span class="nc" id="L123">                } else {</span>
+<span class="nc" id="L124">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Class already exists&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L100">    }</span>
+<span class="nc" id="L128">    }</span>
 
     /**
      * Creates and adds a field to a class if the given strings are nonempty and the class exists,
@@ -110,32 +138,32 @@ public class GUIController {
      */
     public void addFieldAction(String className, String fieldName, String fieldType, Stage stage) {
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L113" title="All 6 branches missed.">        if (className.isEmpty() || fieldName.isEmpty() || fieldType.isEmpty()) {</span>
-<span class="nc" id="L114">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L141" title="All 6 branches missed.">        if (className.isEmpty() || fieldName.isEmpty() || fieldType.isEmpty()) {</span>
+<span class="nc" id="L142">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L117" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L118">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L146">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the field name is not a valid string, pop an error up
-<span class="nc bnc" id="L120" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(fieldName)) {</span>
-<span class="nc" id="L121">                this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is invalid&quot;);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(fieldName)) {</span>
+<span class="nc" id="L149">                this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is invalid&quot;);</span>
             // check if the field exists
             } else {
                 // if the field does not exist, add it and close
-<span class="nc bnc" id="L125" title="All 2 branches missed.">                if (this.model.findClass(className).findField(fieldName) == null) {</span>
-<span class="nc" id="L126">                    Field newField = new Field(fieldName, fieldType);</span>
-<span class="nc" id="L127">                    setState();</span>
-<span class="nc" id="L128">                    this.model.findClass(className).addField(newField);</span>
-<span class="nc" id="L129">                    stage.close();</span>
-<span class="nc" id="L130">                    this.view.drawFieldBox(this.model.findClass(className).getFieldList().size(),</span>
-<span class="nc" id="L131">                            this.model.findClass(className).getMethodList().size(), newField, className);</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                if (this.model.findClass(className).findField(fieldName) == null) {</span>
+<span class="nc" id="L154">                    Field newField = new Field(fieldName, fieldType);</span>
+<span class="nc" id="L155">                    setState();</span>
+<span class="nc" id="L156">                    this.model.findClass(className).addField(newField);</span>
+<span class="nc" id="L157">                    stage.close();</span>
+<span class="nc" id="L158">                    this.view.drawFieldBox(this.model.findClass(className).getFieldList().size(),</span>
+<span class="nc" id="L159">                            this.model.findClass(className).getMethodList().size(), newField, className);</span>
                 // if the field does exist, pop an error up
-<span class="nc" id="L133">                } else {</span>
-<span class="nc" id="L134">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Field already exists&quot;);</span>
+<span class="nc" id="L161">                } else {</span>
+<span class="nc" id="L162">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Field already exists&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L138">    }</span>
+<span class="nc" id="L166">    }</span>
 
     /**
      * Creates and adds a method to a class if the given strings are nonempty and the class exists,
@@ -148,32 +176,32 @@ public class GUIController {
      */
     public void addMethodAction(String className, String methodName, String returnType, Stage stage){
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L151" title="All 6 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || returnType.isEmpty()) {</span>
-<span class="nc" id="L152">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L179" title="All 6 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || returnType.isEmpty()) {</span>
+<span class="nc" id="L180">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L155" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L156">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L184">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the method name is not a valid string, pop an error up
-<span class="nc bnc" id="L158" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(methodName)) {</span>
-<span class="nc" id="L159">                this.view.popUpWindow(&quot;Error&quot;, &quot;The method name is invalid&quot;);</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(methodName)) {</span>
+<span class="nc" id="L187">                this.view.popUpWindow(&quot;Error&quot;, &quot;The method name is invalid&quot;);</span>
             // check if the method exists
             } else {
                 // if the method does not exist, add it and close
-<span class="nc bnc" id="L163" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(methodName) == null) {</span>
-<span class="nc" id="L164">                    Method newMethod = new Method(methodName, returnType);</span>
-<span class="nc" id="L165">                    setState();</span>
-<span class="nc" id="L166">                    this.model.findClass(className).addMethod(newMethod);</span>
-<span class="nc" id="L167">                    stage.close();</span>
-<span class="nc" id="L168">                    this.view.drawMethodBox(this.model.findClass(className).getFieldList().size(),</span>
-<span class="nc" id="L169">                            this.model.findClass(className).getMethodList().size(), newMethod, className);</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(methodName) == null) {</span>
+<span class="nc" id="L192">                    Method newMethod = new Method(methodName, returnType);</span>
+<span class="nc" id="L193">                    setState();</span>
+<span class="nc" id="L194">                    this.model.findClass(className).addMethod(newMethod);</span>
+<span class="nc" id="L195">                    stage.close();</span>
+<span class="nc" id="L196">                    this.view.drawMethodBox(this.model.findClass(className).getFieldList().size(),</span>
+<span class="nc" id="L197">                            this.model.findClass(className).getMethodList().size(), newMethod, className);</span>
                     // if the method does exist, pop an error up
-<span class="nc" id="L171">                } else {</span>
-<span class="nc" id="L172">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Method already exists&quot;);</span>
+<span class="nc" id="L199">                } else {</span>
+<span class="nc" id="L200">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Method already exists&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L176">    }</span>
+<span class="nc" id="L204">    }</span>
 
     /**
      * Creates and adds a relationship to the relationshipList if the given strings are nonempty,
@@ -186,37 +214,37 @@ public class GUIController {
      */
     public void addRelationshipAction(String srcName, String destName, String relType, Stage stage) {
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L189" title="All 6 branches missed.">        if (srcName.isEmpty() || destName.isEmpty() || relType.isEmpty()) {</span>
-<span class="nc" id="L190">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L217" title="All 6 branches missed.">        if (srcName.isEmpty() || destName.isEmpty() || relType.isEmpty()) {</span>
+<span class="nc" id="L218">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the source does not exist, pop an error up
-<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (this.model.findClass(srcName) == null) {</span>
-<span class="nc" id="L194">                this.view.popUpWindow(&quot;Error&quot;, &quot;Source does not exist&quot;);</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (this.model.findClass(srcName) == null) {</span>
+<span class="nc" id="L222">                this.view.popUpWindow(&quot;Error&quot;, &quot;Source does not exist&quot;);</span>
             // if the destination does not exist, pop an error up
-<span class="nc bnc" id="L196" title="All 2 branches missed.">            } else if (this.model.findClass(destName) == null) {</span>
-<span class="nc" id="L197">                this.view.popUpWindow(&quot;Error&quot;, &quot;Destination does not exist&quot;);</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">            } else if (this.model.findClass(destName) == null) {</span>
+<span class="nc" id="L225">                this.view.popUpWindow(&quot;Error&quot;, &quot;Destination does not exist&quot;);</span>
             // check if the relationship exists
-<span class="nc bnc" id="L199" title="All 2 branches missed.">            } else if (this.model.checkType(relType)){</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">            } else if (this.model.checkType(relType)){</span>
                 // if the relationship does not exist, add it and close
-<span class="nc bnc" id="L201" title="All 2 branches missed.">                if (this.model.findRelationship(srcName, destName, relType) == null &amp;&amp;</span>
-<span class="nc bnc" id="L202" title="All 2 branches missed.">                        !this.model.isRelated(srcName, destName)) {</span>
-<span class="nc" id="L203">                    UMLClass src = this.model.findClass(srcName);</span>
-<span class="nc" id="L204">                    UMLClass dest = this.model.findClass(destName);</span>
-<span class="nc" id="L205">                    Relationship newRel = new Relationship(src, dest, relType);</span>
-<span class="nc" id="L206">                    setState();</span>
-<span class="nc" id="L207">                    this.model.addRel(newRel);</span>
-<span class="nc" id="L208">                    this.view.drawLine(srcName, destName, this.model.findRelType(srcName, destName));</span>
-<span class="nc" id="L209">                    stage.close();</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">                if (this.model.findRelationship(srcName, destName, relType) == null &amp;&amp;</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">                        !this.model.isRelated(srcName, destName)) {</span>
+<span class="nc" id="L231">                    UMLClass src = this.model.findClass(srcName);</span>
+<span class="nc" id="L232">                    UMLClass dest = this.model.findClass(destName);</span>
+<span class="nc" id="L233">                    Relationship newRel = new Relationship(src, dest, relType);</span>
+<span class="nc" id="L234">                    setState();</span>
+<span class="nc" id="L235">                    this.model.addRel(newRel);</span>
+<span class="nc" id="L236">                    this.view.drawLine(srcName, destName, this.model.findRelType(srcName, destName));</span>
+<span class="nc" id="L237">                    stage.close();</span>
                 // if the relationship does exist, pop an error up
-<span class="nc" id="L211">                } else {</span>
-<span class="nc" id="L212">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Relationship already exists&quot;);</span>
+<span class="nc" id="L239">                } else {</span>
+<span class="nc" id="L240">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Relationship already exists&quot;);</span>
                 }
             }
             else {
-<span class="nc" id="L216">                this.view.popUpWindow(&quot;Error&quot;, &quot;Relationship type &quot; + relType + &quot; does not exist&quot;);</span>
+<span class="nc" id="L244">                this.view.popUpWindow(&quot;Error&quot;, &quot;Relationship type &quot; + relType + &quot; does not exist&quot;);</span>
             }
         }
-<span class="nc" id="L219">    }</span>
+<span class="nc" id="L247">    }</span>
 
     /**
      * Creates and adds a parameter to a method if the given strings are nonempty,
@@ -231,37 +259,37 @@ public class GUIController {
     public boolean addParameterAction(String className, String methodName, String paramName, String paramType,
                                           Stage stage) {
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L234" title="All 8 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || paramType.isEmpty()) {</span>
-<span class="nc" id="L235">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L262" title="All 8 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || paramType.isEmpty()) {</span>
+<span class="nc" id="L263">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L238" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L239">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L267">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the method does not exist, pop an error up
-<span class="nc bnc" id="L241" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
-<span class="nc" id="L242">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
+<span class="nc" id="L270">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
             // if the parameter name is not a valid string, pop an error up
-<span class="nc bnc" id="L244" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(paramName)) {</span>
-<span class="nc" id="L245">                this.view.popUpWindow(&quot;Error&quot;, &quot;The parameter name is invalid&quot;);</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(paramName)) {</span>
+<span class="nc" id="L273">                this.view.popUpWindow(&quot;Error&quot;, &quot;The parameter name is invalid&quot;);</span>
             } else {
                 // if the parameter does not exist, add it and close
-<span class="nc bnc" id="L248" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {</span>
-<span class="nc" id="L249">                    Parameter newParam = new Parameter(paramName, paramType);</span>
-<span class="nc" id="L250">                    setState();</span>
-<span class="nc" id="L251">                    this.model.findClass(className).findMethod(methodName).addParameter(newParam);</span>
-<span class="nc" id="L252">                    stage.close();</span>
-<span class="nc" id="L253">                    this.view.findClassBox(className).addText(this.model.findClass(className).findMethod(methodName),</span>
-<span class="nc" id="L254">                            this.model.findClass(className).getFieldList().size(),</span>
-<span class="nc" id="L255">                            this.model.findClass(className).getMethodList().size(), true);</span>
-<span class="nc" id="L256">                    this.view.resizeMethod(this.model.findClass(className).findMethod(methodName), className);</span>
-<span class="nc" id="L257">                    return true;</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {</span>
+<span class="nc" id="L277">                    Parameter newParam = new Parameter(paramName, paramType);</span>
+<span class="nc" id="L278">                    setState();</span>
+<span class="nc" id="L279">                    this.model.findClass(className).findMethod(methodName).addParameter(newParam);</span>
+<span class="nc" id="L280">                    stage.close();</span>
+<span class="nc" id="L281">                    this.view.findClassBox(className).addText(this.model.findClass(className).findMethod(methodName),</span>
+<span class="nc" id="L282">                            this.model.findClass(className).getFieldList().size(),</span>
+<span class="nc" id="L283">                            this.model.findClass(className).getMethodList().size(), true);</span>
+<span class="nc" id="L284">                    this.view.resizeMethod(this.model.findClass(className).findMethod(methodName), className);</span>
+<span class="nc" id="L285">                    return true;</span>
                 // if the method does exist, pop an error up
                 } else {
-<span class="nc" id="L260">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Field already exists&quot;);</span>
+<span class="nc" id="L288">                    this.view.popUpWindow(&quot;Error&quot;, &quot;Field already exists&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L264">        return false;</span>
+<span class="nc" id="L292">        return false;</span>
     }
 
     //***************************************//
@@ -277,44 +305,44 @@ public class GUIController {
      */
     public void deleteClassAction(String className, Stage stage) {
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L280" title="All 2 branches missed.">        if (className.isEmpty()) {</span>
-<span class="nc" id="L281">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">        if (className.isEmpty()) {</span>
+<span class="nc" id="L309">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L284" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L285">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L313">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the class does exist, delete it and close
             } else {
-<span class="nc" id="L288">                UMLClass classToDelete = this.model.findClass(className);</span>
-<span class="nc" id="L289">                setState();</span>
+<span class="nc" id="L316">                UMLClass classToDelete = this.model.findClass(className);</span>
+<span class="nc" id="L317">                setState();</span>
                 // update the view
-<span class="nc" id="L291">                stage.close();</span>
+<span class="nc" id="L319">                stage.close();</span>
                 // for each relationship object in the relationship list
-<span class="nc bnc" id="L293" title="All 2 branches missed.">                for(Relationship r : this.model.getRelationshipList()){</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">                for(Relationship r : this.model.getRelationshipList()){</span>
                     // if the className is the name of the source in a relationship
-<span class="nc bnc" id="L295" title="All 2 branches missed.">                    if(r.getSource().getClassName().equals(className)){</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">                    if(r.getSource().getClassName().equals(className)){</span>
                         // delete the relationship line in the diagram
-<span class="nc" id="L297">                        this.view.deleteRelLine(this.view.findClassBox(className),</span>
-<span class="nc" id="L298">                                this.view.findClassBox(r.getDestination().getClassName()));</span>
+<span class="nc" id="L325">                        this.view.deleteRelLine(this.view.findClassBox(className),</span>
+<span class="nc" id="L326">                                this.view.findClassBox(r.getDestination().getClassName()));</span>
                     }
                     // if className is the name of the destination in a relationship
-<span class="nc bnc" id="L301" title="All 2 branches missed.">                    if(r.getDestination().getClassName().equals(className)){</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">                    if(r.getDestination().getClassName().equals(className)){</span>
                         // delete the relationship line in the diagram
-<span class="nc" id="L303">                        this.view.deleteRelLine(this.view.findClassBox(r.getSource().getClassName()),</span>
-<span class="nc" id="L304">                                this.view.findClassBox(className));</span>
+<span class="nc" id="L331">                        this.view.deleteRelLine(this.view.findClassBox(r.getSource().getClassName()),</span>
+<span class="nc" id="L332">                                this.view.findClassBox(className));</span>
                     }
                     else{
                         break;
                     }
-<span class="nc" id="L309">                }</span>
+<span class="nc" id="L337">                }</span>
                 // delete the classbox from the view
-<span class="nc" id="L311">                this.view.deleteClassBox(className);</span>
+<span class="nc" id="L339">                this.view.deleteClassBox(className);</span>
                 // update the model
-<span class="nc" id="L313">                this.model.updateRelationshipList(className);</span>
-<span class="nc" id="L314">                this.model.deleteClass(classToDelete);</span>
+<span class="nc" id="L341">                this.model.updateRelationshipList(className);</span>
+<span class="nc" id="L342">                this.model.deleteClass(classToDelete);</span>
             }
         }
-<span class="nc" id="L317">    }</span>
+<span class="nc" id="L345">    }</span>
 
     /**
      * Deletes a field from a class if the given string is nonempty and the field exists,
@@ -326,34 +354,34 @@ public class GUIController {
      */
     public void deleteFieldAction(String className, String fieldName, Stage stage){
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L329" title="All 4 branches missed.">        if (className.isEmpty() || fieldName.isEmpty()) {</span>
-<span class="nc" id="L330">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L357" title="All 4 branches missed.">        if (className.isEmpty() || fieldName.isEmpty()) {</span>
+<span class="nc" id="L358">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L333" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L334">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L361" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L362">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the field does not exist, pop an error up
-<span class="nc bnc" id="L336" title="All 2 branches missed.">            } else if (this.model.findClass(className).findField(fieldName) == null) {</span>
-<span class="nc" id="L337">                this.view.popUpWindow(&quot;Error&quot;, &quot;Field does not exist&quot;);</span>
+<span class="nc bnc" id="L364" title="All 2 branches missed.">            } else if (this.model.findClass(className).findField(fieldName) == null) {</span>
+<span class="nc" id="L365">                this.view.popUpWindow(&quot;Error&quot;, &quot;Field does not exist&quot;);</span>
             // if the field does exist, delete it and close
             } else {
-<span class="nc" id="L340">                Field fieldToDelete = this.model.findClass(className).findField(fieldName);</span>
-<span class="nc" id="L341">                setState();</span>
-<span class="nc" id="L342">                this.model.findClass(className).deleteField(fieldToDelete);</span>
+<span class="nc" id="L368">                Field fieldToDelete = this.model.findClass(className).findField(fieldName);</span>
+<span class="nc" id="L369">                setState();</span>
+<span class="nc" id="L370">                this.model.findClass(className).deleteField(fieldToDelete);</span>
                 // go through fieldList in ClassBox, remove the field from the fieldList, then
                 // remove field from flow
-<span class="nc bnc" id="L345" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getFieldTextList().size(); ++i) {</span>
-<span class="nc" id="L346">                    if (this.view.findClassBox(className).getFieldTextList().get(i).getText().</span>
-<span class="nc bnc" id="L347" title="All 2 branches missed.">                            startsWith(&quot;\n- &quot; + fieldName)) {</span>
-<span class="nc" id="L348">                        this.view.findClassBox(className).getFlow().getChildren().remove(</span>
-<span class="nc" id="L349">                                this.view.findClassBox(className).getFieldTextList().get(i));</span>
-<span class="nc" id="L350">                        this.view.findClassBox(className).getFieldTextList().remove(i);</span>
+<span class="nc bnc" id="L373" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getFieldTextList().size(); ++i) {</span>
+<span class="nc" id="L374">                    if (this.view.findClassBox(className).getFieldTextList().get(i).getText().</span>
+<span class="nc bnc" id="L375" title="All 2 branches missed.">                            startsWith(&quot;\n- &quot; + fieldName)) {</span>
+<span class="nc" id="L376">                        this.view.findClassBox(className).getFlow().getChildren().remove(</span>
+<span class="nc" id="L377">                                this.view.findClassBox(className).getFieldTextList().get(i));</span>
+<span class="nc" id="L378">                        this.view.findClassBox(className).getFieldTextList().remove(i);</span>
                     }
                 }
-<span class="nc" id="L353">                stage.close();</span>
+<span class="nc" id="L381">                stage.close();</span>
             }
         }
-<span class="nc" id="L356">    }</span>
+<span class="nc" id="L384">    }</span>
 
     /**
      * Deletes a method from a class if the given string is nonempty and the method exists,
@@ -365,34 +393,34 @@ public class GUIController {
      */
     public void deleteMethodAction(String className, String methodName, Stage stage){
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L368" title="All 4 branches missed.">        if (className.isEmpty() || methodName.isEmpty()) {</span>
-<span class="nc" id="L369">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L396" title="All 4 branches missed.">        if (className.isEmpty() || methodName.isEmpty()) {</span>
+<span class="nc" id="L397">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L372" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L373">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L401">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the method does not exist, pop an error up
-<span class="nc bnc" id="L375" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
-<span class="nc" id="L376">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
+<span class="nc bnc" id="L403" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
+<span class="nc" id="L404">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
             // if the method does exist, delete it and close
             } else {
-<span class="nc" id="L379">                Method methodToDelete = this.model.findClass(className).findMethod(methodName);</span>
-<span class="nc" id="L380">                setState();</span>
-<span class="nc" id="L381">                this.model.findClass(className).deleteMethod(methodToDelete);</span>
+<span class="nc" id="L407">                Method methodToDelete = this.model.findClass(className).findMethod(methodName);</span>
+<span class="nc" id="L408">                setState();</span>
+<span class="nc" id="L409">                this.model.findClass(className).deleteMethod(methodToDelete);</span>
                 // go through fieldList in ClassBox, remove the field from the fieldList, then
                 // remove field from flow
-<span class="nc bnc" id="L384" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
-<span class="nc" id="L385">                    if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
-<span class="nc bnc" id="L386" title="All 2 branches missed.">                            startsWith(&quot;\n+ &quot; + methodName)) {</span>
-<span class="nc" id="L387">                        this.view.findClassBox(className).getFlow().getChildren().remove(</span>
-<span class="nc" id="L388">                                this.view.findClassBox(className).getMethTextList().get(i));</span>
-<span class="nc" id="L389">                        this.view.findClassBox(className).getMethTextList().remove(i);</span>
+<span class="nc bnc" id="L412" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
+<span class="nc" id="L413">                    if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
+<span class="nc bnc" id="L414" title="All 2 branches missed.">                            startsWith(&quot;\n+ &quot; + methodName)) {</span>
+<span class="nc" id="L415">                        this.view.findClassBox(className).getFlow().getChildren().remove(</span>
+<span class="nc" id="L416">                                this.view.findClassBox(className).getMethTextList().get(i));</span>
+<span class="nc" id="L417">                        this.view.findClassBox(className).getMethTextList().remove(i);</span>
                     }
                 }
-<span class="nc" id="L392">                stage.close();</span>
+<span class="nc" id="L420">                stage.close();</span>
             }
         }
-<span class="nc" id="L395">    }</span>
+<span class="nc" id="L423">    }</span>
 
     /**
      * Deletes a field from a class if the given string is nonempty and the field exists,
@@ -405,40 +433,40 @@ public class GUIController {
      */
     public boolean deleteParamAction(String className, String methodName, String paramName, Stage stage){
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L408" title="All 6 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty()) {</span>
-<span class="nc" id="L409">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L436" title="All 6 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty()) {</span>
+<span class="nc" id="L437">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L412" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L413">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L440" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L441">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
                 // if the method does not exist, pop an error up
-<span class="nc bnc" id="L415" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
-<span class="nc" id="L416">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
+<span class="nc" id="L444">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
                 // if the parameter does not exist, pop an error up
-<span class="nc bnc" id="L418" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {</span>
-<span class="nc" id="L419">                this.view.popUpWindow(&quot;Error&quot;, &quot;Parameter does not exist&quot;);</span>
+<span class="nc bnc" id="L446" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {</span>
+<span class="nc" id="L447">                this.view.popUpWindow(&quot;Error&quot;, &quot;Parameter does not exist&quot;);</span>
                 // if the parameter name is not a valid string, pop an error up
             } else {
-<span class="nc" id="L422">                setState();</span>
-<span class="nc" id="L423">                Parameter paramToDelete = this.model.findClass(className).findMethod(methodName).findParameter(paramName);</span>
-<span class="nc" id="L424">                this.model.findClass(className).findMethod(methodName).deleteParameter(paramToDelete);</span>
+<span class="nc" id="L450">                setState();</span>
+<span class="nc" id="L451">                Parameter paramToDelete = this.model.findClass(className).findMethod(methodName).findParameter(paramName);</span>
+<span class="nc" id="L452">                this.model.findClass(className).findMethod(methodName).deleteParameter(paramToDelete);</span>
                 // go through methlist in ClassBox, edit text of method in that methlist, remove the
                 // old method, add the new, renamed method at the bottom
-<span class="nc bnc" id="L427" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
-<span class="nc" id="L428">                    if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
-<span class="nc bnc" id="L429" title="All 2 branches missed.">                            startsWith(&quot;\n+ &quot; + methodName)) {</span>
-<span class="nc" id="L430">                        this.view.findClassBox(className).getMethTextList().remove(i);</span>
-<span class="nc" id="L431">                        this.view.findClassBox(className).addText(this.model.findClass(className).</span>
-<span class="nc" id="L432">                                        findMethod(methodName),</span>
-<span class="nc" id="L433">                                this.model.findClass(className).getFieldList().size(),</span>
-<span class="nc" id="L434">                                this.model.findClass(className).getMethodList().size(), true);</span>
+<span class="nc bnc" id="L455" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
+<span class="nc" id="L456">                    if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">                            startsWith(&quot;\n+ &quot; + methodName)) {</span>
+<span class="nc" id="L458">                        this.view.findClassBox(className).getMethTextList().remove(i);</span>
+<span class="nc" id="L459">                        this.view.findClassBox(className).addText(this.model.findClass(className).</span>
+<span class="nc" id="L460">                                        findMethod(methodName),</span>
+<span class="nc" id="L461">                                this.model.findClass(className).getFieldList().size(),</span>
+<span class="nc" id="L462">                                this.model.findClass(className).getMethodList().size(), true);</span>
                     }
                 }
-<span class="nc" id="L437">                stage.close();</span>
-<span class="nc bnc" id="L438" title="All 2 branches missed.">                return (this.model.findClass(className).findMethod(methodName).getParamList().size() &gt; 0);</span>
+<span class="nc" id="L465">                stage.close();</span>
+<span class="nc bnc" id="L466" title="All 2 branches missed.">                return (this.model.findClass(className).findMethod(methodName).getParamList().size() &gt; 0);</span>
             }
         }
-<span class="nc" id="L441">        return false;</span>
+<span class="nc" id="L469">        return false;</span>
     }
 
     /**
@@ -451,25 +479,25 @@ public class GUIController {
      */
     public void deleteRelAction(String srcName, String destName, Stage stage) {
         // if any string is empty, pop an error up
-<span class="nc bnc" id="L454" title="All 4 branches missed.">        if (srcName.isEmpty() || destName.isEmpty()) {</span>
-<span class="nc" id="L455">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L482" title="All 4 branches missed.">        if (srcName.isEmpty() || destName.isEmpty()) {</span>
+<span class="nc" id="L483">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         // if the relationship between the two classes in src-&gt;dest order does
         // exist, display error message
-<span class="nc bnc" id="L458" title="All 2 branches missed.">        } else if (this.model.findRelationship(srcName, destName,</span>
-<span class="nc" id="L459">                this.model.findRelType(srcName, destName)) == null) {</span>
-<span class="nc" id="L460">            this.view.popUpWindow(&quot;Error&quot;, &quot;Relationship does not exist&quot;);</span>
+<span class="nc bnc" id="L486" title="All 2 branches missed.">        } else if (this.model.findRelationship(srcName, destName,</span>
+<span class="nc" id="L487">                this.model.findRelType(srcName, destName)) == null) {</span>
+<span class="nc" id="L488">            this.view.popUpWindow(&quot;Error&quot;, &quot;Relationship does not exist&quot;);</span>
         // delete the relationship, update the view and close
         } else {
-<span class="nc" id="L463">            setState();</span>
-<span class="nc" id="L464">            Relationship relToDelete = this.model.findRelationship(srcName, destName,</span>
-<span class="nc" id="L465">                    this.model.findRelType(srcName, destName));</span>
+<span class="nc" id="L491">            setState();</span>
+<span class="nc" id="L492">            Relationship relToDelete = this.model.findRelationship(srcName, destName,</span>
+<span class="nc" id="L493">                    this.model.findRelType(srcName, destName));</span>
             // update view
-<span class="nc" id="L467">            this.view.deleteRelLine(this.view.findClassBox(srcName), this.view.findClassBox(destName));</span>
+<span class="nc" id="L495">            this.view.deleteRelLine(this.view.findClassBox(srcName), this.view.findClassBox(destName));</span>
             // update model
-<span class="nc" id="L469">            this.model.deleteRel(relToDelete);</span>
-<span class="nc" id="L470">            stage.close();</span>
+<span class="nc" id="L497">            this.model.deleteRel(relToDelete);</span>
+<span class="nc" id="L498">            stage.close();</span>
         }
-<span class="nc" id="L472">    }</span>
+<span class="nc" id="L500">    }</span>
 
     //***************************************//
     //********** Rename Actions *************//
@@ -485,36 +513,36 @@ public class GUIController {
      */
     public void renameClassAction(String className, String newClassName, Stage stage) {
         // if the string is empty, pop an error up
-<span class="nc bnc" id="L488" title="All 2 branches missed.">        if (className.isEmpty()) {</span>
-<span class="nc" id="L489">            this.view.popUpWindow(&quot;Error&quot;, &quot;Class name is required&quot;);</span>
+<span class="nc bnc" id="L516" title="All 2 branches missed.">        if (className.isEmpty()) {</span>
+<span class="nc" id="L517">            this.view.popUpWindow(&quot;Error&quot;, &quot;Class name is required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L492" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L493">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L520" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L521">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the class name is not a valid string, pop an error up
-<span class="nc bnc" id="L495" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newClassName)) {</span>
-<span class="nc" id="L496">                this.view.popUpWindow(&quot;Error&quot;, &quot;The class name is invalid&quot;);</span>
+<span class="nc bnc" id="L523" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newClassName)) {</span>
+<span class="nc" id="L524">                this.view.popUpWindow(&quot;Error&quot;, &quot;The class name is invalid&quot;);</span>
             } else {
                 // if the class name is not already in use, rename the field
-<span class="nc bnc" id="L499" title="All 2 branches missed.">                if (this.model.findClass(newClassName) == null) {</span>
-<span class="nc" id="L500">                    setState();</span>
+<span class="nc bnc" id="L527" title="All 2 branches missed.">                if (this.model.findClass(newClassName) == null) {</span>
+<span class="nc" id="L528">                    setState();</span>
                     // update model
-<span class="nc" id="L502">                    this.model.findClass(className).setClassName(newClassName);</span>
+<span class="nc" id="L530">                    this.model.findClass(className).setClassName(newClassName);</span>
                     // update view
-<span class="nc" id="L504">                    stage.close();</span>
-<span class="nc" id="L505">                    this.view.findClassBox(className).getFlow().getChildren().remove(0);</span>
-<span class="nc" id="L506">                    Text newTextName = new Text(newClassName);</span>
-<span class="nc" id="L507">                    newTextName.setFont(Font.font(newTextName.getFont().getName(), FontWeight.BOLD, 12));</span>
-<span class="nc" id="L508">                    this.view.findClassBox(className).getFlow().getChildren().add(0, newTextName);</span>
-<span class="nc" id="L509">                    this.view.findClassBox(className).setClassTitle(newTextName);</span>
-<span class="nc" id="L510">                    this.view.findClassBox(className).setClassBoxName(newClassName);</span>
+<span class="nc" id="L532">                    stage.close();</span>
+<span class="nc" id="L533">                    this.view.findClassBox(className).getFlow().getChildren().remove(0);</span>
+<span class="nc" id="L534">                    Text newTextName = new Text(newClassName);</span>
+<span class="nc" id="L535">                    newTextName.setFont(Font.font(newTextName.getFont().getName(), FontWeight.BOLD, 12));</span>
+<span class="nc" id="L536">                    this.view.findClassBox(className).getFlow().getChildren().add(0, newTextName);</span>
+<span class="nc" id="L537">                    this.view.findClassBox(className).setClassTitle(newTextName);</span>
+<span class="nc" id="L538">                    this.view.findClassBox(className).setClassBoxName(newClassName);</span>
                 // otherwise, pop an error up
-<span class="nc" id="L512">                } else {</span>
-<span class="nc" id="L513">                    this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is already in use&quot;);</span>
+<span class="nc" id="L540">                } else {</span>
+<span class="nc" id="L541">                    this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is already in use&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L517">    }</span>
+<span class="nc" id="L545">    }</span>
 
     /**
      * Renames a field to a given string in a class if the given string is nonempty and the class and field exist,
@@ -527,46 +555,46 @@ public class GUIController {
      */
     public void renameFieldAction(String className, String fieldName, String newFieldName, Stage stage) {
         // if any strings are empty, pop an error up
-<span class="nc bnc" id="L530" title="All 6 branches missed.">        if (className.isEmpty() || fieldName.isEmpty() || newFieldName.isEmpty()) {</span>
-<span class="nc" id="L531">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L558" title="All 6 branches missed.">        if (className.isEmpty() || fieldName.isEmpty() || newFieldName.isEmpty()) {</span>
+<span class="nc" id="L559">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L534" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L535">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L562" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L563">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
                 // if the field does not exist, pop an error up
-<span class="nc bnc" id="L537" title="All 2 branches missed.">            } else if (this.model.findClass(className).findField(fieldName) == null) {</span>
-<span class="nc" id="L538">                this.view.popUpWindow(&quot;Error&quot;, &quot;Field does not exist&quot;);</span>
+<span class="nc bnc" id="L565" title="All 2 branches missed.">            } else if (this.model.findClass(className).findField(fieldName) == null) {</span>
+<span class="nc" id="L566">                this.view.popUpWindow(&quot;Error&quot;, &quot;Field does not exist&quot;);</span>
                 // if the field name is not a valid string, pop an error up
-<span class="nc bnc" id="L540" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newFieldName)) {</span>
-<span class="nc" id="L541">                this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is invalid&quot;);</span>
+<span class="nc bnc" id="L568" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newFieldName)) {</span>
+<span class="nc" id="L569">                this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is invalid&quot;);</span>
                 // if the field exists and the type matches, rename the field
             }
             // if the field name is not already in use, rename the field
-<span class="nc bnc" id="L545" title="All 2 branches missed.">            if (this.model.findClass(className).findField(newFieldName) == null) {</span>
-<span class="nc" id="L546">                setState();</span>
+<span class="nc bnc" id="L573" title="All 2 branches missed.">            if (this.model.findClass(className).findField(newFieldName) == null) {</span>
+<span class="nc" id="L574">                setState();</span>
                 // update model
-<span class="nc" id="L548">                this.model.findClass(className).findField(fieldName).setAttName(newFieldName);</span>
+<span class="nc" id="L576">                this.model.findClass(className).findField(fieldName).setAttName(newFieldName);</span>
                 // update view
-<span class="nc" id="L550">                stage.close();</span>
+<span class="nc" id="L578">                stage.close();</span>
                 // go through fieldList in ClassBox, edit text of field in that fieldlist, remove the
                 // old text, add the new, renamed field at the bottom
-<span class="nc bnc" id="L553" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getFieldTextList().size(); ++i) {</span>
-<span class="nc" id="L554">                    if (this.view.findClassBox(className).getFieldTextList().get(i).getText().</span>
-<span class="nc bnc" id="L555" title="All 2 branches missed.">                            startsWith(&quot;\n- &quot; + fieldName)) {</span>
-<span class="nc" id="L556">                        this.view.findClassBox(className).getFieldTextList().get(i).getText().</span>
-<span class="nc" id="L557">                                replace(&quot;\n- &quot; + fieldName, &quot;\n- &quot; + newFieldName);</span>
-<span class="nc" id="L558">                        this.view.findClassBox(className).getFieldTextList().remove(i);</span>
-<span class="nc" id="L559">                        this.view.findClassBox(className).addText(this.model.findClass(className).findField(newFieldName),</span>
-<span class="nc" id="L560">                                this.model.findClass(className).getFieldList().size(),</span>
-<span class="nc" id="L561">                                this.model.findClass(className).getMethodList().size(), true);</span>
+<span class="nc bnc" id="L581" title="All 2 branches missed.">                for (int i = 0; i &lt; this.view.findClassBox(className).getFieldTextList().size(); ++i) {</span>
+<span class="nc" id="L582">                    if (this.view.findClassBox(className).getFieldTextList().get(i).getText().</span>
+<span class="nc bnc" id="L583" title="All 2 branches missed.">                            startsWith(&quot;\n- &quot; + fieldName)) {</span>
+<span class="nc" id="L584">                        this.view.findClassBox(className).getFieldTextList().get(i).getText().</span>
+<span class="nc" id="L585">                                replace(&quot;\n- &quot; + fieldName, &quot;\n- &quot; + newFieldName);</span>
+<span class="nc" id="L586">                        this.view.findClassBox(className).getFieldTextList().remove(i);</span>
+<span class="nc" id="L587">                        this.view.findClassBox(className).addText(this.model.findClass(className).findField(newFieldName),</span>
+<span class="nc" id="L588">                                this.model.findClass(className).getFieldList().size(),</span>
+<span class="nc" id="L589">                                this.model.findClass(className).getMethodList().size(), true);</span>
                     }
                 }
                 // otherwise, pop an error up
             } else {
-<span class="nc" id="L566">                this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is already in use&quot;);</span>
+<span class="nc" id="L594">                this.view.popUpWindow(&quot;Error&quot;, &quot;The field name is already in use&quot;);</span>
             }
         }
-<span class="nc" id="L569">    }</span>
+<span class="nc" id="L597">    }</span>
 
 
     /**
@@ -580,45 +608,45 @@ public class GUIController {
      */
     public void renameMethodAction(String className, String methodName, String newMethodName, Stage stage) {
         // if any strings are empty, pop an error up
-<span class="nc bnc" id="L583" title="All 6 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || newMethodName.isEmpty()) {</span>
-<span class="nc" id="L584">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L611" title="All 6 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || newMethodName.isEmpty()) {</span>
+<span class="nc" id="L612">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L587" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L588">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L615" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L616">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
             // if the method does not exist, pop an error up
-<span class="nc bnc" id="L590" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
-<span class="nc" id="L591">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
+<span class="nc bnc" id="L618" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
+<span class="nc" id="L619">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
             // if the method name is not a valid string, pop an error up
-<span class="nc bnc" id="L593" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newMethodName)) {</span>
-<span class="nc" id="L594">                this.view.popUpWindow(&quot;Error&quot;, &quot;The method name is invalid&quot;);</span>
+<span class="nc bnc" id="L621" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newMethodName)) {</span>
+<span class="nc" id="L622">                this.view.popUpWindow(&quot;Error&quot;, &quot;The method name is invalid&quot;);</span>
             } else {
                 // if the method name is not already in use, rename the method
-<span class="nc bnc" id="L597" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(newMethodName) == null) {</span>
-<span class="nc" id="L598">                    setState();</span>
-<span class="nc" id="L599">                    this.model.findClass(className).findMethod(methodName).setAttName(newMethodName);</span>
-<span class="nc" id="L600">                    stage.close();</span>
+<span class="nc bnc" id="L625" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(newMethodName) == null) {</span>
+<span class="nc" id="L626">                    setState();</span>
+<span class="nc" id="L627">                    this.model.findClass(className).findMethod(methodName).setAttName(newMethodName);</span>
+<span class="nc" id="L628">                    stage.close();</span>
                     // go through methlist in ClassBox, edit text of method in that methlist, remove the
                     // old method, add the new, renamed method at the bottom
-<span class="nc bnc" id="L603" title="All 2 branches missed.">                    for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
-<span class="nc" id="L604">                        if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
-<span class="nc bnc" id="L605" title="All 2 branches missed.">                                startsWith(&quot;\n+ &quot; + methodName)) {</span>
-<span class="nc" id="L606">                            this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
-<span class="nc" id="L607">                                    replace(&quot;\n+ &quot; + methodName, &quot;\n+ &quot; + newMethodName);</span>
-<span class="nc" id="L608">                            this.view.findClassBox(className).getMethTextList().remove(i);</span>
-<span class="nc" id="L609">                            this.view.findClassBox(className).addText(this.model.findClass(className).</span>
-<span class="nc" id="L610">                                            findMethod(newMethodName),</span>
-<span class="nc" id="L611">                                    this.model.findClass(className).getFieldList().size(),</span>
-<span class="nc" id="L612">                                    this.model.findClass(className).getMethodList().size(), true);</span>
+<span class="nc bnc" id="L631" title="All 2 branches missed.">                    for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
+<span class="nc" id="L632">                        if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
+<span class="nc bnc" id="L633" title="All 2 branches missed.">                                startsWith(&quot;\n+ &quot; + methodName)) {</span>
+<span class="nc" id="L634">                            this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
+<span class="nc" id="L635">                                    replace(&quot;\n+ &quot; + methodName, &quot;\n+ &quot; + newMethodName);</span>
+<span class="nc" id="L636">                            this.view.findClassBox(className).getMethTextList().remove(i);</span>
+<span class="nc" id="L637">                            this.view.findClassBox(className).addText(this.model.findClass(className).</span>
+<span class="nc" id="L638">                                            findMethod(newMethodName),</span>
+<span class="nc" id="L639">                                    this.model.findClass(className).getFieldList().size(),</span>
+<span class="nc" id="L640">                                    this.model.findClass(className).getMethodList().size(), true);</span>
                         }
                     }
                 // otherwise, pop an error up
                 } else {
-<span class="nc" id="L617">                    this.view.popUpWindow(&quot;Error&quot;, &quot;The method name is already in use&quot;);</span>
+<span class="nc" id="L645">                    this.view.popUpWindow(&quot;Error&quot;, &quot;The method name is already in use&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L621">    }</span>
+<span class="nc" id="L649">    }</span>
 
     /**
      * Changes a parameter to a given string in a class if the given string is nonempty, and the class, method,
@@ -634,51 +662,51 @@ public class GUIController {
     public boolean changeParameterAction(String className, String methodName, String paramName,
                                              String newParamName, String newParamType, Stage stage) {
         // if any strings are empty, pop an error up
-<span class="nc bnc" id="L637" title="All 8 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || newParamName.isEmpty()) {</span>
-<span class="nc" id="L638">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L665" title="All 8 branches missed.">        if (className.isEmpty() || methodName.isEmpty() || paramName.isEmpty() || newParamName.isEmpty()) {</span>
+<span class="nc" id="L666">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         } else {
             // if the class does not exist, pop an error up
-<span class="nc bnc" id="L641" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
-<span class="nc" id="L642">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L669" title="All 2 branches missed.">            if (this.model.findClass(className) == null) {</span>
+<span class="nc" id="L670">                this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
                 // if the method does not exist, pop an error up
-<span class="nc bnc" id="L644" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
-<span class="nc" id="L645">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
+<span class="nc bnc" id="L672" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName) == null) {</span>
+<span class="nc" id="L673">                this.view.popUpWindow(&quot;Error&quot;, &quot;Method does not exist&quot;);</span>
                 // if the parameter does not exist, pop an error up
-<span class="nc bnc" id="L647" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {</span>
-<span class="nc" id="L648">                this.view.popUpWindow(&quot;Error&quot;, &quot;Parameter does not exist&quot;);</span>
+<span class="nc bnc" id="L675" title="All 2 branches missed.">            } else if (this.model.findClass(className).findMethod(methodName).findParameter(paramName) == null) {</span>
+<span class="nc" id="L676">                this.view.popUpWindow(&quot;Error&quot;, &quot;Parameter does not exist&quot;);</span>
                 // if the parameter name is not a valid string, pop an error up
-<span class="nc bnc" id="L650" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newParamName)) {</span>
-<span class="nc" id="L651">                this.view.popUpWindow(&quot;Error&quot;, &quot;The parameter name is invalid&quot;);</span>
+<span class="nc bnc" id="L678" title="All 2 branches missed.">            } else if (this.model.isNotValidInput(newParamName)) {</span>
+<span class="nc" id="L679">                this.view.popUpWindow(&quot;Error&quot;, &quot;The parameter name is invalid&quot;);</span>
             } else {
                 // if the parameter name is not already in use, change the parameter
-<span class="nc bnc" id="L654" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(methodName).findParameter(newParamName) == null) {</span>
-<span class="nc" id="L655">                    setState();</span>
-<span class="nc" id="L656">                    this.model.findClass(className).findMethod(methodName).findParameter(paramName).</span>
-<span class="nc" id="L657">                            setAttName(newParamName);</span>
-<span class="nc" id="L658">                    this.model.findClass(className).findMethod(methodName).findParameter(newParamName)</span>
-<span class="nc" id="L659">                            .setFieldType(newParamType);</span>
-<span class="nc" id="L660">                    stage.close();</span>
+<span class="nc bnc" id="L682" title="All 2 branches missed.">                if (this.model.findClass(className).findMethod(methodName).findParameter(newParamName) == null) {</span>
+<span class="nc" id="L683">                    setState();</span>
+<span class="nc" id="L684">                    this.model.findClass(className).findMethod(methodName).findParameter(paramName).</span>
+<span class="nc" id="L685">                            setAttName(newParamName);</span>
+<span class="nc" id="L686">                    this.model.findClass(className).findMethod(methodName).findParameter(newParamName)</span>
+<span class="nc" id="L687">                            .setFieldType(newParamType);</span>
+<span class="nc" id="L688">                    stage.close();</span>
                     // go through methlist in ClassBox, edit text of method in that methlist, remove the
                     // old method, add the new, renamed method at the bottom
-<span class="nc bnc" id="L663" title="All 2 branches missed.">                    for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
-<span class="nc" id="L664">                        if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
-<span class="nc bnc" id="L665" title="All 2 branches missed.">                                startsWith(&quot;\n+ &quot; + methodName)) {</span>
-<span class="nc" id="L666">                            this.view.findClassBox(className).getMethTextList().remove(i);</span>
-<span class="nc" id="L667">                            this.view.findClassBox(className).addText(this.model.findClass(className).</span>
-<span class="nc" id="L668">                                            findMethod(methodName),</span>
-<span class="nc" id="L669">                                    this.model.findClass(className).getFieldList().size(),</span>
-<span class="nc" id="L670">                                    this.model.findClass(className).getMethodList().size(), true);</span>
-<span class="nc" id="L671">                            this.view.resizeMethod(this.model.findClass(className).findMethod(methodName), className);</span>
+<span class="nc bnc" id="L691" title="All 2 branches missed.">                    for (int i = 0; i &lt; this.view.findClassBox(className).getMethTextList().size(); ++i) {</span>
+<span class="nc" id="L692">                        if (this.view.findClassBox(className).getMethTextList().get(i).getText().</span>
+<span class="nc bnc" id="L693" title="All 2 branches missed.">                                startsWith(&quot;\n+ &quot; + methodName)) {</span>
+<span class="nc" id="L694">                            this.view.findClassBox(className).getMethTextList().remove(i);</span>
+<span class="nc" id="L695">                            this.view.findClassBox(className).addText(this.model.findClass(className).</span>
+<span class="nc" id="L696">                                            findMethod(methodName),</span>
+<span class="nc" id="L697">                                    this.model.findClass(className).getFieldList().size(),</span>
+<span class="nc" id="L698">                                    this.model.findClass(className).getMethodList().size(), true);</span>
+<span class="nc" id="L699">                            this.view.resizeMethod(this.model.findClass(className).findMethod(methodName), className);</span>
                         }
                     }
-<span class="nc" id="L674">                    return true;</span>
+<span class="nc" id="L702">                    return true;</span>
                     // otherwise, pop an error up
                 } else {
-<span class="nc" id="L677">                    this.view.popUpWindow(&quot;Error&quot;, &quot;The parameter name is already in use&quot;);</span>
+<span class="nc" id="L705">                    this.view.popUpWindow(&quot;Error&quot;, &quot;The parameter name is already in use&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L681">        return false;</span>
+<span class="nc" id="L709">        return false;</span>
     }
 
     /**
@@ -694,85 +722,85 @@ public class GUIController {
      */
     public void changeRelTypeAction(String src, String dest, String oldReltype, String newRelType, Stage stage){
         // if any strings are empty, display error message
-<span class="nc bnc" id="L697" title="All 4 branches missed.">        if(oldReltype.isEmpty() || newRelType.isEmpty()){</span>
-<span class="nc" id="L698">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
+<span class="nc bnc" id="L725" title="All 4 branches missed.">        if(oldReltype.isEmpty() || newRelType.isEmpty()){</span>
+<span class="nc" id="L726">            this.view.popUpWindow(&quot;Error&quot;, &quot;All fields are required&quot;);</span>
         }
         // if source class does not exist, display error message
-<span class="nc bnc" id="L701" title="All 2 branches missed.">        else if(this.model.findClass(src) == null){</span>
-<span class="nc" id="L702">            this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L729" title="All 2 branches missed.">        else if(this.model.findClass(src) == null){</span>
+<span class="nc" id="L730">            this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
         }
         // if dest class does not exist, display error message
-<span class="nc bnc" id="L705" title="All 2 branches missed.">        else if(this.model.findClass(dest) == null){</span>
-<span class="nc" id="L706">            this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
+<span class="nc bnc" id="L733" title="All 2 branches missed.">        else if(this.model.findClass(dest) == null){</span>
+<span class="nc" id="L734">            this.view.popUpWindow(&quot;Error&quot;, &quot;Class does not exist&quot;);</span>
         }
         // if the source and destination are not related, display error message
-<span class="nc bnc" id="L709" title="All 2 branches missed.">        else if(!this.model.isRelated(src, dest)){</span>
-<span class="nc" id="L710">            this.view.popUpWindow(&quot;Error&quot;, &quot;Classes not related&quot;);</span>
+<span class="nc bnc" id="L737" title="All 2 branches missed.">        else if(!this.model.isRelated(src, dest)){</span>
+<span class="nc" id="L738">            this.view.popUpWindow(&quot;Error&quot;, &quot;Classes not related&quot;);</span>
         }
         // if the old relationship type does not match the type from the relation
         // display error message
-<span class="nc bnc" id="L714" title="All 2 branches missed.">        else if(!this.model.findRelType(src, dest).equals(oldReltype)){</span>
-<span class="nc" id="L715">            this.view.popUpWindow(&quot;Error&quot;, &quot;Type not present&quot;);</span>
+<span class="nc bnc" id="L742" title="All 2 branches missed.">        else if(!this.model.findRelType(src, dest).equals(oldReltype)){</span>
+<span class="nc" id="L743">            this.view.popUpWindow(&quot;Error&quot;, &quot;Type not present&quot;);</span>
         }
         // if the new relationship type is not a valid type, display error message
-<span class="nc bnc" id="L718" title="All 2 branches missed.">        else if(!this.model.checkType(newRelType)){</span>
-<span class="nc" id="L719">            this.view.popUpWindow(&quot;Error&quot;, &quot;Type not valid&quot;);</span>
+<span class="nc bnc" id="L746" title="All 2 branches missed.">        else if(!this.model.checkType(newRelType)){</span>
+<span class="nc" id="L747">            this.view.popUpWindow(&quot;Error&quot;, &quot;Type not valid&quot;);</span>
         }
         // if the old type and the new type are not the same, change the type
-<span class="nc bnc" id="L722" title="All 2 branches missed.">        else if(!oldReltype.equals(newRelType)){</span>
-<span class="nc" id="L723">            setState();</span>
+<span class="nc bnc" id="L750" title="All 2 branches missed.">        else if(!oldReltype.equals(newRelType)){</span>
+<span class="nc" id="L751">            setState();</span>
             // update the view
-<span class="nc" id="L725">            this.view.deleteRelLine(this.view.findClassBox(src), this.view.findClassBox(dest));</span>
-<span class="nc" id="L726">            this.view.drawLine(src, dest, newRelType);</span>
+<span class="nc" id="L753">            this.view.deleteRelLine(this.view.findClassBox(src), this.view.findClassBox(dest));</span>
+<span class="nc" id="L754">            this.view.drawLine(src, dest, newRelType);</span>
             // set the relationship type
-<span class="nc" id="L728">            this.model.findRelationship(src, dest, oldReltype).setRelType(newRelType);</span>
-<span class="nc" id="L729">            stage.close();</span>
+<span class="nc" id="L756">            this.model.findRelationship(src, dest, oldReltype).setRelType(newRelType);</span>
+<span class="nc" id="L757">            stage.close();</span>
         }
         // else display error message
         else {
-<span class="nc" id="L733">            this.view.popUpWindow(&quot;Error&quot;, &quot;Type are the same&quot;);</span>
+<span class="nc" id="L761">            this.view.popUpWindow(&quot;Error&quot;, &quot;Type are the same&quot;);</span>
         }
-<span class="nc" id="L735">    }</span>
+<span class="nc" id="L763">    }</span>
 
     /**
      * Stores the current state in the state stack
      */
     public void setState() {
-<span class="nc" id="L741">        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
-<span class="nc" id="L742">        caretaker.pushToUndoStack(currState);</span>
-<span class="nc" id="L743">    }</span>
+<span class="nc" id="L769">        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
+<span class="nc" id="L770">        caretaker.pushToUndoStack(currState);</span>
+<span class="nc" id="L771">    }</span>
 
     public void undoAction() {
         // if the stack is empty, return false, otherwise perform the undo and return
-<span class="nc bnc" id="L747" title="All 2 branches missed.">        if (this.caretaker.undoStackIsEmpty()) {</span>
-<span class="nc" id="L748">            this.view.popUpWindow(&quot;Error&quot;, &quot;No actions to undo.&quot;);</span>
+<span class="nc bnc" id="L775" title="All 2 branches missed.">        if (this.caretaker.undoStackIsEmpty()) {</span>
+<span class="nc" id="L776">            this.view.popUpWindow(&quot;Error&quot;, &quot;No actions to undo.&quot;);</span>
         } else {
             // get the current state the model is in
-<span class="nc" id="L751">            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
+<span class="nc" id="L779">            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
             // get the previous state on the state stack, and pass the helper the current state for the redo stack
-<span class="nc" id="L753">            Memento prevState = caretaker.undoHelper(currState);</span>
+<span class="nc" id="L781">            Memento prevState = caretaker.undoHelper(currState);</span>
             // make this current model the previous model
-<span class="nc" id="L755">            this.model = prevState.getState();</span>
-<span class="nc" id="L756">            clearDiagram();</span>
-<span class="nc" id="L757">            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());</span>
+<span class="nc" id="L783">            this.model = prevState.getState();</span>
+<span class="nc" id="L784">            clearDiagram();</span>
+<span class="nc" id="L785">            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());</span>
         }
-<span class="nc" id="L759">    }</span>
+<span class="nc" id="L787">    }</span>
 
     public void redoAction() {
         // if the stack is empty, return false, otherwise perform the redo and return
-<span class="nc bnc" id="L763" title="All 2 branches missed.">        if (this.caretaker.redoStackIsEmpty()) {</span>
-<span class="nc" id="L764">            this.view.popUpWindow(&quot;Error&quot;, &quot;No actions to redo.&quot;);</span>
+<span class="nc bnc" id="L791" title="All 2 branches missed.">        if (this.caretaker.redoStackIsEmpty()) {</span>
+<span class="nc" id="L792">            this.view.popUpWindow(&quot;Error&quot;, &quot;No actions to redo.&quot;);</span>
         } else {
             // get the current state the model is in
-<span class="nc" id="L767">            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
+<span class="nc" id="L795">            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
             // get the previous state on the state stack, and pass the helper the current state for the undo stack
-<span class="nc" id="L769">            Memento prevState = caretaker.redoHelper(currState);</span>
+<span class="nc" id="L797">            Memento prevState = caretaker.redoHelper(currState);</span>
             // make this current model the previous model
-<span class="nc" id="L771">            this.model = prevState.getState();</span>
-<span class="nc" id="L772">            clearDiagram();</span>
-<span class="nc" id="L773">            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());</span>
+<span class="nc" id="L799">            this.model = prevState.getState();</span>
+<span class="nc" id="L800">            clearDiagram();</span>
+<span class="nc" id="L801">            uploadDiagram(this.model.getClassList(), this.model.getRelationshipList());</span>
         }
-<span class="nc" id="L775">    }</span>
+<span class="nc" id="L803">    }</span>
 
     /******************************************************************
      *
@@ -786,7 +814,7 @@ public class GUIController {
      * @return the class list
      */
     public ArrayList&lt;UMLClass&gt; getClassList() {
-<span class="nc" id="L789">        return this.model.getClassList();</span>
+<span class="nc" id="L817">        return this.model.getClassList();</span>
     }
 
     /**
@@ -795,7 +823,7 @@ public class GUIController {
      * @return the relationship list
      */
     public ArrayList&lt;Relationship&gt; getRelationshipList() {
-<span class="nc" id="L798">        return this.model.getRelationshipList();</span>
+<span class="nc" id="L826">        return this.model.getRelationshipList();</span>
     }
 
     /**
@@ -804,29 +832,29 @@ public class GUIController {
      * @param stage the working stage
      */
     public void exitAction(Stage stage) {
-<span class="nc" id="L807">        stage.close();</span>
-<span class="nc" id="L808">    }</span>
+<span class="nc" id="L835">        stage.close();</span>
+<span class="nc" id="L836">    }</span>
 
     /**
      * Clear the diagram of all classboxes and relationship lines
      */
     public void clearDiagram() {
-<span class="nc bnc" id="L814" title="All 2 branches missed.">        for (ClassBox cbObj : this.view.getClassBoxList()) {</span>
-<span class="nc" id="L815">            this.view.getSuperRoot().getChildren().remove(cbObj.getClassPane());</span>
-<span class="nc" id="L816">        }</span>
-<span class="nc bnc" id="L817" title="All 2 branches missed.">        for (RelLine relLineObj : this.view.getLineList()) {</span>
-<span class="nc" id="L818">            this.view.getSuperRoot().getChildren().remove(relLineObj.getLine());</span>
-<span class="nc" id="L819">        }</span>
-<span class="nc bnc" id="L820" title="All 2 branches missed.">        for(ArrayList&lt;Line&gt; arrows : this.view.getArrowList()){</span>
-<span class="nc bnc" id="L821" title="All 2 branches missed.">            for (Line arrow : arrows) {</span>
-<span class="nc" id="L822">                this.view.getSuperRoot().getChildren().remove(arrow);</span>
-<span class="nc" id="L823">            }</span>
-<span class="nc" id="L824">            this.view.getSuperRoot().getChildren().remove(arrows);</span>
-<span class="nc" id="L825">        }</span>
-<span class="nc" id="L826">        this.view.getClassBoxList().clear();</span>
-<span class="nc" id="L827">        this.view.getLineList().clear();</span>
-<span class="nc" id="L828">        this.view.getArrowList().clear();</span>
-<span class="nc" id="L829">    }</span>
+<span class="nc bnc" id="L842" title="All 2 branches missed.">        for (ClassBox cbObj : this.view.getClassBoxList()) {</span>
+<span class="nc" id="L843">            this.view.getSuperRoot().getChildren().remove(cbObj.getClassPane());</span>
+<span class="nc" id="L844">        }</span>
+<span class="nc bnc" id="L845" title="All 2 branches missed.">        for (RelLine relLineObj : this.view.getLineList()) {</span>
+<span class="nc" id="L846">            this.view.getSuperRoot().getChildren().remove(relLineObj.getLine());</span>
+<span class="nc" id="L847">        }</span>
+<span class="nc bnc" id="L848" title="All 2 branches missed.">        for(ArrayList&lt;Line&gt; arrows : this.view.getArrowList()){</span>
+<span class="nc bnc" id="L849" title="All 2 branches missed.">            for (Line arrow : arrows) {</span>
+<span class="nc" id="L850">                this.view.getSuperRoot().getChildren().remove(arrow);</span>
+<span class="nc" id="L851">            }</span>
+<span class="nc" id="L852">            this.view.getSuperRoot().getChildren().remove(arrows);</span>
+<span class="nc" id="L853">        }</span>
+<span class="nc" id="L854">        this.view.getClassBoxList().clear();</span>
+<span class="nc" id="L855">        this.view.getLineList().clear();</span>
+<span class="nc" id="L856">        this.view.getArrowList().clear();</span>
+<span class="nc" id="L857">    }</span>
 
     /**
      * Takes in all the data from the model and draws an entirely new diagram
@@ -835,41 +863,41 @@ public class GUIController {
      * @param relList the list of relationships in the diagram
      */
     public void uploadDiagram(ArrayList&lt;UMLClass&gt; classList, ArrayList&lt;Relationship&gt; relList) {
-<span class="nc" id="L838">        int classListSize = 0;</span>
-<span class="nc bnc" id="L839" title="All 2 branches missed.">        for (UMLClass classObj : classList) {</span>
+<span class="nc" id="L866">        int classListSize = 0;</span>
+<span class="nc bnc" id="L867" title="All 2 branches missed.">        for (UMLClass classObj : classList) {</span>
             // formats the class boxes
-<span class="nc" id="L841">            classListSize += 1;</span>
-<span class="nc" id="L842">            int multiplier = (((int) classListSize - 1) / (int) 8);</span>
-<span class="nc" id="L843">            int yOffset = 20 + (multiplier * 200);</span>
-<span class="nc" id="L844">            int xOffset = (-85) + (((classListSize - 1) % 8) * 115);</span>
-<span class="nc" id="L845">            int fieldListSize = 0;</span>
-<span class="nc" id="L846">            int methodListSize = 0;</span>
+<span class="nc" id="L869">            classListSize += 1;</span>
+<span class="nc" id="L870">            int multiplier = (((int) classListSize - 1) / (int) 8);</span>
+<span class="nc" id="L871">            int yOffset = 20 + (multiplier * 200);</span>
+<span class="nc" id="L872">            int xOffset = (-85) + (((classListSize - 1) % 8) * 115);</span>
+<span class="nc" id="L873">            int fieldListSize = 0;</span>
+<span class="nc" id="L874">            int methodListSize = 0;</span>
             // draws class boxes with fields, methods and parameters
-<span class="nc" id="L848">            this.view.drawClassBox(classObj.getClassName(), xOffset, yOffset);</span>
-<span class="nc bnc" id="L849" title="All 2 branches missed.">            for (Field fieldObj : classObj.getFieldList()) {</span>
-<span class="nc" id="L850">                fieldListSize += 1;</span>
-<span class="nc" id="L851">                this.view.drawFieldBox(fieldListSize, methodListSize,</span>
-<span class="nc" id="L852">                        fieldObj, classObj.getClassName());</span>
-<span class="nc" id="L853">            }</span>
+<span class="nc" id="L876">            this.view.drawClassBox(classObj.getClassName(), xOffset, yOffset);</span>
+<span class="nc bnc" id="L877" title="All 2 branches missed.">            for (Field fieldObj : classObj.getFieldList()) {</span>
+<span class="nc" id="L878">                fieldListSize += 1;</span>
+<span class="nc" id="L879">                this.view.drawFieldBox(fieldListSize, methodListSize,</span>
+<span class="nc" id="L880">                        fieldObj, classObj.getClassName());</span>
+<span class="nc" id="L881">            }</span>
             // move all of the class boxes to the right positions
-<span class="nc" id="L855">            this.view.moveClassBoxes();</span>
-<span class="nc bnc" id="L856" title="All 2 branches missed.">            for (Method methodObj : classObj.getMethodList()) {</span>
-<span class="nc" id="L857">                methodListSize += 1;</span>
-<span class="nc" id="L858">                this.view.drawMethodBox(fieldListSize, methodListSize,</span>
-<span class="nc" id="L859">                        methodObj, classObj.getClassName());</span>
-<span class="nc" id="L860">                this.view.resizeMethod(methodObj, classObj.getClassName());</span>
-<span class="nc" id="L861">                this.view.findClassBox(classObj.getClassName()).addText(this.model.findClass(</span>
-<span class="nc" id="L862">                        classObj.getClassName()).findMethod(methodObj.getAttName()),</span>
-<span class="nc" id="L863">                        this.model.findClass(classObj.getClassName()).getFieldList().size(),</span>
-<span class="nc" id="L864">                        this.model.findClass(classObj.getClassName()).getMethodList().size(), true);</span>
-<span class="nc" id="L865">            }</span>
-<span class="nc" id="L866">        }</span>
+<span class="nc" id="L883">            this.view.moveClassBoxes();</span>
+<span class="nc bnc" id="L884" title="All 2 branches missed.">            for (Method methodObj : classObj.getMethodList()) {</span>
+<span class="nc" id="L885">                methodListSize += 1;</span>
+<span class="nc" id="L886">                this.view.drawMethodBox(fieldListSize, methodListSize,</span>
+<span class="nc" id="L887">                        methodObj, classObj.getClassName());</span>
+<span class="nc" id="L888">                this.view.resizeMethod(methodObj, classObj.getClassName());</span>
+<span class="nc" id="L889">                this.view.findClassBox(classObj.getClassName()).addText(this.model.findClass(</span>
+<span class="nc" id="L890">                        classObj.getClassName()).findMethod(methodObj.getAttName()),</span>
+<span class="nc" id="L891">                        this.model.findClass(classObj.getClassName()).getFieldList().size(),</span>
+<span class="nc" id="L892">                        this.model.findClass(classObj.getClassName()).getMethodList().size(), true);</span>
+<span class="nc" id="L893">            }</span>
+<span class="nc" id="L894">        }</span>
         // re-draws relationship lines
-<span class="nc bnc" id="L868" title="All 2 branches missed.">        for (Relationship relObj : relList) {</span>
-<span class="nc" id="L869">            this.view.drawLine(relObj.getSource().getClassName(),</span>
-<span class="nc" id="L870">                    relObj.getDestination().getClassName(), relObj.getRelType());</span>
-<span class="nc" id="L871">        }</span>
-<span class="nc" id="L872">    }</span>
+<span class="nc bnc" id="L896" title="All 2 branches missed.">        for (Relationship relObj : relList) {</span>
+<span class="nc" id="L897">            this.view.drawLine(relObj.getSource().getClassName(),</span>
+<span class="nc" id="L898">                    relObj.getDestination().getClassName(), relObj.getRelType());</span>
+<span class="nc" id="L899">        }</span>
+<span class="nc" id="L900">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

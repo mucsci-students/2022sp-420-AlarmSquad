@@ -139,7 +139,7 @@ public class GUIView extends Application {
         MenuItem load = new MenuItem("Load");
         // if the load button is pressed, open a new window to load
         load.setOnAction(event -> loadWindow());
-        file.getItems().addAll(saveAsFile, saveAsImage);
+        file.getItems().addAll(load, saveAsFile, saveAsImage);
 
         //***************************************//
         //********** Add Menu Items *************//
