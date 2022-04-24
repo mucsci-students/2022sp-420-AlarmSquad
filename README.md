@@ -79,5 +79,7 @@ java -jar target\2022sp-420-AlarmSquad-1.0.jar --cli
     - A stack of saved states is how our Undo/Redo feature works. Each time an action is made, a state is created and put on the stack. Undo will go backwards to the previous state of the Editor. Redo will move forward to the next state after using Undo.
   - Observer
     - This is the View of our project. Are project design is Based on MVC(Model, View, Controller). The View, registered with the controllers, will show the user the data they are using. The controller will wait for an event to occur and act upon it to update the Model and the View.
-
+  - Object Pool
+    - Our object pool consists of the model object, the view object and the caretaker. These global objects are never destroyed and are reusable whenever the user requests to do something to that object like create a class, display that class and undo/redo their actions made to those objects.
+    
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  
