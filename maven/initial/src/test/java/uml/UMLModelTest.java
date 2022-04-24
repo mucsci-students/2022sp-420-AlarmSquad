@@ -2,14 +2,48 @@ package uml;
 
 import org.junit.Test;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class UMLModelTest {
-
     private UMLClass student = new UMLClass("student");
     private UMLClass teacher = new UMLClass("teacher");
+    private UMLClass principal = new UMLClass("principal");
+    private Field name = new Field ("name", "String");
+    private Method setName = new Method ("setName", "void");
+    private Parameter newName = new Parameter("newName", "String");
     private Relationship stuTea = new Relationship(student, teacher, "aggregation");
     private Relationship teaStu = new Relationship(teacher, student, "realization");
+    private Relationship prinTea = new Relationship(principal, teacher, "composition");
+    String coordinateName = "key";
+    List<Double> coordinateList = new ArrayList<>();
+
+    @Test
+    public void UMLModel() {
+        ArrayList<UMLClass> umlList = new ArrayList<>();
+        student.addField(name);
+        setName.addParameter(newName);
+        student.addMethod(setName);
+        umlList.add(student);
+        umlList.add(teacher);
+        ArrayList<Relationship> relList = new ArrayList<>();
+        relList.add(stuTea);
+        relList.add(teaStu);
+        HashMap<String, List<Double>> coordinateMap = new HashMap<>();
+        coordinateList.add (5.0);
+        coordinateList.add (15.0);
+        coordinateMap.put(coordinateName, coordinateList);
+
+        UMLModel model = new UMLModel(umlList, relList, coordinateMap);
+        UMLModel modelCopy = new UMLModel(model);
+        assertEquals(model.getClassList().get(0).getClassName(), new UMLModel(umlList, relList, coordinateMap).getClassList().get(0).getClassName());
+        assertEquals(model.getRelationshipList().get(0).getSource(), new UMLModel(umlList, relList, coordinateMap).getRelationshipList().get(0).getSource());
+        assertEquals(model.getCoordinateMap(), new UMLModel(umlList, relList, coordinateMap).getCoordinateMap());
+        assertEquals(model.getClassList().get(1).getClassName(), new UMLModel(umlList, relList, coordinateMap).getClassList().get(1).getClassName());
+        assertEquals(model.getClassList().get(1).getClassName(), modelCopy.getClassList().get(1).getClassName());
+    }
 
     @Test
     public void getClassList() {
@@ -51,10 +85,16 @@ public class UMLModelTest {
 
     @Test
     public void getCoordinateMap() {
+        UMLModel model = new UMLModel();
+        assertEquals (new HashMap<>(), model.getCoordinateMap());
     }
 
     @Test
     public void setCoordinateMap() {
+        UMLModel model = new UMLModel();
+        HashMap<String, List<Double>> coordinateMap = new HashMap<>();
+        coordinateMap.put(coordinateName, coordinateList);
+        model.setCoordinateMap(coordinateMap);
     }
 
     @Test
@@ -118,6 +158,7 @@ public class UMLModelTest {
         model.addClass(teacher);
         assertEquals("student", model.findClass("student").getClassName());
         assertEquals("teacher", model.findClass("teacher").getClassName());
+        assertEquals(null, model.findClass("principal"));
     }
 
     @Test
@@ -127,8 +168,13 @@ public class UMLModelTest {
         model.addRel(teaStu);
         assertEquals("student", model.findRelationship("student", "teacher", "aggregation")
                 .getSource().getClassName());
-        assertEquals("teacher", model.findRelationship("teacher", "student", "realization")
-                .getSource().getClassName());
+        assertEquals("student", model.findRelationship("teacher", "student", "realization")
+                .getDestination().getClassName());
+        assertEquals("realization", model.findRelationship("teacher", "student", "realization")
+                .getRelType());
+        assertEquals(null, model.findRelationship("professor", "student", "realization"));
+        assertEquals(null, model.findRelationship("teacher", "parent", "realization"));
+        assertEquals(null, model.findRelationship("student", "teacher", "realization"));
     }
 
     @Test
@@ -138,6 +184,8 @@ public class UMLModelTest {
         model.addRel(teaStu);
         assertEquals("aggregation", model.findRelType("student", "teacher"));
         assertEquals("realization", model.findRelType("teacher", "student"));
+        assertEquals(null, model.findRelType("parent", "teacher"));
+        assertEquals(null, model.findRelType("student", "professor"));
     }
 
     @Test
@@ -160,7 +208,19 @@ public class UMLModelTest {
         UMLModel model = new UMLModel();
         model.addRel(stuTea);
         model.changeRelType("student", "teacher", "composition");
+        assertEquals(null, model.findRelationship("teacher", "student", "aggregation"));
         assertEquals("composition", model.findRelationship("student", "teacher", "composition")
+                .getRelType());
+        model.addRel(teaStu);
+        model.changeRelType("teacher", "teacher", "generalization");
+        assertEquals("realization", model.findRelationship("teacher", "student", "realization")
+                .getRelType());
+        model.changeRelType("principal", "teacher", "generalization");
+        assertEquals("realization", model.findRelationship("teacher", "student", "realization")
+                .getRelType());
+        model.changeRelType("teacher", "student", "generalization");
+        assertEquals(null, model.findRelationship("teacher", "student", "realization"));
+        assertEquals("generalization", model.findRelationship("teacher", "student", "generalization")
                 .getRelType());
     }
 
@@ -169,28 +229,31 @@ public class UMLModelTest {
         UMLModel model = new UMLModel();
         model.addClass(student);
         model.addClass(teacher);
+        model.addClass(principal);
         model.addRel(stuTea);
+        model.addRel(teaStu);
+        model.addRel(prinTea);
         model.deleteClass(student);
         model.updateRelationshipList("student");
-        assertEquals("[]", "" + model.getRelationshipList());
+        assertEquals("principal", "" + model.getRelationshipList().get(0).getSource().getClassName());
     }
 
     @Test
     public void isValidIdentifier() {
         UMLModel model = new UMLModel();
+        assertEquals(false, model.isValidIdentifier(null));
         assertEquals(true, model.isValidIdentifier("string"));
         assertEquals(false, model.isValidIdentifier("123String"));
         assertEquals(true, model.isValidIdentifier("string123"));
         assertEquals(false, model.isValidIdentifier("&string"));
+        assertEquals(false, model.isValidIdentifier("string&"));
     }
 
     @Test
     public void isNotValidInput() {
         UMLModel model = new UMLModel();
-        assertEquals(true, model.isValidIdentifier("string"));
-        assertEquals(false, model.isValidIdentifier("123String"));
-        assertEquals(true, model.isValidIdentifier("string123"));
-        assertEquals(false, model.isValidIdentifier("&string"));
+        assertEquals(true, model.isNotValidInput("123String"));
+        assertEquals(false, model.isNotValidInput("string123"));
     }
 
     @Test
