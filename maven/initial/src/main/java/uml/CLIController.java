@@ -941,7 +941,7 @@ public class CLIController {
             Memento prevState = caretaker.redoHelper(currState);
             // make this current model the previous model
             this.model = prevState.getState();
-            this.view.editCompleter(model.getClassList());gi
+            this.view.editCompleter(model.getClassList());
             return true;
         }
     }
