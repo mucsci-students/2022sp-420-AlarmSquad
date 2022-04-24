@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CLIController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">CLIController.java</span></div><h1>CLIController.java</h1><pre class="source lang-java linenums">package uml;
 
 import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
 import org.jline.terminal.Terminal;
 
 import java.io.IOException;
@@ -19,719 +18,733 @@ public class CLIController {
     private Caretaker caretaker;
     private CLIView view;
 
-<span class="nc" id="L22">    public CLIController(UMLModel model, Caretaker caretaker, CLIView view) {</span>
-<span class="nc" id="L23">        this.model = model;</span>
-<span class="nc" id="L24">        this.caretaker = caretaker;</span>
-<span class="nc" id="L25">        this.view = view;</span>
-<span class="nc" id="L26">    }</span>
-  
+<span class="nc" id="L21">    public CLIController(UMLModel model, Caretaker caretaker, CLIView view) {</span>
+<span class="nc" id="L22">        this.model = model;</span>
+<span class="nc" id="L23">        this.caretaker = caretaker;</span>
+<span class="nc" id="L24">        this.view = view;</span>
+<span class="nc" id="L25">    }</span>
+
     //creates a line reader and a terminal
     private LineReader reader;
     private Terminal terminal;
 
     //our prompt string
-<span class="nc" id="L33">    private String prompt = &quot;&gt; &quot;;</span>
+<span class="nc" id="L32">    private String prompt = &quot;&gt; &quot;;</span>
 
     // Interprets user input
     public void run() {
-<span class="nc" id="L37">        clearScreen();</span>
+<span class="nc" id="L36">        clearScreen();</span>
         //builds console from cli view
-<span class="nc" id="L39">        reader = this.view.buildConsole();</span>
-<span class="nc" id="L40">        terminal = reader.getTerminal();</span>
+<span class="nc" id="L38">        reader = this.view.buildConsole();</span>
+<span class="nc" id="L39">        terminal = reader.getTerminal();</span>
         // intro to CLI for user
-<span class="nc" id="L42">        String intro = &quot;Welcome to ALARM Squad's UML editor!&quot;;</span>
-<span class="nc" id="L43">        intro += &quot;\n\nType 'help' to list all commands and their accompanying descriptions.\n&quot;;</span>
-<span class="nc" id="L44">        terminal.writer().println(intro);</span>
+<span class="nc" id="L41">        String intro = &quot;Welcome to ALARM Squad's UML editor!&quot;;</span>
+<span class="nc" id="L42">        intro += &quot;\n\nType 'help' to list all commands and their accompanying descriptions.\n&quot;;</span>
+<span class="nc" id="L43">        terminal.writer().println(intro);</span>
         //loop for reading and replacing input
         while (true) {
             //matches strings to regex and replaces them
-<span class="nc" id="L48">            String line = reader.readLine(prompt).replaceAll(&quot;\\s+&quot;, &quot; &quot;).trim();</span>
-<span class="nc bnc" id="L49" title="All 2 branches missed.">            if (line.equals(&quot;exit&quot;)) {</span>
-<span class="nc" id="L50">                return;</span>
-<span class="nc bnc" id="L51" title="All 2 branches missed.">            } else if (line.equals(&quot;&quot;)) {</span>
-<span class="nc" id="L52">                continue;</span>
+<span class="nc" id="L47">            String line = reader.readLine(prompt).replaceAll(&quot;\\s+&quot;, &quot; &quot;).trim();</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">            if (line.equals(&quot;exit&quot;)) {</span>
+<span class="nc" id="L49">                return;</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            } else if (line.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L51">                continue;</span>
             } else {
                 //adds spaces between strings
-<span class="nc" id="L55">                String[] input = line.split(&quot; &quot;);</span>
+<span class="nc" id="L54">                String[] input = line.split(&quot; &quot;);</span>
                 //passes input to switch statement
-<span class="nc" id="L57">                interpretInput(input);</span>
+<span class="nc" id="L56">                interpretInput(input);</span>
             }
-<span class="nc" id="L59">        }</span>
+
+
+<span class="nc" id="L60">        }</span>
     }
     // Interprets user input
     public void interpretInput(String[] inputList) {
         try {
             // Check first word user inputted and act accordingly
-<span class="nc bnc" id="L65" title="All 12 branches missed.">            switch (inputList[0]) {</span>
+<span class="nc bnc" id="L66" title="All 12 branches missed.">            switch (inputList[0]) {</span>
 
                 //***************************************//
                 //********* Terminal Commands ***********//
                 //***************************************//
 
-                    // clear screen
-                    case &quot;clear&quot; -&gt; {
-<span class="nc" id="L73">                        clearScreen();</span>
-<span class="nc" id="L74">                    }</span>
-                    // save case
-                    case &quot;save&quot; -&gt; {
-<span class="nc" id="L77">                        terminal.writer().print(&quot;Save file name: &quot;);</span>
-<span class="nc" id="L78">                        String saveFileName = reader.readLine().trim();</span>
-<span class="nc" id="L79">                        JSON json = new JSON(this.model);</span>
-<span class="nc" id="L80">                        json.saveCLI(saveFileName);</span>
-<span class="nc" id="L81">                    }</span>
-                    // load case
-                    case &quot;load&quot; -&gt; {
-<span class="nc" id="L84">                        JSON json = new JSON(this.model);</span>
-                        // if no files exist
-<span class="nc bnc" id="L86" title="All 2 branches missed.">                        if (json.ifDirIsEmpty()) {</span>
-<span class="nc" id="L87">                            terminal.writer().println(&quot;No save files found&quot;);</span>
-                        }
-                        // load the file
-                        else {
-<span class="nc" id="L91">                            terminal.writer().print(&quot;Load file name: &quot;);</span>
-<span class="nc" id="L92">                            String loadFileName = reader.readLine().trim();</span>
-<span class="nc" id="L93">                            UMLModel newModel = json.loadCLI(loadFileName);</span>
-<span class="nc bnc" id="L94" title="All 2 branches missed.">                            if (newModel != null) {</span>
-                                // inform the user that the load succeeded
-<span class="nc" id="L96">                                terminal.writer().println(&quot;Diagram has been loaded from \&quot;&quot; + loadFileName + &quot;\&quot;&quot;);</span>
-<span class="nc" id="L97">                                setState();</span>
-<span class="nc" id="L98">                                this.model = newModel;</span>
-                            } else {
-<span class="nc" id="L100">                                terminal.writer().println(&quot;File does not exist&quot;);</span>
-                            }
-                        }
-<span class="nc" id="L103">                    }</span>
-                    // help case
-                    case &quot;help&quot; -&gt; {
-<span class="nc" id="L106">                        terminal.writer().println(model.getCLIHelpMenu());</span>
-<span class="nc" id="L107">                    }</span>
-                    // undo case
-                    case &quot;undo&quot; -&gt; {
-<span class="nc bnc" id="L110" title="All 2 branches missed.">                        if (!undo()) {</span>
-<span class="nc" id="L111">                            terminal.writer().println(&quot;No actions to undo.&quot;);</span>
+                // clear screen
+                case &quot;clear&quot; -&gt; {
+<span class="nc" id="L74">                    clearScreen();</span>
+<span class="nc" id="L75">                }</span>
+                // save case
+                case &quot;save&quot; -&gt; {
+<span class="nc" id="L78">                    terminal.writer().print(&quot;Save file name: &quot;);</span>
+<span class="nc" id="L79">                    String saveFileName = reader.readLine().trim();</span>
+<span class="nc" id="L80">                    JSON json = new JSON(this.model);</span>
+<span class="nc" id="L81">                    json.saveCLI(saveFileName);</span>
+<span class="nc" id="L82">                }</span>
+                // load case
+                case &quot;load&quot; -&gt; {
+<span class="nc" id="L85">                    JSON json = new JSON(this.model);</span>
+                    // if no files exist
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                    if (json.ifDirIsEmpty()) {</span>
+<span class="nc" id="L88">                        terminal.writer().println(&quot;No save files found&quot;);</span>
+                    }
+                    // load the file
+                    else {
+<span class="nc" id="L92">                        terminal.writer().print(&quot;Load file name: &quot;);</span>
+<span class="nc" id="L93">                        String loadFileName = reader.readLine().trim();</span>
+<span class="nc" id="L94">                        UMLModel newModel = json.loadCLI(loadFileName);</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                        if (newModel != null) {</span>
+                            // inform the user that the load succeeded
+<span class="nc" id="L97">                            terminal.writer().println(&quot;Diagram has been loaded from \&quot;&quot; + loadFileName + &quot;\&quot;&quot;);</span>
+<span class="nc" id="L98">                            setState();</span>
+<span class="nc" id="L99">                            this.model = newModel;</span>
                         } else {
-<span class="nc" id="L113">                            terminal.writer().println(&quot;Last action undone.&quot;);</span>
+<span class="nc" id="L101">                            terminal.writer().println(&quot;File does not exist&quot;);</span>
                         }
-<span class="nc" id="L115">                    }</span>
-                    // undo case
-                    case &quot;redo&quot; -&gt; {
-<span class="nc bnc" id="L118" title="All 2 branches missed.">                        if (!redo()) {</span>
-<span class="nc" id="L119">                            terminal.writer().println(&quot;No actions to redo.&quot;);</span>
-                        } else {
-<span class="nc" id="L121">                            terminal.writer().println(&quot;Last action redone.&quot;);</span>
-                        }
-<span class="nc" id="L123">                    }</span>
+                    }
+<span class="nc" id="L104">                }</span>
+                // help case
+                case &quot;help&quot; -&gt; {
+<span class="nc" id="L107">                    terminal.writer().println(model.getCLIHelpMenu());</span>
+<span class="nc" id="L108">                }</span>
+                // undo case
+                case &quot;undo&quot; -&gt; {
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                    if (!undo()) {</span>
+<span class="nc" id="L112">                        terminal.writer().println(&quot;No actions to undo.&quot;);</span>
+                    } else {
+<span class="nc" id="L114">                        terminal.writer().println(&quot;Last action undone.&quot;);</span>
+                    }
+<span class="nc" id="L116">                }</span>
+                // undo case
+                case &quot;redo&quot; -&gt; {
+<span class="nc bnc" id="L119" title="All 2 branches missed.">                    if (!redo()) {</span>
+<span class="nc" id="L120">                        terminal.writer().println(&quot;No actions to redo.&quot;);</span>
+                    } else {
+<span class="nc" id="L122">                        terminal.writer().println(&quot;Last action redone.&quot;);</span>
+                    }
+<span class="nc" id="L124">                }</span>
 
                 //***************************************//
                 //************** Add cases **************//
                 //***************************************//
 
                 case &quot;add&quot;, &quot;a&quot; -&gt; {
-<span class="nc bnc" id="L130" title="All 4 branches missed.">                    switch (inputList[1]) {</span>
+<span class="nc bnc" id="L131" title="All 4 branches missed.">                    switch (inputList[1]) {</span>
                         // add class
                         case &quot;class&quot; -&gt; {
                             // Get user defined name for Class, then adds new Class to the classList
-<span class="nc" id="L134">                            String className = getClassName(&quot;add&quot;, &quot;&quot;);</span>
+<span class="nc" id="L135">                            String className = getClassName(&quot;add&quot;, &quot;&quot;);</span>
 
                             // Edge cases for class name, checks validity
-<span class="nc bnc" id="L137" title="All 2 branches missed.">                            if (model.isNotValidInput(className)) {</span>
-<span class="nc" id="L138">                                break;</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                            if (model.isNotValidInput(className)) {</span>
+<span class="nc" id="L139">                                break;</span>
                             }
 
                             // Checks for duplicates
-<span class="nc bnc" id="L142" title="All 2 branches missed.">                            if(model.getClassList().stream().anyMatch(o -&gt; o.getClassName().equals(className))){</span>
-<span class="nc" id="L143">                                terminal.writer().printf(&quot;Class %s already exists\n&quot;, className);</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                            if(model.getClassList().stream().anyMatch(o -&gt; o.getClassName().equals(className))){</span>
+<span class="nc" id="L144">                                terminal.writer().printf(&quot;Class %s already exists\n&quot;, className);</span>
                             } else {
                                 // Adds class to class list then prompts confirmation to use
-<span class="nc" id="L146">                                UMLClass newUMLClass = new UMLClass(className);</span>
-<span class="nc" id="L147">                                setState();</span>
-<span class="nc" id="L148">                                model.addClass(newUMLClass);</span>
-<span class="nc" id="L149">                                terminal.writer().println(&quot;Added class \&quot;&quot; + className + &quot;\&quot;&quot;);</span>
+<span class="nc" id="L147">                                UMLClass newUMLClass = new UMLClass(className);</span>
+<span class="nc" id="L148">                                setState();</span>
+<span class="nc" id="L149">                                model.addClass(newUMLClass);</span>
+<span class="nc" id="L150">                                terminal.writer().println(&quot;Added class \&quot;&quot; + className + &quot;\&quot;&quot;);</span>
+
+<span class="nc" id="L152">                                this.view.editCompleter(model.getClassList());</span>
+
+                                //terminal.writer().printf(&quot;************TEST: %s\n&quot;, Arrays.toString(clStrsArr));
+
                             }
-<span class="nc" id="L151">                        }</span>
+<span class="nc" id="L157">                        }</span>
                         // add relationship
                         case &quot;rel&quot; -&gt; {
                             // If user inputted &quot;a rel&quot; with no flag, ask for one
-<span class="nc bnc" id="L155" title="All 2 branches missed.">                            if (inputList.length == 2) {</span>
-<span class="nc bnc" id="L156" title="All 2 branches missed.">                                if (!addRelFlag(convertStringList2ArrayList(inputList), &quot;add&quot;)) {</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                            if (inputList.length == 2) {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">                                if (!addRelFlag(convertStringList2ArrayList(inputList), &quot;add&quot;)) {</span>
                                     // If user tried to input an invalid flag, break
-<span class="nc" id="L158">                                    break;</span>
+<span class="nc" id="L164">                                    break;</span>
                                 }
                             }
-<span class="nc bnc" id="L161" title="All 2 branches missed.">                            switch (inputList[2]) {</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">                            switch (inputList[2]) {</span>
                                 // relationship type flags
                                 case &quot;-a&quot;, &quot;-c&quot;, &quot;-i&quot;, &quot;-r&quot; -&gt; {
-<span class="nc" id="L164">                                    String relType = flagToString(inputList[2]);</span>
+<span class="nc" id="L170">                                    String relType = flagToString(inputList[2]);</span>
                                     // if a flag was not given by user input
-<span class="nc bnc" id="L166" title="All 2 branches missed.">                                    if (!relType.equals(&quot;&quot;)) {</span>
-<span class="nc" id="L167">                                        terminal.writer().print(&quot;Enter source class name: &quot;);</span>
-<span class="nc" id="L168">                                        String sourceName = reader.readLine().trim();</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">                                    if (!relType.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L173">                                        terminal.writer().print(&quot;Enter source class name: &quot;);</span>
+<span class="nc" id="L174">                                        String sourceName = reader.readLine().trim();</span>
                                         // If source class is valid and exists get destination class
-<span class="nc bnc" id="L170" title="All 2 branches missed.">                                        if (model.findClass(sourceName) != (null)) {</span>
-<span class="nc" id="L171">                                            terminal.writer().print(&quot;Enter destination: &quot;);</span>
-<span class="nc" id="L172">                                            String destinationName = reader.readLine().trim();</span>
+<span class="nc bnc" id="L176" title="All 2 branches missed.">                                        if (model.findClass(sourceName) != (null)) {</span>
+<span class="nc" id="L177">                                            terminal.writer().print(&quot;Enter destination: &quot;);</span>
+<span class="nc" id="L178">                                            String destinationName = reader.readLine().trim();</span>
                                             // If destination class is valid and exists add
                                             // relationship to relationship array list
-<span class="nc bnc" id="L175" title="All 2 branches missed.">                                            if (model.findClass(destinationName) != (null)) {</span>
-<span class="nc bnc" id="L176" title="All 2 branches missed.">                                                if (model.findRelationship(sourceName, destinationName, relType)</span>
-<span class="nc bnc" id="L177" title="All 2 branches missed.">                                                        != null || model.isRelated(sourceName, destinationName)){</span>
-<span class="nc" id="L178">                                                    terminal.writer().println(&quot;Relationship already exists between &quot; +</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">                                            if (model.findClass(destinationName) != (null)) {</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">                                                if (model.findRelationship(sourceName, destinationName, relType)</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                                                        != null || model.isRelated(sourceName, destinationName)){</span>
+<span class="nc" id="L184">                                                    terminal.writer().println(&quot;Relationship already exists between &quot; +</span>
                                                             sourceName + &quot; and &quot; + destinationName + &quot; with &quot;
-<span class="nc" id="L180">                                                            + model.findRelType(sourceName,destinationName) +</span>
+<span class="nc" id="L186">                                                            + model.findRelType(sourceName,destinationName) +</span>
                                                             &quot; type&quot;);
-<span class="nc" id="L182">                                                    break;</span>
+<span class="nc" id="L188">                                                    break;</span>
                                                 }
-<span class="nc" id="L184">                                                Relationship newRelationship =</span>
-<span class="nc" id="L185">                                                        new Relationship(model.findClass(sourceName),</span>
-<span class="nc" id="L186">                                                                model.findClass(destinationName), relType);</span>
-<span class="nc" id="L187">                                                setState();</span>
-<span class="nc" id="L188">                                                model.addRel(newRelationship);</span>
-<span class="nc" id="L189">                                                terminal.writer().println(&quot;Relationship added between &quot; + sourceName</span>
+<span class="nc" id="L190">                                                Relationship newRelationship =</span>
+<span class="nc" id="L191">                                                        new Relationship(model.findClass(sourceName),</span>
+<span class="nc" id="L192">                                                                model.findClass(destinationName), relType);</span>
+<span class="nc" id="L193">                                                setState();</span>
+<span class="nc" id="L194">                                                model.addRel(newRelationship);</span>
+<span class="nc" id="L195">                                                terminal.writer().println(&quot;Relationship added between &quot; + sourceName</span>
                                                         + &quot; and &quot; + destinationName + &quot; with &quot; + relType + &quot; type&quot;);
-<span class="nc" id="L191">                                            }</span>
+<span class="nc" id="L197">                                            }</span>
                                             // If destination class does not exist, inform user and break
                                             else {
-<span class="nc" id="L194">                                                terminal.writer().println(&quot;Class &quot; + destinationName + &quot; does not exist&quot;);</span>
+<span class="nc" id="L200">                                                terminal.writer().println(&quot;Class &quot; + destinationName + &quot; does not exist&quot;);</span>
                                             }
-<span class="nc" id="L196">                                        }</span>
+<span class="nc" id="L202">                                        }</span>
                                         // If source class does not exist, inform user and break
                                         else {
-<span class="nc" id="L199">                                            terminal.writer().println(&quot;Class &quot; + sourceName + &quot; does not exist&quot;);</span>
+<span class="nc" id="L205">                                            terminal.writer().println(&quot;Class &quot; + sourceName + &quot; does not exist&quot;);</span>
                                         }
                                     }
-<span class="nc" id="L202">                                }</span>
+<span class="nc" id="L208">                                }</span>
                                 // If flag user entered is invalid, inform user and break
                                 default -&gt; {
-<span class="nc" id="L205">                                    terminal.writer().println(&quot;Invalid flag&quot;);</span>
+<span class="nc" id="L211">                                    terminal.writer().println(&quot;Invalid flag&quot;);</span>
                                 }
                             }
-<span class="nc" id="L208">                        }</span>
+<span class="nc" id="L214">                        }</span>
                         // add attribute
                         case &quot;att&quot; -&gt; {
                             // If user inputted &quot;a att&quot; with no flag, ask for one
-<span class="nc bnc" id="L212" title="All 2 branches missed.">                            if (inputList.length == 2) {</span>
-<span class="nc bnc" id="L213" title="All 2 branches missed.">                                if (addAttFlag(convertStringList2ArrayList(inputList), &quot;add&quot;)) {</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">                            if (inputList.length == 2) {</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">                                if (addAttFlag(convertStringList2ArrayList(inputList), &quot;add&quot;)) {</span>
                                     // If user tried to input an invalid flag, break
-<span class="nc" id="L215">                                    break;</span>
+<span class="nc" id="L221">                                    break;</span>
                                 }
                             }
-<span class="nc bnc" id="L218" title="All 3 branches missed.">                            switch (inputList[2]) {</span>
+<span class="nc bnc" id="L224" title="All 3 branches missed.">                            switch (inputList[2]) {</span>
                                 // add field or method
                                 case &quot;-f&quot;, &quot;-m&quot; -&gt; {
                                     // Convert flag to &quot;field&quot; or &quot;method&quot;.
                                     // Needed for method calls later on
-<span class="nc" id="L223">                                    String attType = flagToString(inputList[2]);</span>
-<span class="nc bnc" id="L224" title="All 2 branches missed.">                                    if (!attType.equals(&quot;&quot;)) {</span>
+<span class="nc" id="L229">                                    String attType = flagToString(inputList[2]);</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">                                    if (!attType.equals(&quot;&quot;)) {</span>
                                         // Get name of class user wants to add attribute to and
                                         // ensure the class exists
-<span class="nc" id="L227">                                        String classToAddAttName = getClassName(&quot;add&quot;, attType);</span>
-<span class="nc" id="L228">                                        UMLClass classToAddAtt = model.findClass(classToAddAttName);</span>
+<span class="nc" id="L233">                                        String classToAddAttName = getClassName(&quot;add&quot;, attType);</span>
+<span class="nc" id="L234">                                        UMLClass classToAddAtt = model.findClass(classToAddAttName);</span>
                                         // If class exists...
-<span class="nc bnc" id="L230" title="All 2 branches missed.">                                        if (classToAddAtt != null) {</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">                                        if (classToAddAtt != null) {</span>
                                             // Get name of attribute user wants to add
-<span class="nc" id="L232">                                            String attName = getAttName(attType);</span>
+<span class="nc" id="L238">                                            String attName = getAttName(attType);</span>
                                             // Ensure attribute name is valid
-<span class="nc bnc" id="L234" title="All 2 branches missed.">                                            if (!model.isNotValidInput(attName)) {</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">                                            if (!model.isNotValidInput(attName)) {</span>
                                                 // If attribute doesn't already exist in class, add it to class
-<span class="nc" id="L236">                                                if (classToAddAtt.getAttList(attType).stream()</span>
-<span class="nc bnc" id="L237" title="All 2 branches missed.">                                                        .noneMatch(attObj -&gt; attObj.getAttName().equals(attName))){</span>
-<span class="nc" id="L238">                                                    setState();</span>
-<span class="nc" id="L239">                                                    addAttribute(classToAddAtt, attType, attName);</span>
+<span class="nc" id="L242">                                                if (classToAddAtt.getAttList(attType).stream()</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">                                                        .noneMatch(attObj -&gt; attObj.getAttName().equals(attName))){</span>
+<span class="nc" id="L244">                                                    setState();</span>
+<span class="nc" id="L245">                                                    addAttribute(classToAddAtt, attType, attName);</span>
+
+<span class="nc" id="L247">                                                    this.view.editCompleter(model.getClassList());</span>
                                                 }
                                                 // If attribute user entered already exists in class, inform user
                                                 // and break
                                                 else {
-<span class="nc" id="L244">                                                    terminal.writer().println(attType + &quot; &quot; + attName +</span>
+<span class="nc" id="L252">                                                    terminal.writer().println(attType + &quot; &quot; + attName +</span>
                                                             &quot; already exists in class &quot; +
-<span class="nc" id="L246">                                                            classToAddAtt.getClassName());</span>
+<span class="nc" id="L254">                                                            classToAddAtt.getClassName());</span>
                                                 }
                                             }
                                             // If class user entered does not exist, inform user and break
-<span class="nc" id="L250">                                        } else {</span>
-<span class="nc" id="L251">                                            terminal.writer().println(&quot;Class &quot; + classToAddAttName + &quot; does not exist&quot;);</span>
+<span class="nc" id="L258">                                        } else {</span>
+<span class="nc" id="L259">                                            terminal.writer().println(&quot;Class &quot; + classToAddAttName + &quot; does not exist&quot;);</span>
                                         }
                                     }
-<span class="nc" id="L254">                                }</span>
+<span class="nc" id="L262">                                }</span>
                                 // add parameter
                                 case &quot;-p&quot; -&gt; {
                                     UMLClass classToAddParam;
                                     Method methodToAddParam;
                                     String paramName;
-<span class="nc bnc" id="L260" title="All 2 branches missed.">                                    if((classToAddParam = findClass(&quot;add&quot;, &quot;parameter&quot;)) == null) {</span>
-<span class="nc" id="L261">                                        break;</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">                                    if((classToAddParam = findClass(&quot;add&quot;, &quot;parameter&quot;)) == null) {</span>
+<span class="nc" id="L269">                                        break;</span>
                                     }
-<span class="nc bnc" id="L263" title="All 2 branches missed.">                                    if((methodToAddParam = findMethod(classToAddParam)) == null) {</span>
-<span class="nc" id="L264">                                        break;</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">                                    if((methodToAddParam = findMethod(classToAddParam)) == null) {</span>
+<span class="nc" id="L272">                                        break;</span>
                                     }
 
-<span class="nc" id="L267">                                    String answer = &quot;y&quot;;</span>
+<span class="nc" id="L275">                                    String answer = &quot;y&quot;;</span>
 
                                     // While loop lets user to continuously add parameters until they choose not
                                     // to or an error occurs
-<span class="nc" id="L271">                                    setState();</span>
-<span class="nc bnc" id="L272" title="All 2 branches missed.">                                    while (answer.equals(&quot;y&quot;)) {</span>
-<span class="nc bnc" id="L273" title="All 2 branches missed.">                                        if((paramName = findParamName(methodToAddParam)) == null) {</span>
-<span class="nc" id="L274">                                            break;</span>
+<span class="nc" id="L279">                                    setState();</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">                                    while (answer.equals(&quot;y&quot;)) {</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">                                        if((paramName = findParamName(methodToAddParam)) == null) {</span>
+<span class="nc" id="L282">                                            break;</span>
                                         }
                                         String paramType;
-<span class="nc bnc" id="L277" title="All 2 branches missed.">                                        if ((paramType = getAttType(&quot;parameter&quot;)) == null)</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">                                        if ((paramType = getAttType(&quot;parameter&quot;)) == null)</span>
                                         {
-<span class="nc" id="L279">                                            break;</span>
+<span class="nc" id="L287">                                            break;</span>
                                         }
-<span class="nc" id="L281">                                        Parameter param = new Parameter(paramName, paramType);</span>
-<span class="nc" id="L282">                                        setState();</span>
-<span class="nc" id="L283">                                        methodToAddParam.addParameter(param);</span>
-<span class="nc" id="L284">                                        terminal.writer().printf(&quot;Add another? [y/n]: &quot;);</span>
-<span class="nc" id="L285">                                        answer = reader.readLine().toLowerCase().trim();</span>
-<span class="nc" id="L286">                                    }</span>
-<span class="nc" id="L287">                                }</span>
+<span class="nc" id="L289">                                        Parameter param = new Parameter(paramName, paramType);</span>
+<span class="nc" id="L290">                                        setState();</span>
+<span class="nc" id="L291">                                        methodToAddParam.addParameter(param);</span>
+<span class="nc" id="L292">                                        this.view.editCompleter(model.getClassList());</span>
+<span class="nc" id="L293">                                        terminal.writer().printf(&quot;Add another? [y/n]: &quot;);</span>
+<span class="nc" id="L294">                                        answer = reader.readLine().toLowerCase().trim();</span>
+<span class="nc" id="L295">                                    }</span>
+<span class="nc" id="L296">                                }</span>
                                 // If flag user entered is invalid, inform user and break
                                 default -&gt; {
-<span class="nc" id="L290">                                    terminal.writer().println(&quot;Invalid flag&quot;);</span>
+<span class="nc" id="L299">                                    terminal.writer().println(&quot;Invalid flag&quot;);</span>
                                 }
                             }
-<span class="nc" id="L293">                        }</span>
+<span class="nc" id="L302">                        }</span>
                         // If the user's command is not valid
                         default -&gt; {
-<span class="nc" id="L296">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
+<span class="nc" id="L305">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
                         }
                     }
-<span class="nc" id="L299">                }</span>
+<span class="nc" id="L308">                }</span>
 
                 //***************************************//
                 //************ Delete cases *************//
                 //***************************************//
 
                 case &quot;delete&quot;, &quot;d&quot; -&gt; {
-<span class="nc bnc" id="L306" title="All 4 branches missed.">                    switch (inputList[1]) {</span>
+<span class="nc bnc" id="L315" title="All 4 branches missed.">                    switch (inputList[1]) {</span>
                         // delete class of the user's choice from the class list
                         case &quot;class&quot; -&gt; {
                             // Get user input of Class name to be deleted
-<span class="nc" id="L310">                            terminal.writer().print(&quot;Enter class name to delete: &quot;);</span>
-<span class="nc" id="L311">                            String classDeleteInput = reader.readLine().trim();</span>
-<span class="nc" id="L312">                            UMLClass UMLClassToDel = model.findClass(classDeleteInput);</span>
-<span class="nc bnc" id="L313" title="All 2 branches missed.">                            if (UMLClassToDel != null) {</span>
+<span class="nc" id="L319">                            terminal.writer().print(&quot;Enter class name to delete: &quot;);</span>
+<span class="nc" id="L320">                            String classDeleteInput = reader.readLine().trim();</span>
+<span class="nc" id="L321">                            UMLClass UMLClassToDel = model.findClass(classDeleteInput);</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">                            if (UMLClassToDel != null) {</span>
                                 // Copy classList into new ArrayList with deleted Class
-<span class="nc" id="L315">                                setState();</span>
-<span class="nc" id="L316">                                model.setClassList(deleteClass(classDeleteInput));</span>
+<span class="nc" id="L324">                                setState();</span>
+<span class="nc" id="L325">                                model.setClassList(deleteClass(classDeleteInput));</span>
                             }
-<span class="nc" id="L318">                        }</span>
+
+<span class="nc" id="L328">                            this.view.editCompleter(model.getClassList());</span>
+<span class="nc" id="L329">                        }</span>
                         // delete relationship
                         case &quot;rel&quot; -&gt; {
-<span class="nc" id="L321">                            terminal.writer().print(&quot;Enter relationship source name: &quot;);</span>
-<span class="nc" id="L322">                            String sourceToFind = reader.readLine().trim();</span>
-<span class="nc" id="L323">                            UMLClass src = model.findClass(sourceToFind);</span>
-<span class="nc bnc" id="L324" title="All 2 branches missed.">                            if (src != null) {</span>
+<span class="nc" id="L332">                            terminal.writer().print(&quot;Enter relationship source name: &quot;);</span>
+<span class="nc" id="L333">                            String sourceToFind = reader.readLine().trim();</span>
+<span class="nc" id="L334">                            UMLClass src = model.findClass(sourceToFind);</span>
+<span class="nc bnc" id="L335" title="All 2 branches missed.">                            if (src != null) {</span>
                                 // If source name was found, proceed to find dest name
-<span class="nc" id="L326">                                terminal.writer().print(&quot;Enter relationship destination name: &quot;);</span>
-<span class="nc" id="L327">                                String destToFind = reader.readLine().trim();</span>
-<span class="nc" id="L328">                                UMLClass dest = model.findClass(destToFind);</span>
-<span class="nc bnc" id="L329" title="All 2 branches missed.">                                if (dest != null) {</span>
+<span class="nc" id="L337">                                terminal.writer().print(&quot;Enter relationship destination name: &quot;);</span>
+<span class="nc" id="L338">                                String destToFind = reader.readLine().trim();</span>
+<span class="nc" id="L339">                                UMLClass dest = model.findClass(destToFind);</span>
+<span class="nc bnc" id="L340" title="All 2 branches missed.">                                if (dest != null) {</span>
                                     // Find the type of relationship
-<span class="nc" id="L331">                                    String relType = model.findRelType(sourceToFind, destToFind);</span>
+<span class="nc" id="L342">                                    String relType = model.findRelType(sourceToFind, destToFind);</span>
                                     // Find the relationship
-<span class="nc" id="L333">                                    Relationship r = model.findRelationship(sourceToFind, destToFind, relType);</span>
-<span class="nc bnc" id="L334" title="All 2 branches missed.">                                    if (r != null) {</span>
-<span class="nc" id="L335">                                        terminal.writer().print(&quot;Delete relationship between \&quot;&quot; +</span>
-<span class="nc" id="L336">                                                r.getSource().getClassName() + &quot;\&quot; and \&quot;&quot; +</span>
-<span class="nc" id="L337">                                                r.getDestination().getClassName() + &quot;\&quot;? (y/n): &quot;);</span>
-<span class="nc" id="L338">                                        String rAnswer = reader.readLine().trim();</span>
+<span class="nc" id="L344">                                    Relationship r = model.findRelationship(sourceToFind, destToFind, relType);</span>
+<span class="nc bnc" id="L345" title="All 2 branches missed.">                                    if (r != null) {</span>
+<span class="nc" id="L346">                                        terminal.writer().print(&quot;Delete relationship between \&quot;&quot; +</span>
+<span class="nc" id="L347">                                                r.getSource().getClassName() + &quot;\&quot; and \&quot;&quot; +</span>
+<span class="nc" id="L348">                                                r.getDestination().getClassName() + &quot;\&quot;? (y/n): &quot;);</span>
+<span class="nc" id="L349">                                        String rAnswer = reader.readLine().trim();</span>
                                         // If the user wants to delete the relationship, proceed to do so
-<span class="nc bnc" id="L340" title="All 2 branches missed.">                                        if (rAnswer.equalsIgnoreCase(&quot;y&quot;)) {</span>
-<span class="nc" id="L341">                                            setState();</span>
-<span class="nc" id="L342">                                            model.deleteRel(r);</span>
-<span class="nc" id="L343">                                            terminal.writer().println(&quot;Relationship has been deleted&quot;);</span>
+<span class="nc bnc" id="L351" title="All 2 branches missed.">                                        if (rAnswer.equalsIgnoreCase(&quot;y&quot;)) {</span>
+<span class="nc" id="L352">                                            setState();</span>
+<span class="nc" id="L353">                                            model.deleteRel(r);</span>
+<span class="nc" id="L354">                                            terminal.writer().println(&quot;Relationship has been deleted&quot;);</span>
                                         }
                                         // If not, prompt user and move on
-<span class="nc bnc" id="L346" title="All 2 branches missed.">                                        else if (rAnswer.equalsIgnoreCase(&quot;n&quot;)) {</span>
-<span class="nc" id="L347">                                            terminal.writer().println(&quot;Relationship has NOT been deleted&quot;);</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">                                        else if (rAnswer.equalsIgnoreCase(&quot;n&quot;)) {</span>
+<span class="nc" id="L358">                                            terminal.writer().println(&quot;Relationship has NOT been deleted&quot;);</span>
                                         }
                                     }
                                 }
                             }
-<span class="nc" id="L352">                        }</span>
+<span class="nc" id="L363">                        }</span>
                         // delete attribute
                         case &quot;att&quot; -&gt; {
                             // If user inputted &quot;a att&quot; with no flag, ask for one.
-<span class="nc bnc" id="L356" title="All 2 branches missed.">                            if (inputList.length == 2) {</span>
-<span class="nc bnc" id="L357" title="All 2 branches missed.">                                if (addAttFlag(convertStringList2ArrayList(inputList), &quot;delete&quot;)) {</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">                            if (inputList.length == 2) {</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">                                if (addAttFlag(convertStringList2ArrayList(inputList), &quot;delete&quot;)) {</span>
                                     // If user inputs invalid flag, break
-<span class="nc" id="L359">                                    break;</span>
+<span class="nc" id="L370">                                    break;</span>
                                 }
                             }
                             // delete field or method
-<span class="nc bnc" id="L363" title="All 3 branches missed.">                            switch (inputList[2]) {</span>
+<span class="nc bnc" id="L374" title="All 3 branches missed.">                            switch (inputList[2]) {</span>
                                 case &quot;-f&quot;, &quot;-m&quot; -&gt; {
                                     // Convert -f flag to the string &quot;field&quot;,
                                     // and the same for -m flag, etc.
-<span class="nc" id="L367">                                    String flagName = flagToString(inputList[2]);</span>
+<span class="nc" id="L378">                                    String flagName = flagToString(inputList[2]);</span>
 
                                     // If user entered a valid flag...
-<span class="nc bnc" id="L370" title="All 2 branches missed.">                                    if (!flagName.equals(&quot;&quot;)) {</span>
+<span class="nc bnc" id="L381" title="All 2 branches missed.">                                    if (!flagName.equals(&quot;&quot;)) {</span>
                                         // Get name of class user wants to add attribute to and
                                         // ensure the class exists
-<span class="nc" id="L373">                                        String classToDelAttName = getClassName(&quot;delete&quot;, flagName);</span>
-<span class="nc" id="L374">                                        UMLClass classToDelAtt = model.findClass(classToDelAttName);</span>
-<span class="nc bnc" id="L375" title="All 2 branches missed.">                                        if (classToDelAtt != null) {</span>
-<span class="nc" id="L376">                                            setState();</span>
+<span class="nc" id="L384">                                        String classToDelAttName = getClassName(&quot;delete&quot;, flagName);</span>
+<span class="nc" id="L385">                                        UMLClass classToDelAtt = model.findClass(classToDelAttName);</span>
+<span class="nc bnc" id="L386" title="All 2 branches missed.">                                        if (classToDelAtt != null) {</span>
+<span class="nc" id="L387">                                            setState();</span>
                                             // Delete attribute within specified class
-<span class="nc" id="L378">                                            delAttribute(classToDelAtt, flagName);</span>
+<span class="nc" id="L389">                                            delAttribute(classToDelAtt, flagName);</span>
+
+<span class="nc" id="L391">                                            this.view.editCompleter(model.getClassList());</span>
                                         }
                                         // If class was not found, inform user and break
                                         else {
-<span class="nc" id="L382">                                            terminal.writer().println(&quot;Class &quot; + classToDelAttName + &quot; does not exist&quot;);</span>
+<span class="nc" id="L395">                                            terminal.writer().println(&quot;Class &quot; + classToDelAttName + &quot; does not exist&quot;);</span>
                                         }
                                     }
-<span class="nc" id="L385">                                }</span>
+<span class="nc" id="L398">                                }</span>
                                 // delete parameter
                                 case &quot;-p&quot; -&gt; {
                                     UMLClass classToDeleteParam;
                                     Method methodToDeleteParam;
                                     Parameter param;
-<span class="nc bnc" id="L391" title="All 2 branches missed.">                                    if((classToDeleteParam = findClass(&quot;delete&quot;, &quot;parameter&quot;)) == null) {</span>
-<span class="nc" id="L392">                                        break;</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">                                    if((classToDeleteParam = findClass(&quot;delete&quot;, &quot;parameter&quot;)) == null) {</span>
+<span class="nc" id="L405">                                        break;</span>
                                     }
-<span class="nc bnc" id="L394" title="All 2 branches missed.">                                    if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {</span>
-<span class="nc" id="L395">                                        break;</span>
+<span class="nc bnc" id="L407" title="All 2 branches missed.">                                    if((methodToDeleteParam = findMethod(classToDeleteParam)) == null) {</span>
+<span class="nc" id="L408">                                        break;</span>
                                     }
 
-<span class="nc" id="L398">                                    String answer = &quot;y&quot;;</span>
+<span class="nc" id="L411">                                    String answer = &quot;y&quot;;</span>
 
                                     // While loop lets user to continuously add parameters until they choose not
                                     // to or an error occurs
-<span class="nc bnc" id="L402" title="All 2 branches missed.">                                    while (answer.equals(&quot;y&quot;)) {</span>
-<span class="nc bnc" id="L403" title="All 2 branches missed.">                                        if((param = findParam(methodToDeleteParam)) == null) {</span>
-<span class="nc" id="L404">                                            break;</span>
+<span class="nc bnc" id="L415" title="All 2 branches missed.">                                    while (answer.equals(&quot;y&quot;)) {</span>
+<span class="nc bnc" id="L416" title="All 2 branches missed.">                                        if((param = findParam(methodToDeleteParam)) == null) {</span>
+<span class="nc" id="L417">                                            break;</span>
                                         }
-<span class="nc" id="L406">                                        String paramName = param.getAttName();</span>
-<span class="nc" id="L407">                                        terminal.writer().printf(&quot;Delete parameter \&quot;%s\&quot;? [y/N]: &quot;, paramName);</span>
-<span class="nc" id="L408">                                        answer = reader.readLine().trim();</span>
+<span class="nc" id="L419">                                        String paramName = param.getAttName();</span>
+<span class="nc" id="L420">                                        terminal.writer().printf(&quot;Delete parameter \&quot;%s\&quot;? [y/N]: &quot;, paramName);</span>
+<span class="nc" id="L421">                                        answer = reader.readLine().trim();</span>
                                         // If the user wants to delete a parameter, proceed to do so
-<span class="nc bnc" id="L410" title="All 2 branches missed.">                                        if (answer.equalsIgnoreCase(&quot;y&quot;)) {</span>
-<span class="nc" id="L411">                                            setState();</span>
-<span class="nc" id="L412">                                            methodToDeleteParam.deleteParameter(param);</span>
-<span class="nc bnc" id="L413" title="All 2 branches missed.">                                            if (methodToDeleteParam.getParamList().size() &lt;= 0) {</span>
-<span class="nc" id="L414">                                                break;</span>
+<span class="nc bnc" id="L423" title="All 2 branches missed.">                                        if (answer.equalsIgnoreCase(&quot;y&quot;)) {</span>
+<span class="nc" id="L424">                                            setState();</span>
+<span class="nc" id="L425">                                            methodToDeleteParam.deleteParameter(param);</span>
+<span class="nc" id="L426">                                            this.view.editCompleter(model.getClassList());</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">                                            if (methodToDeleteParam.getParamList().size() &lt;= 0) {</span>
+<span class="nc" id="L428">                                                break;</span>
                                             }
-<span class="nc" id="L416">                                            terminal.writer().printf(&quot;Parameter \&quot;%s\&quot; has been deleted.&quot; +</span>
+
+<span class="nc" id="L431">                                            terminal.writer().printf(&quot;Parameter \&quot;%s\&quot; has been deleted.&quot; +</span>
                                                     &quot; Delete another? [y/N]: &quot;, paramName);
-<span class="nc" id="L418">                                            answer = reader.readLine().trim();</span>
+<span class="nc" id="L433">                                            answer = reader.readLine().trim();</span>
                                         }
                                         // If user types n, confirm and return
                                         else {
-<span class="nc" id="L422">                                            terminal.writer().printf(&quot;Parameter \&quot;%s\&quot; has NOT been deleted\n&quot;, paramName);</span>
-<span class="nc" id="L423">                                            break;</span>
+<span class="nc" id="L437">                                            terminal.writer().printf(&quot;Parameter \&quot;%s\&quot; has NOT been deleted\n&quot;, paramName);</span>
+<span class="nc" id="L438">                                            break;</span>
                                         }
-<span class="nc" id="L425">                                    }</span>
-<span class="nc" id="L426">                                } // If user entered invalid flag, inform user and break</span>
+<span class="nc" id="L440">                                    }</span>
+<span class="nc" id="L441">                                } // If user entered invalid flag, inform user and break</span>
                                 default -&gt; {
-<span class="nc" id="L428">                                    terminal.writer().println(&quot;Invalid flag&quot;);</span>
-<span class="nc" id="L429">                                    terminal.writer().println(prompt);</span>
+<span class="nc" id="L443">                                    terminal.writer().println(&quot;Invalid flag&quot;);</span>
+<span class="nc" id="L444">                                    terminal.writer().println(prompt);</span>
                                 }
                             }
-<span class="nc" id="L432">                        }</span>
+<span class="nc" id="L447">                        }</span>
                         // If the user's command is not valid
                         default -&gt; {
-<span class="nc" id="L435">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
+<span class="nc" id="L450">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
                         }
                     }
-<span class="nc" id="L438">                }</span>
+<span class="nc" id="L453">                }</span>
 
                 //***************************************//
                 //************ Rename cases *************//
                 //***************************************//
 
                 case &quot;rename&quot;, &quot;r&quot; -&gt; {
-<span class="nc bnc" id="L445" title="All 2 branches missed.">                    switch (inputList[1]) {</span>
+<span class="nc bnc" id="L460" title="All 2 branches missed.">                    switch (inputList[1]) {</span>
                         case &quot;class&quot; -&gt; {
                             // Get user input of Class name to be renamed
-<span class="nc" id="L448">                            terminal.writer().print(&quot;Enter class to rename: &quot;);</span>
-<span class="nc" id="L449">                            String oldClassName = reader.readLine().trim();</span>
+<span class="nc" id="L463">                            terminal.writer().print(&quot;Enter class to rename: &quot;);</span>
+<span class="nc" id="L464">                            String oldClassName = reader.readLine().trim();</span>
                             // If Class exists, set Class name to user inputted name
-<span class="nc" id="L451">                            UMLClass oldUMLClass = model.findClass(oldClassName);</span>
+<span class="nc" id="L466">                            UMLClass oldUMLClass = model.findClass(oldClassName);</span>
                             // Prompt user to rename a class name
-<span class="nc bnc" id="L453" title="All 2 branches missed.">                            if (oldUMLClass != null) {</span>
-<span class="nc" id="L454">                                terminal.writer().print(&quot;Enter new name for class &quot; + oldUMLClass.getClassName() + &quot;: &quot;);</span>
-<span class="nc" id="L455">                                String newName = reader.readLine().trim();</span>
-<span class="nc bnc" id="L456" title="All 2 branches missed.">                                if (model.isNotValidInput(newName)) {</span>
-<span class="nc" id="L457">                                    terminal.writer().println(&quot;\&quot;&quot; + newName + &quot;\&quot; is not a valid identifier\n&quot;);</span>
-<span class="nc" id="L458">                                    break;</span>
+<span class="nc bnc" id="L468" title="All 2 branches missed.">                            if (oldUMLClass != null) {</span>
+<span class="nc" id="L469">                                terminal.writer().print(&quot;Enter new name for class &quot; + oldUMLClass.getClassName() + &quot;: &quot;);</span>
+<span class="nc" id="L470">                                String newName = reader.readLine().trim();</span>
+<span class="nc bnc" id="L471" title="All 2 branches missed.">                                if (model.isNotValidInput(newName)) {</span>
+<span class="nc" id="L472">                                    terminal.writer().println(&quot;\&quot;&quot; + newName + &quot;\&quot; is not a valid identifier\n&quot;);</span>
+<span class="nc" id="L473">                                    break;</span>
                                 }
-<span class="nc bnc" id="L460" title="All 2 branches missed.">                                if (model.findClass(newName) != null) {</span>
-<span class="nc" id="L461">                                    terminal.writer().println(&quot;Class \&quot;&quot; + newName + &quot;\&quot; already exists\n&quot;);</span>
-<span class="nc" id="L462">                                    break;</span>
+<span class="nc bnc" id="L475" title="All 2 branches missed.">                                if (model.findClass(newName) != null) {</span>
+<span class="nc" id="L476">                                    terminal.writer().println(&quot;Class \&quot;&quot; + newName + &quot;\&quot; already exists\n&quot;);</span>
+<span class="nc" id="L477">                                    break;</span>
                                 }
-<span class="nc" id="L464">                                setState();</span>
-<span class="nc" id="L465">                                oldUMLClass.setClassName(newName);</span>
+<span class="nc" id="L479">                                setState();</span>
+<span class="nc" id="L480">                                oldUMLClass.setClassName(newName);</span>
                                 // Inform user of renamed Class
-<span class="nc" id="L467">                                terminal.writer().println(&quot;The class \&quot;&quot; + oldClassName +</span>
-<span class="nc" id="L468">                                        &quot;\&quot; has been renamed to \&quot;&quot; + oldUMLClass.getClassName() + &quot;\&quot;&quot;);</span>
+<span class="nc" id="L482">                                terminal.writer().println(&quot;The class \&quot;&quot; + oldClassName +</span>
+<span class="nc" id="L483">                                        &quot;\&quot; has been renamed to \&quot;&quot; + oldUMLClass.getClassName() + &quot;\&quot;&quot;);</span>
                             }
-<span class="nc" id="L470">                        }</span>
+<span class="nc" id="L485">                        }</span>
                         // If the user's command is not valid
                         default -&gt; {
-<span class="nc" id="L473">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
+<span class="nc" id="L488">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
                         }
                     }
-<span class="nc" id="L476">                }</span>
+<span class="nc" id="L491">                }</span>
 
                 //***************************************//
                 //************ Change cases *************//
                 //***************************************//
 
                 case &quot;c&quot;, &quot;change&quot; -&gt; {
-<span class="nc bnc" id="L483" title="All 3 branches missed.">                    switch (inputList[1]) {</span>
+<span class="nc bnc" id="L498" title="All 3 branches missed.">                    switch (inputList[1]) {</span>
                         // change attribute
                         case &quot;att&quot; -&gt; {
-<span class="nc bnc" id="L486" title="All 4 branches missed.">                            switch (inputList[2]) {</span>
+<span class="nc bnc" id="L501" title="All 4 branches missed.">                            switch (inputList[2]) {</span>
                                 // change field
                                 case &quot;-f&quot; -&gt; {
                                     // Show user classes and attributes before asking for input
-<span class="nc" id="L490">                                    listClasses();</span>
-<span class="nc" id="L491">                                    terminal.writer().print(&quot;Enter class that contains field: &quot;);</span>
-<span class="nc" id="L492">                                    String classWithFieldName = reader.readLine().trim();</span>
+<span class="nc" id="L505">                                    listClasses();</span>
+<span class="nc" id="L506">                                    terminal.writer().print(&quot;Enter class that contains field: &quot;);</span>
+<span class="nc" id="L507">                                    String classWithFieldName = reader.readLine().trim();</span>
                                     // Ensure class exists
-<span class="nc" id="L494">                                    UMLClass UMLClassWithField = model.findClass(classWithFieldName);</span>
-<span class="nc bnc" id="L495" title="All 2 branches missed.">                                    if (UMLClassWithField != null) {</span>
+<span class="nc" id="L509">                                    UMLClass UMLClassWithField = model.findClass(classWithFieldName);</span>
+<span class="nc bnc" id="L510" title="All 2 branches missed.">                                    if (UMLClassWithField != null) {</span>
                                         // List attributes in class before asking for input
-<span class="nc" id="L497">                                        listClass(classWithFieldName);</span>
-<span class="nc" id="L498">                                        terminal.writer().print(&quot;Enter field to be renamed: &quot;);</span>
-<span class="nc" id="L499">                                        String oldFieldName = reader.readLine().trim();</span>
+<span class="nc" id="L512">                                        listClass(classWithFieldName);</span>
+<span class="nc" id="L513">                                        terminal.writer().print(&quot;Enter field to be renamed: &quot;);</span>
+<span class="nc" id="L514">                                        String oldFieldName = reader.readLine().trim();</span>
                                         // Ensure attribute exists
-<span class="nc" id="L501">                                        Attribute newField = UMLClassWithField.findField(oldFieldName);</span>
-<span class="nc bnc" id="L502" title="All 2 branches missed.">                                        if (newField != null) {</span>
+<span class="nc" id="L516">                                        Attribute newField = UMLClassWithField.findField(oldFieldName);</span>
+<span class="nc bnc" id="L517" title="All 2 branches missed.">                                        if (newField != null) {</span>
                                             // Rename attribute with user's new name
-<span class="nc" id="L504">                                            terminal.writer().print(&quot;Enter new name for &quot; + oldFieldName + &quot;: &quot;);</span>
-<span class="nc" id="L505">                                            String newFieldName = reader.readLine().trim();</span>
-<span class="nc bnc" id="L506" title="All 2 branches missed.">                                            if (model.isNotValidInput(newFieldName)) {</span>
-<span class="nc" id="L507">                                                terminal.writer().println(&quot;\&quot;&quot; + newFieldName +</span>
+<span class="nc" id="L519">                                            terminal.writer().print(&quot;Enter new name for &quot; + oldFieldName + &quot;: &quot;);</span>
+<span class="nc" id="L520">                                            String newFieldName = reader.readLine().trim();</span>
+<span class="nc bnc" id="L521" title="All 2 branches missed.">                                            if (model.isNotValidInput(newFieldName)) {</span>
+<span class="nc" id="L522">                                                terminal.writer().println(&quot;\&quot;&quot; + newFieldName +</span>
                                                         &quot;\&quot; is not a valid identifier\n&quot;);
-<span class="nc" id="L509">                                                break;</span>
+<span class="nc" id="L524">                                                break;</span>
                                             }
-<span class="nc bnc" id="L511" title="All 2 branches missed.">                                            if (UMLClassWithField.findField(newFieldName) != null) {</span>
-<span class="nc" id="L512">                                                terminal.writer().println(&quot;Field \&quot;&quot; + newFieldName +</span>
+<span class="nc bnc" id="L526" title="All 2 branches missed.">                                            if (UMLClassWithField.findField(newFieldName) != null) {</span>
+<span class="nc" id="L527">                                                terminal.writer().println(&quot;Field \&quot;&quot; + newFieldName +</span>
                                                         &quot;\&quot; already exists in class \&quot;&quot; + classWithFieldName +
                                                         &quot;\&quot;\n&quot;);
-<span class="nc" id="L515">                                                break;</span>
+<span class="nc" id="L530">                                                break;</span>
                                             }
                                             //get fieldtype
-<span class="nc" id="L518">                                            String newFieldType = getAttType(newFieldName);</span>
-<span class="nc bnc" id="L519" title="All 2 branches missed.">                                            if(newFieldType == null){</span>
-<span class="nc" id="L520">                                                break;</span>
+<span class="nc" id="L533">                                            String newFieldType = getAttType(newFieldName);</span>
+<span class="nc bnc" id="L534" title="All 2 branches missed.">                                            if(newFieldType == null){</span>
+<span class="nc" id="L535">                                                break;</span>
                                             }
                                             //make a new field
-<span class="nc" id="L523">                                            Field changedField = new Field(newFieldName, newFieldType);</span>
-<span class="nc" id="L524">                                            setState();</span>
+<span class="nc" id="L538">                                            Field changedField = new Field(newFieldName, newFieldType);</span>
+<span class="nc" id="L539">                                            setState();</span>
                                             //replace orignal field
-<span class="nc" id="L526">                                            UMLClassWithField.changeField(oldFieldName, changedField);</span>
+<span class="nc" id="L541">                                            UMLClassWithField.changeField(oldFieldName, changedField);</span>
                                         }
                                     }
-<span class="nc" id="L529">                                }</span>
+<span class="nc" id="L544">                                }</span>
                                 // change method
                                 case &quot;-m&quot; -&gt; {
                                     // Show user classes and attributes before asking for input
-<span class="nc" id="L533">                                    listClasses();</span>
-<span class="nc" id="L534">                                    terminal.writer().print(&quot;Enter class that contains method: &quot;);</span>
-<span class="nc" id="L535">                                    String classWithMethodName = reader.readLine().trim();</span>
+<span class="nc" id="L548">                                    listClasses();</span>
+<span class="nc" id="L549">                                    terminal.writer().print(&quot;Enter class that contains method: &quot;);</span>
+<span class="nc" id="L550">                                    String classWithMethodName = reader.readLine().trim();</span>
                                     // Ensure class exists
-<span class="nc" id="L537">                                    UMLClass UMLClassWithMethod = model.findClass(classWithMethodName);</span>
-<span class="nc bnc" id="L538" title="All 2 branches missed.">                                    if (UMLClassWithMethod != null) {</span>
+<span class="nc" id="L552">                                    UMLClass UMLClassWithMethod = model.findClass(classWithMethodName);</span>
+<span class="nc bnc" id="L553" title="All 2 branches missed.">                                    if (UMLClassWithMethod != null) {</span>
                                         // List attributes in class before asking for input
-<span class="nc" id="L540">                                        listClass(classWithMethodName);</span>
-<span class="nc" id="L541">                                        terminal.writer().print(&quot;Enter method to be renamed: &quot;);</span>
-<span class="nc" id="L542">                                        String oldMethodName = reader.readLine().trim();</span>
+<span class="nc" id="L555">                                        listClass(classWithMethodName);</span>
+<span class="nc" id="L556">                                        terminal.writer().print(&quot;Enter method to be renamed: &quot;);</span>
+<span class="nc" id="L557">                                        String oldMethodName = reader.readLine().trim();</span>
                                         // Ensure attribute exists
-<span class="nc" id="L544">                                        Attribute newField = UMLClassWithMethod.findMethod(oldMethodName);</span>
-<span class="nc bnc" id="L545" title="All 2 branches missed.">                                        if (newField != null) {</span>
+<span class="nc" id="L559">                                        Attribute newField = UMLClassWithMethod.findMethod(oldMethodName);</span>
+<span class="nc bnc" id="L560" title="All 2 branches missed.">                                        if (newField != null) {</span>
                                             // Rename attribute with user's new name
-<span class="nc" id="L547">                                            terminal.writer().print(&quot;Enter new name for &quot; + oldMethodName + &quot;: &quot;);</span>
-<span class="nc" id="L548">                                            String newMethodName = reader.readLine().trim();</span>
-<span class="nc bnc" id="L549" title="All 2 branches missed.">                                            if (model.isNotValidInput(newMethodName)) {</span>
-<span class="nc" id="L550">                                                terminal.writer().println(&quot;\&quot;&quot; + newMethodName +</span>
+<span class="nc" id="L562">                                            terminal.writer().print(&quot;Enter new name for &quot; + oldMethodName + &quot;: &quot;);</span>
+<span class="nc" id="L563">                                            String newMethodName = reader.readLine().trim();</span>
+<span class="nc bnc" id="L564" title="All 2 branches missed.">                                            if (model.isNotValidInput(newMethodName)) {</span>
+<span class="nc" id="L565">                                                terminal.writer().println(&quot;\&quot;&quot; + newMethodName +</span>
                                                         &quot;\&quot; is not a valid identifier\n&quot;);
-<span class="nc" id="L552">                                                break;</span>
+<span class="nc" id="L567">                                                break;</span>
                                             }
-<span class="nc bnc" id="L554" title="All 2 branches missed.">                                            if (UMLClassWithMethod.findMethodNoPrint(newMethodName) != null) {</span>
-<span class="nc" id="L555">                                                terminal.writer().println(&quot;Method \&quot;&quot; + newMethodName +</span>
+<span class="nc bnc" id="L569" title="All 2 branches missed.">                                            if (UMLClassWithMethod.findMethodNoPrint(newMethodName) != null) {</span>
+<span class="nc" id="L570">                                                terminal.writer().println(&quot;Method \&quot;&quot; + newMethodName +</span>
                                                         &quot;\&quot; already exists in class \&quot;&quot; + classWithMethodName +
                                                         &quot;\&quot;\n&quot;);
-<span class="nc" id="L558">                                                break;</span>
+<span class="nc" id="L573">                                                break;</span>
                                             }
                                             //get methodtype
-<span class="nc" id="L561">                                            String newMethodReturnType = getAttReturnType(newMethodName);</span>
-<span class="nc bnc" id="L562" title="All 2 branches missed.">                                            if (newMethodReturnType == null) {</span>
-<span class="nc" id="L563">                                                break;</span>
+<span class="nc" id="L576">                                            String newMethodReturnType = getAttReturnType(newMethodName);</span>
+<span class="nc bnc" id="L577" title="All 2 branches missed.">                                            if (newMethodReturnType == null) {</span>
+<span class="nc" id="L578">                                                break;</span>
                                             }
-<span class="nc bnc" id="L565" title="All 2 branches missed.">                                            if (!newMethodName.endsWith(&quot;()&quot;)){</span>
-<span class="nc" id="L566">                                                newMethodName += &quot;()&quot;;</span>
+<span class="nc bnc" id="L580" title="All 2 branches missed.">                                            if (!newMethodName.endsWith(&quot;()&quot;)){</span>
+<span class="nc" id="L581">                                                newMethodName += &quot;()&quot;;</span>
                                             }
                                             //make a new method
-<span class="nc" id="L569">                                            Method changedMethod = new Method(newMethodName, newMethodReturnType);</span>
-<span class="nc" id="L570">                                            setState();</span>
+<span class="nc" id="L584">                                            Method changedMethod = new Method(newMethodName, newMethodReturnType);</span>
+<span class="nc" id="L585">                                            setState();</span>
                                             //replace orginal method
-<span class="nc" id="L572">                                            UMLClassWithMethod.changeMethod(oldMethodName, changedMethod);</span>
+<span class="nc" id="L587">                                            UMLClassWithMethod.changeMethod(oldMethodName, changedMethod);</span>
                                         }
                                     }
-<span class="nc" id="L575">                                }</span>
+<span class="nc" id="L590">                                }</span>
                                 // change parameter
                                 case &quot;-p&quot; -&gt; {
                                     UMLClass classToChangeParam;
                                     Method methodToChangeParam;
                                     Parameter param;
-<span class="nc bnc" id="L581" title="All 2 branches missed.">                                    if((classToChangeParam = findClass(&quot;change&quot;, &quot;parameter&quot;)) == null) {</span>
-<span class="nc" id="L582">                                        break;</span>
+<span class="nc bnc" id="L596" title="All 2 branches missed.">                                    if((classToChangeParam = findClass(&quot;change&quot;, &quot;parameter&quot;)) == null) {</span>
+<span class="nc" id="L597">                                        break;</span>
                                     }
-<span class="nc bnc" id="L584" title="All 2 branches missed.">                                    if((methodToChangeParam = findMethod(classToChangeParam)) == null) {</span>
-<span class="nc" id="L585">                                        break;</span>
+<span class="nc bnc" id="L599" title="All 2 branches missed.">                                    if((methodToChangeParam = findMethod(classToChangeParam)) == null) {</span>
+<span class="nc" id="L600">                                        break;</span>
                                     }
-<span class="nc" id="L587">                                    String answer = &quot;y&quot;;</span>
-<span class="nc bnc" id="L588" title="All 2 branches missed.">                                    while (answer.equals(&quot;y&quot;)) {</span>
-<span class="nc bnc" id="L589" title="All 2 branches missed.">                                        if ((param = findParam(methodToChangeParam)) == null) {</span>
-<span class="nc" id="L590">                                            break;</span>
+<span class="nc" id="L602">                                    String answer = &quot;y&quot;;</span>
+<span class="nc bnc" id="L603" title="All 2 branches missed.">                                    while (answer.equals(&quot;y&quot;)) {</span>
+<span class="nc bnc" id="L604" title="All 2 branches missed.">                                        if ((param = findParam(methodToChangeParam)) == null) {</span>
+<span class="nc" id="L605">                                            break;</span>
                                         }
                                         String oldParamName;
-<span class="nc bnc" id="L593" title="All 2 branches missed.">                                        if((oldParamName = param.getAttName()) == null) {</span>
-<span class="nc" id="L594">                                            break;</span>
+<span class="nc bnc" id="L608" title="All 2 branches missed.">                                        if((oldParamName = param.getAttName()) == null) {</span>
+<span class="nc" id="L609">                                            break;</span>
                                         }
                                         String newParamName;
-<span class="nc bnc" id="L597" title="All 2 branches missed.">                                        if((newParamName = getAttName(&quot;parameter&quot;)) == null) {</span>
-<span class="nc" id="L598">                                            break;</span>
+<span class="nc bnc" id="L612" title="All 2 branches missed.">                                        if((newParamName = getAttName(&quot;parameter&quot;)) == null) {</span>
+<span class="nc" id="L613">                                            break;</span>
                                         }
                                         String newParamType;
-<span class="nc bnc" id="L601" title="All 2 branches missed.">                                        if ((newParamType = getAttType(&quot;parameter&quot;)) == null) {</span>
-<span class="nc" id="L602">                                            break;</span>
+<span class="nc bnc" id="L616" title="All 2 branches missed.">                                        if ((newParamType = getAttType(&quot;parameter&quot;)) == null) {</span>
+<span class="nc" id="L617">                                            break;</span>
                                         }
-<span class="nc" id="L604">                                        param = new Parameter(newParamName, newParamType);</span>
-<span class="nc" id="L605">                                        setState();</span>
-<span class="nc" id="L606">                                        methodToChangeParam.changeParameter(oldParamName, param);</span>
+<span class="nc" id="L619">                                        param = new Parameter(newParamName, newParamType);</span>
+<span class="nc" id="L620">                                        setState();</span>
+<span class="nc" id="L621">                                        methodToChangeParam.changeParameter(oldParamName, param);</span>
 
-<span class="nc" id="L608">                                        terminal.writer().printf(&quot;Change another? [y/n]: &quot;);</span>
-<span class="nc" id="L609">                                        answer = reader.readLine().toLowerCase().trim();</span>
-<span class="nc" id="L610">                                    }</span>
+<span class="nc" id="L623">                                        terminal.writer().printf(&quot;Change another? [y/n]: &quot;);</span>
+<span class="nc" id="L624">                                        answer = reader.readLine().toLowerCase().trim();</span>
+<span class="nc" id="L625">                                    }</span>
                                 }
                             }
-<span class="nc" id="L613">                        }</span>
+<span class="nc" id="L628">                        }</span>
                         // change relationship types
                         case &quot;rel&quot; -&gt; {
                             // prompt user for source
-<span class="nc" id="L617">                            terminal.writer().print(&quot;Enter source name: &quot;);</span>
-<span class="nc" id="L618">                            String srcName = reader.readLine().trim();</span>
+<span class="nc" id="L632">                            terminal.writer().print(&quot;Enter source name: &quot;);</span>
+<span class="nc" id="L633">                            String srcName = reader.readLine().trim();</span>
                             // if source exists continue
-<span class="nc bnc" id="L620" title="All 2 branches missed.">                            if(model.findClass(srcName) != (null)){</span>
+<span class="nc bnc" id="L635" title="All 2 branches missed.">                            if(model.findClass(srcName) != (null)){</span>
                                 // prompt user for destination
-<span class="nc" id="L622">                                terminal.writer().print(&quot;Enter destination name: &quot;);</span>
-<span class="nc" id="L623">                                String destName = reader.readLine().trim();</span>
+<span class="nc" id="L637">                                terminal.writer().print(&quot;Enter destination name: &quot;);</span>
+<span class="nc" id="L638">                                String destName = reader.readLine().trim();</span>
                                 // if destination exists, continue
-<span class="nc bnc" id="L625" title="All 2 branches missed.">                                if(model.findClass(destName) != (null)){</span>
+<span class="nc bnc" id="L640" title="All 2 branches missed.">                                if(model.findClass(destName) != (null)){</span>
                                     // if the relationship does not exist
-<span class="nc bnc" id="L627" title="All 2 branches missed.">                                    if(!model.isRelated(srcName, destName)){</span>
-<span class="nc" id="L628">                                        terminal.writer().println(&quot;Relationship does not exist&quot;);</span>
-<span class="nc" id="L629">                                        break;</span>
+<span class="nc bnc" id="L642" title="All 2 branches missed.">                                    if(!model.isRelated(srcName, destName)){</span>
+<span class="nc" id="L643">                                        terminal.writer().println(&quot;Relationship does not exist&quot;);</span>
+<span class="nc" id="L644">                                        break;</span>
                                     }
                                     // prompt user for old type
-<span class="nc" id="L632">                                    terminal.writer().print(&quot;Enter old relationship type: &quot;);</span>
-<span class="nc" id="L633">                                    String oldRelType = reader.readLine().trim();</span>
+<span class="nc" id="L647">                                    terminal.writer().print(&quot;Enter old relationship type: &quot;);</span>
+<span class="nc" id="L648">                                    String oldRelType = reader.readLine().trim();</span>
                                     // check old type
-<span class="nc bnc" id="L635" title="All 2 branches missed.">                                    if(!Objects.equals(model.findRelType(srcName, destName), oldRelType)){</span>
-<span class="nc" id="L636">                                        terminal.writer().println(&quot;Relationship type does not exist for: &quot;</span>
+<span class="nc bnc" id="L650" title="All 2 branches missed.">                                    if(!Objects.equals(model.findRelType(srcName, destName), oldRelType)){</span>
+<span class="nc" id="L651">                                        terminal.writer().println(&quot;Relationship type does not exist for: &quot;</span>
                                                 + srcName + &quot; and &quot; + destName);
                                     }
                                     // prompt for new type
                                     else {
-<span class="nc" id="L641">                                        terminal.writer().print(&quot;Enter new relationship type: &quot;);</span>
-<span class="nc" id="L642">                                        String newRelType = reader.readLine().trim();</span>
+<span class="nc" id="L656">                                        terminal.writer().print(&quot;Enter new relationship type: &quot;);</span>
+<span class="nc" id="L657">                                        String newRelType = reader.readLine().trim();</span>
                                         // check type validity
-<span class="nc bnc" id="L644" title="All 2 branches missed.">                                        if(!model.checkType(newRelType)){</span>
-<span class="nc" id="L645">                                            terminal.writer().println(&quot;Invalid relationship type&quot;);</span>
+<span class="nc bnc" id="L659" title="All 2 branches missed.">                                        if(!model.checkType(newRelType)){</span>
+<span class="nc" id="L660">                                            terminal.writer().println(&quot;Invalid relationship type&quot;);</span>
                                         }
                                         // change the type
                                         else {
-<span class="nc" id="L649">                                            setState();</span>
-<span class="nc" id="L650">                                            model.changeRelType(srcName, destName, newRelType);</span>
-<span class="nc" id="L651">                                            terminal.writer().print(&quot;Relationship type changed\n&quot;);</span>
+<span class="nc" id="L664">                                            setState();</span>
+<span class="nc" id="L665">                                            model.changeRelType(srcName, destName, newRelType);</span>
+<span class="nc" id="L666">                                            terminal.writer().print(&quot;Relationship type changed\n&quot;);</span>
                                         }
                                     }
                                 }
                             }
-<span class="nc" id="L656">                        }</span>
+<span class="nc" id="L671">                        }</span>
                         // If the user's command is not valid
                         default -&gt; {
-<span class="nc" id="L659">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
+<span class="nc" id="L674">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
                         }
                     }
-<span class="nc" id="L662">                }</span>
+<span class="nc" id="L677">                }</span>
 
                 //***************************************//
                 //************* List cases **************//
                 //***************************************//
 
                 case &quot;list&quot;, &quot;l&quot; -&gt; {
-<span class="nc bnc" id="L669" title="All 4 branches missed.">                    switch (inputList[1]) {</span>
+<span class="nc bnc" id="L684" title="All 4 branches missed.">                    switch (inputList[1]) {</span>
                         // many classes
                         case &quot;classes&quot; -&gt; {
-<span class="nc" id="L672">                            listClasses();</span>
-<span class="nc" id="L673">                        }</span>
+<span class="nc" id="L687">                            listClasses();</span>
+<span class="nc" id="L688">                        }</span>
                         // one class
                         case &quot;class&quot; -&gt; {
                             // Get user to input desired class
-<span class="nc" id="L677">                            terminal.writer().print(&quot;Enter class name: &quot;);</span>
-<span class="nc" id="L678">                            String classToDisplayName = reader.readLine().trim();</span>
+<span class="nc" id="L692">                            terminal.writer().print(&quot;Enter class name: &quot;);</span>
+<span class="nc" id="L693">                            String classToDisplayName = reader.readLine().trim();</span>
                             // print class name
-<span class="nc bnc" id="L680" title="All 2 branches missed.">                            if (model.findClass(classToDisplayName) != null) {</span>
-<span class="nc" id="L681">                                terminal.writer().println(&quot;\n--------------------&quot;);</span>
-<span class="nc" id="L682">                                listClass(classToDisplayName);</span>
-<span class="nc" id="L683">                                terminal.writer().println(&quot;\n--------------------\n&quot;);</span>
+<span class="nc bnc" id="L695" title="All 2 branches missed.">                            if (model.findClass(classToDisplayName) != null) {</span>
+<span class="nc" id="L696">                                terminal.writer().println(&quot;\n--------------------&quot;);</span>
+<span class="nc" id="L697">                                listClass(classToDisplayName);</span>
+<span class="nc" id="L698">                                terminal.writer().println(&quot;\n--------------------\n&quot;);</span>
                             }
                             else{
-<span class="nc" id="L686">                                terminal.writer().println(&quot;Class does not exist&quot;);</span>
+<span class="nc" id="L701">                                terminal.writer().println(&quot;Class does not exist&quot;);</span>
                             }
-<span class="nc" id="L688">                        }</span>
+<span class="nc" id="L703">                        }</span>
                         // list relationships
                         case &quot;rel&quot; -&gt; {
                             // Ensure there are relationships to list. If not, break
-<span class="nc bnc" id="L692" title="All 2 branches missed.">                            if (model.getRelationshipList().size() == 0) {</span>
-<span class="nc" id="L693">                                terminal.writer().println(&quot;There are no relationships to list&quot;);</span>
-<span class="nc" id="L694">                                break;</span>
+<span class="nc bnc" id="L707" title="All 2 branches missed.">                            if (model.getRelationshipList().size() == 0) {</span>
+<span class="nc" id="L708">                                terminal.writer().println(&quot;There are no relationships to list&quot;);</span>
+<span class="nc" id="L709">                                break;</span>
                             }
                             // List relationships spaced out by new lines and arrows
                             // designating which class is the source and destination
-<span class="nc" id="L698">                            terminal.writer().println(&quot;\n--------------------&quot;);</span>
+<span class="nc" id="L713">                            terminal.writer().println(&quot;\n--------------------&quot;);</span>
                             // if there is only one relationship, print it
-<span class="nc bnc" id="L700" title="All 2 branches missed.">                            if (model.getRelationshipList().size() &gt;= 1) {</span>
-<span class="nc" id="L701">                                terminal.writer().print(model.getRelationshipList().get(0).getSource().getClassName());</span>
-<span class="nc" id="L702">                                terminal.writer().print(&quot; [&quot; + model.getRelationshipList().get(0).getRelType() +</span>
+<span class="nc bnc" id="L715" title="All 2 branches missed.">                            if (model.getRelationshipList().size() &gt;= 1) {</span>
+<span class="nc" id="L716">                                terminal.writer().print(model.getRelationshipList().get(0).getSource().getClassName());</span>
+<span class="nc" id="L717">                                terminal.writer().print(&quot; [&quot; + model.getRelationshipList().get(0).getRelType() +</span>
                                         &quot;] -&gt; &quot;);
-<span class="nc" id="L704">                                terminal.writer().print(model.getRelationshipList().get(0).getDestination().</span>
-<span class="nc" id="L705">                                        getClassName());</span>
+<span class="nc" id="L719">                                terminal.writer().print(model.getRelationshipList().get(0).getDestination().</span>
+<span class="nc" id="L720">                                        getClassName());</span>
                             }
                             // iterates through relationship list and prints the relationship
-<span class="nc bnc" id="L708" title="All 2 branches missed.">                            for (int i = 1; i &lt; model.getRelationshipList().size(); ++i) {</span>
-<span class="nc" id="L709">                                terminal.writer().println();</span>
-<span class="nc" id="L710">                                terminal.writer().print(&quot;\n&quot; + model.getRelationshipList().get(i).getSource()</span>
-<span class="nc" id="L711">                                        .getClassName());</span>
-<span class="nc" id="L712">                                terminal.writer().print(&quot; [&quot; + model.getRelationshipList().get(i).getRelType() +</span>
+<span class="nc bnc" id="L723" title="All 2 branches missed.">                            for (int i = 1; i &lt; model.getRelationshipList().size(); ++i) {</span>
+<span class="nc" id="L724">                                terminal.writer().println();</span>
+<span class="nc" id="L725">                                terminal.writer().print(&quot;\n&quot; + model.getRelationshipList().get(i).getSource()</span>
+<span class="nc" id="L726">                                        .getClassName());</span>
+<span class="nc" id="L727">                                terminal.writer().print(&quot; [&quot; + model.getRelationshipList().get(i).getRelType() +</span>
                                         &quot;] -&gt; &quot;);
-<span class="nc" id="L714">                                terminal.writer().print(model.getRelationshipList().get(i).getDestination().</span>
-<span class="nc" id="L715">                                        getClassName());</span>
+<span class="nc" id="L729">                                terminal.writer().print(model.getRelationshipList().get(i).getDestination().</span>
+<span class="nc" id="L730">                                        getClassName());</span>
                             }
-<span class="nc" id="L717">                            terminal.writer().println(&quot;\n--------------------\n&quot;);</span>
-<span class="nc" id="L718">                        }</span>
+<span class="nc" id="L732">                            terminal.writer().println(&quot;\n--------------------\n&quot;);</span>
+<span class="nc" id="L733">                        }</span>
                         // If the user's command is not valid
-                        default -&gt; {
-<span class="nc" id="L721">                            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
-                        }
+<span class="nc" id="L735">                        default -&gt; terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
                     }
-<span class="nc" id="L724">                }</span>
+<span class="nc" id="L737">                }</span>
                 // If the user's command is not valid
                 default -&gt; {
-<span class="nc" id="L727">                    terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
+<span class="nc" id="L740">                    terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
                 }
             }
             // catches invalid command
-<span class="nc" id="L731">        } catch (Exception e) {</span>
-<span class="nc" id="L732">            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
-<span class="nc" id="L733">        }</span>
-<span class="nc" id="L734">    }</span>
+<span class="nc" id="L744">        } catch (Exception e) {</span>
+<span class="nc" id="L745">            terminal.writer().println(&quot;Please enter a valid command&quot;);</span>
+<span class="nc" id="L746">        }</span>
+<span class="nc" id="L747">    }</span>
 
 
     /***************************
@@ -753,8 +766,8 @@ public class CLIController {
      */
     public String getClassName(String operation, String attType) {
         // Get user input of Class name
-<span class="nc" id="L756">        terminal.writer().print(&quot;Enter class name to &quot; + operation + &quot; &quot; + attType + &quot;: &quot;);</span>
-<span class="nc" id="L757">        return reader.readLine().trim();</span>
+<span class="nc" id="L769">        terminal.writer().print(&quot;Enter class name to &quot; + operation + &quot; &quot; + attType + &quot;: &quot;);</span>
+<span class="nc" id="L770">        return reader.readLine().trim();</span>
     }
 
     /**
@@ -767,39 +780,39 @@ public class CLIController {
     public ArrayList&lt;UMLClass&gt; deleteClass(String classToDeleteName) {
         // Create new class object. If a class matches the user inputted name,
         // remove it from the ArrayList. Otherwise, inform user of failure.
-<span class="nc" id="L770">        UMLClass UMLClassToDelete = null;</span>
+<span class="nc" id="L783">        UMLClass UMLClassToDelete = null;</span>
         // While loop to make sure the user can make a mistake when typing in
         // a class name to delete, and continue to delete a class afterwards
-<span class="nc bnc" id="L773" title="All 2 branches missed.">        while (UMLClassToDelete == null) {</span>
+<span class="nc bnc" id="L786" title="All 2 branches missed.">        while (UMLClassToDelete == null) {</span>
             // Iterate through ArrayList of classes to see if class exists
-<span class="nc bnc" id="L775" title="All 2 branches missed.">            for (UMLClass UMLClassObj : this.model.getClassList()) {</span>
-<span class="nc bnc" id="L776" title="All 2 branches missed.">                if (UMLClassObj.getClassName().equals(classToDeleteName)) {</span>
-<span class="nc" id="L777">                    UMLClassToDelete = UMLClassObj;</span>
+<span class="nc bnc" id="L788" title="All 2 branches missed.">            for (UMLClass UMLClassObj : this.model.getClassList()) {</span>
+<span class="nc bnc" id="L789" title="All 2 branches missed.">                if (UMLClassObj.getClassName().equals(classToDeleteName)) {</span>
+<span class="nc" id="L790">                    UMLClassToDelete = UMLClassObj;</span>
                 }
-<span class="nc" id="L779">            }</span>
+<span class="nc" id="L792">            }</span>
             // Remove whatever class classToDelete was assigned as from
             // the ArrayList
-<span class="nc bnc" id="L782" title="All 2 branches missed.">            if (UMLClassToDelete != null) {</span>
-<span class="nc" id="L783">                terminal.writer().print(&quot;Delete class \&quot;&quot; + classToDeleteName + &quot;\&quot;? (y/n): &quot;);</span>
-<span class="nc" id="L784">                String theNextAnswer = reader.readLine().trim();</span>
+<span class="nc bnc" id="L795" title="All 2 branches missed.">            if (UMLClassToDelete != null) {</span>
+<span class="nc" id="L796">                terminal.writer().print(&quot;Delete class \&quot;&quot; + classToDeleteName + &quot;\&quot;? (y/n): &quot;);</span>
+<span class="nc" id="L797">                String theNextAnswer = reader.readLine().trim();</span>
                 // User confirms if they wish to delete. If no, break out of loop
-<span class="nc bnc" id="L786" title="All 2 branches missed.">                if (theNextAnswer.equalsIgnoreCase(&quot;y&quot;)) {</span>
-<span class="nc" id="L787">                    this.model.setRelationshipList(this.model.updateRelationshipList(classToDeleteName));</span>
-<span class="nc" id="L788">                    this.model.deleteClass(UMLClassToDelete);</span>
-<span class="nc" id="L789">                    terminal.writer().print(&quot;Class \&quot;&quot; + UMLClassToDelete.getClassName() + &quot;\&quot; has been deleted\n&quot;);</span>
-<span class="nc" id="L790">                    break;</span>
-<span class="nc bnc" id="L791" title="All 2 branches missed.">                } else if (theNextAnswer.equalsIgnoreCase(&quot;n&quot;)) {</span>
-<span class="nc" id="L792">                    terminal.writer().print(&quot;Class \&quot;&quot; + UMLClassToDelete.getClassName() + &quot;\&quot; has NOT been deleted\n&quot;);</span>
-<span class="nc" id="L793">                    break;</span>
+<span class="nc bnc" id="L799" title="All 2 branches missed.">                if (theNextAnswer.equalsIgnoreCase(&quot;y&quot;)) {</span>
+<span class="nc" id="L800">                    this.model.setRelationshipList(this.model.updateRelationshipList(classToDeleteName));</span>
+<span class="nc" id="L801">                    this.model.deleteClass(UMLClassToDelete);</span>
+<span class="nc" id="L802">                    terminal.writer().print(&quot;Class \&quot;&quot; + UMLClassToDelete.getClassName() + &quot;\&quot; has been deleted\n&quot;);</span>
+<span class="nc" id="L803">                    break;</span>
+<span class="nc bnc" id="L804" title="All 2 branches missed.">                } else if (theNextAnswer.equalsIgnoreCase(&quot;n&quot;)) {</span>
+<span class="nc" id="L805">                    terminal.writer().print(&quot;Class \&quot;&quot; + UMLClassToDelete.getClassName() + &quot;\&quot; has NOT been deleted\n&quot;);</span>
+<span class="nc" id="L806">                    break;</span>
                 }
-<span class="nc" id="L795">            }</span>
+<span class="nc" id="L808">            }</span>
             // If no class was found in the ArrayList matching the name of the
             // users input, classToDelete will still be null
             else {
-<span class="nc" id="L799">                terminal.writer().println(&quot;Class \&quot;&quot; + classToDeleteName + &quot;\&quot; was not found&quot;);</span>
+<span class="nc" id="L812">                terminal.writer().println(&quot;Class \&quot;&quot; + classToDeleteName + &quot;\&quot; was not found&quot;);</span>
             }
         }
-<span class="nc" id="L802">        return this.model.getClassList();</span>
+<span class="nc" id="L815">        return this.model.getClassList();</span>
     }
 
     /**
@@ -809,85 +822,85 @@ public class CLIController {
      */
     public void listClass(String className) {
         // copy class and attribute lists for more readable
-<span class="nc" id="L812">        UMLClass copyClass = this.model.findClass(className);</span>
-<span class="nc" id="L813">        ArrayList&lt;Field&gt; copyFieldList = Objects.requireNonNull(copyClass).getFieldList();</span>
-<span class="nc" id="L814">        ArrayList&lt;Method&gt; copyMethList = Objects.requireNonNull(copyClass).getMethodList();</span>
+<span class="nc" id="L825">        UMLClass copyClass = this.model.findClass(className);</span>
+<span class="nc" id="L826">        ArrayList&lt;Field&gt; copyFieldList = Objects.requireNonNull(copyClass).getFieldList();</span>
+<span class="nc" id="L827">        ArrayList&lt;Method&gt; copyMethList = Objects.requireNonNull(copyClass).getMethodList();</span>
         // prints the name of a class
-<span class="nc" id="L816">        terminal.writer().println(&quot;Class name: &quot; + copyClass.getClassName());</span>
+<span class="nc" id="L829">        terminal.writer().println(&quot;Class name: &quot; + copyClass.getClassName());</span>
         // prints all the fields in a class
-<span class="nc bnc" id="L818" title="All 2 branches missed.">        if (copyFieldList.size() == 0) {</span>
-<span class="nc" id="L819">            terminal.writer().print(&quot;This class has no fields\n&quot;);</span>
-<span class="nc" id="L820">        } else { terminal.writer().print(&quot;-----------------\n&quot;);</span>
-<span class="nc bnc" id="L821" title="All 2 branches missed.">            for (int i = 0; i &lt; copyFieldList.size(); ++i) {</span>
-<span class="nc" id="L822">                Field field = copyFieldList.get(i);</span>
-<span class="nc bnc" id="L823" title="All 2 branches missed.">                if (i == 0) {</span>
-<span class="nc" id="L824">                    terminal.writer().printf(&quot;  -%s %s&quot;, field.getFieldType(), field.getAttName());</span>
+<span class="nc bnc" id="L831" title="All 2 branches missed.">        if (copyFieldList.size() == 0) {</span>
+<span class="nc" id="L832">            terminal.writer().print(&quot;This class has no fields\n&quot;);</span>
+<span class="nc" id="L833">        } else { terminal.writer().print(&quot;-----------------\n&quot;);</span>
+<span class="nc bnc" id="L834" title="All 2 branches missed.">            for (int i = 0; i &lt; copyFieldList.size(); ++i) {</span>
+<span class="nc" id="L835">                Field field = copyFieldList.get(i);</span>
+<span class="nc bnc" id="L836" title="All 2 branches missed.">                if (i == 0) {</span>
+<span class="nc" id="L837">                    terminal.writer().printf(&quot;  -%s %s&quot;, field.getFieldType(), field.getAttName());</span>
                 } else {
-<span class="nc" id="L826">                    terminal.writer().printf(&quot;\n  -%s %s&quot;, field.getFieldType(), field.getAttName());</span>
+<span class="nc" id="L839">                    terminal.writer().printf(&quot;\n  -%s %s&quot;, field.getFieldType(), field.getAttName());</span>
                 }
             }
         }
         // prints all the methods in class
-<span class="nc bnc" id="L831" title="All 2 branches missed.">        if (copyFieldList.size() == 0) {</span>
-<span class="nc" id="L832">            terminal.writer().print(&quot;This class has no methods\n&quot;);</span>
+<span class="nc bnc" id="L844" title="All 2 branches missed.">        if (copyFieldList.size() == 0) {</span>
+<span class="nc" id="L845">            terminal.writer().print(&quot;This class has no methods\n&quot;);</span>
         } else {
-<span class="nc" id="L834">            terminal.writer().print(&quot;\n-----------------\n&quot;);</span>
-<span class="nc bnc" id="L835" title="All 2 branches missed.">            for (int i = 0; i &lt; copyMethList.size(); ++i) {</span>
-<span class="nc" id="L836">                Method method = copyMethList.get(i);</span>
-<span class="nc bnc" id="L837" title="All 2 branches missed.">                if (i == 0) {</span>
-<span class="nc" id="L838">                    terminal.writer().printf(&quot;  +%s %s (&quot;, method.getReturnType(), method.getAttName());</span>
+<span class="nc" id="L847">            terminal.writer().print(&quot;\n-----------------\n&quot;);</span>
+<span class="nc bnc" id="L848" title="All 2 branches missed.">            for (int i = 0; i &lt; copyMethList.size(); ++i) {</span>
+<span class="nc" id="L849">                Method method = copyMethList.get(i);</span>
+<span class="nc bnc" id="L850" title="All 2 branches missed.">                if (i == 0) {</span>
+<span class="nc" id="L851">                    terminal.writer().printf(&quot;  +%s %s (&quot;, method.getReturnType(), method.getAttName());</span>
                 } else {
-<span class="nc" id="L840">                    terminal.writer().print(&quot;\n  +&quot; + method.getReturnType() + &quot; &quot; + copyMethList.get(i).getAttName() + &quot; (&quot;);</span>
+<span class="nc" id="L853">                    terminal.writer().print(&quot;\n  +&quot; + method.getReturnType() + &quot; &quot; + copyMethList.get(i).getAttName() + &quot; (&quot;);</span>
                 }
                 // prints all the parameters of a method
-<span class="nc bnc" id="L843" title="All 2 branches missed.">                for (int j = 0; j &lt; copyMethList.get(i).getParamList().size(); ++j) {</span>
-<span class="nc" id="L844">                    Parameter param = copyMethList.get(i).getParamList().get(j);</span>
-<span class="nc bnc" id="L845" title="All 2 branches missed.">                    if (j == 0) {</span>
-<span class="nc" id="L846">                        terminal.writer().printf(&quot;%s %s&quot;, param.getFieldType(), param.getAttName());</span>
+<span class="nc bnc" id="L856" title="All 2 branches missed.">                for (int j = 0; j &lt; copyMethList.get(i).getParamList().size(); ++j) {</span>
+<span class="nc" id="L857">                    Parameter param = copyMethList.get(i).getParamList().get(j);</span>
+<span class="nc bnc" id="L858" title="All 2 branches missed.">                    if (j == 0) {</span>
+<span class="nc" id="L859">                        terminal.writer().printf(&quot;%s %s&quot;, param.getFieldType(), param.getAttName());</span>
                     } else {
-<span class="nc" id="L848">                        terminal.writer().printf(&quot;, %s %s&quot;, param.getFieldType(), param.getAttName());</span>
+<span class="nc" id="L861">                        terminal.writer().printf(&quot;, %s %s&quot;, param.getFieldType(), param.getAttName());</span>
                     }
                 }
-<span class="nc" id="L851">                terminal.writer().print(&quot;)&quot;);</span>
+<span class="nc" id="L864">                terminal.writer().print(&quot;)&quot;);</span>
             }
-<span class="nc" id="L853">            terminal.writer().print(&quot;\n-----------------\n&quot;);</span>
+<span class="nc" id="L866">            terminal.writer().print(&quot;\n-----------------\n&quot;);</span>
         }
 
-<span class="nc" id="L856">    }</span>
+<span class="nc" id="L869">    }</span>
 
     /**
      * List all the contents of all classes in the diagram in a nice way
      */
     public void listClasses() {
         // if there are classes to list, list them
-<span class="nc bnc" id="L863" title="All 2 branches missed.">        if (this.model.getClassList().size() != 0) {</span>
+<span class="nc bnc" id="L876" title="All 2 branches missed.">        if (this.model.getClassList().size() != 0) {</span>
             // Loops through classList and calls listClass on all elements
-<span class="nc" id="L865">            terminal.writer().print(&quot;\n********************\n&quot;);</span>
-<span class="nc bnc" id="L866" title="All 2 branches missed.">            if (this.model.getClassList().size() == 1) {</span>
-<span class="nc" id="L867">                listClass(this.model.getClassList().get(0).getClassName());</span>
+<span class="nc" id="L878">            terminal.writer().print(&quot;\n********************\n&quot;);</span>
+<span class="nc bnc" id="L879" title="All 2 branches missed.">            if (this.model.getClassList().size() == 1) {</span>
+<span class="nc" id="L880">                listClass(this.model.getClassList().get(0).getClassName());</span>
             } else {
                 // Loops through classList and calls listClass on all elements
-<span class="nc bnc" id="L870" title="All 2 branches missed.">                for (UMLClass aUMLClass : this.model.getClassList()) {</span>
-<span class="nc" id="L871">                    terminal.writer().println();</span>
-<span class="nc" id="L872">                    listClass(aUMLClass.getClassName());</span>
-<span class="nc" id="L873">                    terminal.writer().print(&quot;\n&quot;);</span>
-<span class="nc" id="L874">                }</span>
+<span class="nc bnc" id="L883" title="All 2 branches missed.">                for (UMLClass aUMLClass : this.model.getClassList()) {</span>
+<span class="nc" id="L884">                    terminal.writer().println();</span>
+<span class="nc" id="L885">                    listClass(aUMLClass.getClassName());</span>
+<span class="nc" id="L886">                    terminal.writer().print(&quot;\n&quot;);</span>
+<span class="nc" id="L887">                }</span>
             }
-<span class="nc" id="L876">            terminal.writer().println(&quot;\n********************\n&quot;);</span>
+<span class="nc" id="L889">            terminal.writer().println(&quot;\n********************\n&quot;);</span>
         }
         // if there are no classes to list, prompt user that there are no classes
         else {
-<span class="nc" id="L880">            terminal.writer().println(&quot;There are no classes to list&quot;);</span>
+<span class="nc" id="L893">            terminal.writer().println(&quot;There are no classes to list&quot;);</span>
         }
-<span class="nc" id="L882">    }</span>
+<span class="nc" id="L895">    }</span>
 
     /**
      * Creates a memento object using the current state and puts it onto the state stack
      */
     private void setState() {
-<span class="nc" id="L888">        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
-<span class="nc" id="L889">        caretaker.pushToUndoStack(currState);</span>
-<span class="nc" id="L890">    }</span>
+<span class="nc" id="L901">        Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
+<span class="nc" id="L902">        caretaker.pushToUndoStack(currState);</span>
+<span class="nc" id="L903">    }</span>
 
     /**
      * Undoes the most recent action
@@ -896,16 +909,17 @@ public class CLIController {
      */
     private boolean undo() {
         // if the stack is empty, return false, otherwise perform the undo and return
-<span class="nc bnc" id="L899" title="All 2 branches missed.">            if (this.caretaker.undoStackIsEmpty()) {</span>
-<span class="nc" id="L900">                return false;</span>
-            } else {
-                // get the current state the model is in
-<span class="nc" id="L903">                Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
-                // get the previous state on the state stack, and pass the helper the current state for the redo stack
-<span class="nc" id="L905">                Memento prevState = caretaker.undoHelper(currState);</span>
-                // make this current model the previous model
-<span class="nc" id="L907">                this.model = prevState.getState();</span>
-<span class="nc" id="L908">                return true;</span>
+<span class="nc bnc" id="L912" title="All 2 branches missed.">        if (this.caretaker.undoStackIsEmpty()) {</span>
+<span class="nc" id="L913">            return false;</span>
+        } else {
+            // get the current state the model is in
+<span class="nc" id="L916">            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
+            // get the previous state on the state stack, and pass the helper the current state for the redo stack
+<span class="nc" id="L918">            Memento prevState = caretaker.undoHelper(currState);</span>
+            // make this current model the previous model
+<span class="nc" id="L920">            this.model = prevState.getState();</span>
+<span class="nc" id="L921">            this.view.editCompleter(model.getClassList());</span>
+<span class="nc" id="L922">            return true;</span>
         }
     }
 
@@ -916,16 +930,17 @@ public class CLIController {
      */
     private boolean redo() {
         // if the stack is empty, return false, otherwise perform the redo and return
-<span class="nc bnc" id="L919" title="All 2 branches missed.">        if (this.caretaker.redoStackIsEmpty()) {</span>
-<span class="nc" id="L920">            return false;</span>
+<span class="nc bnc" id="L933" title="All 2 branches missed.">        if (this.caretaker.redoStackIsEmpty()) {</span>
+<span class="nc" id="L934">            return false;</span>
         } else {
             // get the current state the model is in
-<span class="nc" id="L923">            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
+<span class="nc" id="L937">            Memento currState = new Memento(new UMLModel(this.model.getClassList(), this.model.getRelationshipList(), this.model.getCoordinateMap()));</span>
             // get the previous state on the state stack, and pass the helper the current state for the undo stack
-<span class="nc" id="L925">            Memento prevState = caretaker.redoHelper(currState);</span>
+<span class="nc" id="L939">            Memento prevState = caretaker.redoHelper(currState);</span>
             // make this current model the previous model
-<span class="nc" id="L927">            this.model = prevState.getState();</span>
-<span class="nc" id="L928">            return true;</span>
+<span class="nc" id="L941">            this.model = prevState.getState();</span>
+<span class="nc" id="L942">            this.view.editCompleter(model.getClassList());</span>
+<span class="nc" id="L943">            return true;</span>
         }
     }
 
@@ -940,8 +955,8 @@ public class CLIController {
      * @return the user's given name for the attribute
      */
     public String getAttName(String attType) {
-<span class="nc" id="L943">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; name: &quot;);</span>
-<span class="nc" id="L944">        return reader.readLine().trim();</span>
+<span class="nc" id="L958">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; name: &quot;);</span>
+<span class="nc" id="L959">        return reader.readLine().trim();</span>
     }
 
     /**
@@ -951,20 +966,20 @@ public class CLIController {
      * @return the user's given type for the attribute
      */
     public String getAttType(String attType) {
-<span class="nc bnc" id="L954" title="All 2 branches missed.">        if (attType.equals(&quot;method&quot;)) {</span>
-<span class="nc" id="L955">            terminal.writer().print(&quot;Enter &quot; + attType + &quot; return type: &quot;);</span>
-<span class="nc" id="L956">            String attToGet = reader.readLine().trim();</span>
-<span class="nc bnc" id="L957" title="All 2 branches missed.">            if (this.model.isNotValidInput(attToGet)) {</span>
-<span class="nc" id="L958">                return null;</span>
+<span class="nc bnc" id="L969" title="All 2 branches missed.">        if (attType.equals(&quot;method&quot;)) {</span>
+<span class="nc" id="L970">            terminal.writer().print(&quot;Enter &quot; + attType + &quot; return type: &quot;);</span>
+<span class="nc" id="L971">            String attToGet = reader.readLine().trim();</span>
+<span class="nc bnc" id="L972" title="All 2 branches missed.">            if (this.model.isNotValidInput(attToGet)) {</span>
+<span class="nc" id="L973">                return null;</span>
             }
-<span class="nc" id="L960">            return attToGet;</span>
+<span class="nc" id="L975">            return attToGet;</span>
         }
-<span class="nc" id="L962">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; type: &quot;);</span>
-<span class="nc" id="L963">        String attToGet = reader.readLine().trim();</span>
-<span class="nc bnc" id="L964" title="All 2 branches missed.">        if (this.model.isNotValidInput(attToGet)) {</span>
-<span class="nc" id="L965">            return null;</span>
+<span class="nc" id="L977">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; type: &quot;);</span>
+<span class="nc" id="L978">        String attToGet = reader.readLine().trim();</span>
+<span class="nc bnc" id="L979" title="All 2 branches missed.">        if (this.model.isNotValidInput(attToGet)) {</span>
+<span class="nc" id="L980">            return null;</span>
         }
-<span class="nc" id="L967">        return attToGet;</span>
+<span class="nc" id="L982">        return attToGet;</span>
     }
 
     /**
@@ -974,15 +989,15 @@ public class CLIController {
      * @return the user's given type for the attribute
      */
     public String getAttReturnType(String attType) {
-<span class="nc bnc" id="L977" title="All 2 branches missed.">        if (attType.equals(&quot;method&quot;)) {</span>
-<span class="nc" id="L978">            attType += &quot; return&quot;;</span>
+<span class="nc bnc" id="L992" title="All 2 branches missed.">        if (attType.equals(&quot;method&quot;)) {</span>
+<span class="nc" id="L993">            attType += &quot; return&quot;;</span>
         }
-<span class="nc" id="L980">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; type: &quot;);</span>
-<span class="nc" id="L981">        String attToGet = reader.readLine().trim();</span>
-<span class="nc bnc" id="L982" title="All 2 branches missed.">        if (this.model.isNotValidInput(attToGet)) {</span>
-<span class="nc" id="L983">            return null;</span>
+<span class="nc" id="L995">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; type: &quot;);</span>
+<span class="nc" id="L996">        String attToGet = reader.readLine().trim();</span>
+<span class="nc bnc" id="L997" title="All 2 branches missed.">        if (this.model.isNotValidInput(attToGet)) {</span>
+<span class="nc" id="L998">            return null;</span>
         }
-<span class="nc" id="L985">        return attToGet;</span>
+<span class="nc" id="L1000">        return attToGet;</span>
     }
 
     /**
@@ -996,11 +1011,11 @@ public class CLIController {
      * @return true if the object does not exist, false otherwise
      */
     public &lt;E&gt; boolean ifDoesntExist(E obj, String type, String name) {
-<span class="nc bnc" id="L999" title="All 2 branches missed.">        if (obj == null) {</span>
-<span class="nc" id="L1000">            terminal.writer().printf(&quot;%s %s does not exist\n&quot;, type, name);</span>
-<span class="nc" id="L1001">            return true;</span>
+<span class="nc bnc" id="L1014" title="All 2 branches missed.">        if (obj == null) {</span>
+<span class="nc" id="L1015">            terminal.writer().printf(&quot;%s %s does not exist\n&quot;, type, name);</span>
+<span class="nc" id="L1016">            return true;</span>
         }
-<span class="nc" id="L1003">        return false;</span>
+<span class="nc" id="L1018">        return false;</span>
     }
 
     /**
@@ -1014,11 +1029,11 @@ public class CLIController {
      * @return true if dups exist, false otherwise
      */
     public &lt;E&gt; boolean ifExists(E obj, String type, String name) {
-<span class="nc bnc" id="L1017" title="All 2 branches missed.">        if (obj != null) {</span>
-<span class="nc" id="L1018">            terminal.writer().printf(&quot;%s %s already exists\n&quot;, type, name);</span>
-<span class="nc" id="L1019">            return true;</span>
+<span class="nc bnc" id="L1032" title="All 2 branches missed.">        if (obj != null) {</span>
+<span class="nc" id="L1033">            terminal.writer().printf(&quot;%s %s already exists\n&quot;, type, name);</span>
+<span class="nc" id="L1034">            return true;</span>
         }
-<span class="nc" id="L1021">        return false;</span>
+<span class="nc" id="L1036">        return false;</span>
     }
 
     /**
@@ -1033,23 +1048,23 @@ public class CLIController {
         // If attribute is a method, get its return type.
         // If attribute is a field, get its type.
         // Ensure type is valid
-<span class="nc" id="L1036">        String type = getAttType(attType);</span>
-<span class="nc bnc" id="L1037" title="All 2 branches missed.">        if (type == null) {</span>
-<span class="nc" id="L1038">            return;</span>
+<span class="nc" id="L1051">        String type = getAttType(attType);</span>
+<span class="nc bnc" id="L1052" title="All 2 branches missed.">        if (type == null) {</span>
+<span class="nc" id="L1053">            return;</span>
         }
         // If user wants to add a method, get its return type and
         // ensure it is valid. Then return updated class with added method.
-<span class="nc bnc" id="L1042" title="All 2 branches missed.">        if (attType.equalsIgnoreCase(&quot;method&quot;)) {</span>
-<span class="nc" id="L1043">            Method method = new Method(attName, type);</span>
-<span class="nc" id="L1044">            classToAddAtt.addMethod(method);</span>
-<span class="nc" id="L1045">        }</span>
+<span class="nc bnc" id="L1057" title="All 2 branches missed.">        if (attType.equalsIgnoreCase(&quot;method&quot;)) {</span>
+<span class="nc" id="L1058">            Method method = new Method(attName, type);</span>
+<span class="nc" id="L1059">            classToAddAtt.addMethod(method);</span>
+<span class="nc" id="L1060">        }</span>
         // If user wants to add a field, get its type and
         // ensure it is valid. Then return updated class with added field.
-<span class="nc bnc" id="L1048" title="All 2 branches missed.">        else if (attType.equalsIgnoreCase(&quot;field&quot;)) {</span>
-<span class="nc" id="L1049">            Field field = new Field(attName, type);</span>
-<span class="nc" id="L1050">            classToAddAtt.addField(field);</span>
+<span class="nc bnc" id="L1063" title="All 2 branches missed.">        else if (attType.equalsIgnoreCase(&quot;field&quot;)) {</span>
+<span class="nc" id="L1064">            Field field = new Field(attName, type);</span>
+<span class="nc" id="L1065">            classToAddAtt.addField(field);</span>
         }
-<span class="nc" id="L1052">    }</span>
+<span class="nc" id="L1067">    }</span>
 
     /**
      * Takes in a class object and the attribute type
@@ -1060,28 +1075,28 @@ public class CLIController {
      */
     public void delAttribute(UMLClass classWithAttToDel, String attType) {
         // Get name of field or method user wants to delete
-<span class="nc" id="L1063">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; to delete: &quot;);</span>
-<span class="nc" id="L1064">        String attToDel = reader.readLine().trim();</span>
+<span class="nc" id="L1078">        terminal.writer().print(&quot;Enter &quot; + attType + &quot; to delete: &quot;);</span>
+<span class="nc" id="L1079">        String attToDel = reader.readLine().trim();</span>
         // Ensure attribute exists
-<span class="nc" id="L1066">        Attribute deletedAtt = classWithAttToDel.findAtt(attToDel, attType);</span>
-<span class="nc bnc" id="L1067" title="All 2 branches missed.">        if (deletedAtt != null) {</span>
+<span class="nc" id="L1081">        Attribute deletedAtt = classWithAttToDel.findAtt(attToDel, attType);</span>
+<span class="nc bnc" id="L1082" title="All 2 branches missed.">        if (deletedAtt != null) {</span>
             // Confirm  user wants to delete attribute
-<span class="nc" id="L1069">            terminal.writer().print(&quot;Delete &quot; + attType + &quot; \&quot;&quot; + attToDel + &quot;\&quot;? (y/n): &quot;);</span>
-<span class="nc" id="L1070">            String answer = reader.readLine().trim();</span>
+<span class="nc" id="L1084">            terminal.writer().print(&quot;Delete &quot; + attType + &quot; \&quot;&quot; + attToDel + &quot;\&quot;? (y/n): &quot;);</span>
+<span class="nc" id="L1085">            String answer = reader.readLine().trim();</span>
             // If the user wants to delete an attribute, proceed to do so
-<span class="nc bnc" id="L1072" title="All 2 branches missed.">            if (answer.equalsIgnoreCase(&quot;y&quot;)) {</span>
-<span class="nc" id="L1073">                classWithAttToDel.deleteAttribute(deletedAtt);</span>
-<span class="nc" id="L1074">                terminal.writer().print(attType + &quot; \&quot;&quot; + attToDel + &quot;\&quot; has been deleted \n&quot;);</span>
+<span class="nc bnc" id="L1087" title="All 2 branches missed.">            if (answer.equalsIgnoreCase(&quot;y&quot;)) {</span>
+<span class="nc" id="L1088">                classWithAttToDel.deleteAttribute(deletedAtt);</span>
+<span class="nc" id="L1089">                terminal.writer().print(attType + &quot; \&quot;&quot; + attToDel + &quot;\&quot; has been deleted \n&quot;);</span>
             }
             // If user types n, confirm and return
             else {
-<span class="nc" id="L1078">                terminal.writer().println(attType + &quot; \&quot;&quot; + attToDel + &quot;\&quot; has NOT been deleted&quot;);</span>
+<span class="nc" id="L1093">                terminal.writer().println(attType + &quot; \&quot;&quot; + attToDel + &quot;\&quot; has NOT been deleted&quot;);</span>
             }
             // If attribute doesn't exist in class, inform user and return
-<span class="nc" id="L1081">        } else {</span>
-<span class="nc" id="L1082">            terminal.writer().println(&quot;Attribute does not exist&quot;);</span>
+<span class="nc" id="L1096">        } else {</span>
+<span class="nc" id="L1097">            terminal.writer().println(&quot;Attribute does not exist&quot;);</span>
         }
-<span class="nc" id="L1084">    }</span>
+<span class="nc" id="L1099">    }</span>
 
     /**
      * Takes in a class object and the attribute type
@@ -1092,10 +1107,10 @@ public class CLIController {
      * @return the class found
      */
     public UMLClass findClass(String op, String type) {
-<span class="nc" id="L1095">        String className = getClassName(op, type);</span>
-<span class="nc" id="L1096">        UMLClass umlClass = this.model.findClass(className);</span>
-<span class="nc bnc" id="L1097" title="All 2 branches missed.">        if (ifDoesntExist(umlClass, &quot;Class&quot;, className)) { return null; }</span>
-<span class="nc" id="L1098">        return umlClass;</span>
+<span class="nc" id="L1110">        String className = getClassName(op, type);</span>
+<span class="nc" id="L1111">        UMLClass umlClass = this.model.findClass(className);</span>
+<span class="nc bnc" id="L1112" title="All 2 branches missed.">        if (ifDoesntExist(umlClass, &quot;Class&quot;, className)) { return null; }</span>
+<span class="nc" id="L1113">        return umlClass;</span>
     }
 
     /**
@@ -1106,10 +1121,10 @@ public class CLIController {
      * @return the method object
      */
     public Method findMethod(UMLClass umlClass) {
-<span class="nc" id="L1109">        String methodName = getAttName(&quot;method&quot;);</span>
-<span class="nc" id="L1110">        Method method = umlClass.findMethod(methodName);</span>
-<span class="nc bnc" id="L1111" title="All 2 branches missed.">        if (ifDoesntExist(method, &quot;Method&quot;, methodName)) { return null; }</span>
-<span class="nc" id="L1112">        return method;</span>
+<span class="nc" id="L1124">        String methodName = getAttName(&quot;method&quot;);</span>
+<span class="nc" id="L1125">        Method method = umlClass.findMethod(methodName);</span>
+<span class="nc bnc" id="L1126" title="All 2 branches missed.">        if (ifDoesntExist(method, &quot;Method&quot;, methodName)) { return null; }</span>
+<span class="nc" id="L1127">        return method;</span>
     }
 
     /**
@@ -1120,10 +1135,10 @@ public class CLIController {
      * @return the parameter object
      */
     public Parameter findParam(Method method) {
-<span class="nc" id="L1123">        String paramName = getAttName(&quot;parameter&quot;);</span>
-<span class="nc" id="L1124">        Parameter param = method.findParameter(paramName);</span>
-<span class="nc bnc" id="L1125" title="All 2 branches missed.">        if (ifDoesntExist(param, &quot;Parameter&quot;, paramName)) { return null; }</span>
-<span class="nc" id="L1126">        return param;</span>
+<span class="nc" id="L1138">        String paramName = getAttName(&quot;parameter&quot;);</span>
+<span class="nc" id="L1139">        Parameter param = method.findParameter(paramName);</span>
+<span class="nc bnc" id="L1140" title="All 2 branches missed.">        if (ifDoesntExist(param, &quot;Parameter&quot;, paramName)) { return null; }</span>
+<span class="nc" id="L1141">        return param;</span>
     }
 
     /**
@@ -1134,10 +1149,10 @@ public class CLIController {
      * @return the parameter name
      */
     public String findParamName(Method method) {
-<span class="nc" id="L1137">        String paramName = getAttName(&quot;parameter&quot;);</span>
-<span class="nc" id="L1138">        Parameter param = method.findParameter(paramName);</span>
-<span class="nc bnc" id="L1139" title="All 2 branches missed.">        if (ifExists(param, &quot;Parameter&quot;, paramName)) { return null; }</span>
-<span class="nc" id="L1140">        return paramName;</span>
+<span class="nc" id="L1152">        String paramName = getAttName(&quot;parameter&quot;);</span>
+<span class="nc" id="L1153">        Parameter param = method.findParameter(paramName);</span>
+<span class="nc bnc" id="L1154" title="All 2 branches missed.">        if (ifExists(param, &quot;Parameter&quot;, paramName)) { return null; }</span>
+<span class="nc" id="L1155">        return paramName;</span>
     }
 
     //***************************************//
@@ -1153,17 +1168,17 @@ public class CLIController {
      * @return true if flag is invalid, false otherwise
      */
     public boolean addAttFlag(ArrayList&lt;String&gt; userInputList, String operation) {
-<span class="nc" id="L1156">        terminal.writer().print(&quot;type \&quot;-f\&quot; to &quot; + operation + &quot; a field, or \&quot;-m\&quot; to &quot; +</span>
+<span class="nc" id="L1171">        terminal.writer().print(&quot;type \&quot;-f\&quot; to &quot; + operation + &quot; a field, or \&quot;-m\&quot; to &quot; +</span>
                 operation + &quot; a method: &quot;);
-<span class="nc" id="L1158">        String attFlag = reader.readLine().trim();</span>
-<span class="nc bnc" id="L1159" title="All 2 branches missed.">        switch (attFlag) {</span>
+<span class="nc" id="L1173">        String attFlag = reader.readLine().trim();</span>
+<span class="nc bnc" id="L1174" title="All 2 branches missed.">        switch (attFlag) {</span>
             case &quot;-f&quot;, &quot;-m&quot; -&gt; {
-<span class="nc" id="L1161">                userInputList.add(attFlag);</span>
-<span class="nc" id="L1162">                return false;</span>
+<span class="nc" id="L1176">                userInputList.add(attFlag);</span>
+<span class="nc" id="L1177">                return false;</span>
             }
             default -&gt; {
-<span class="nc" id="L1165">                terminal.writer().println(&quot;Invalid flag, no attribute added&quot;);</span>
-<span class="nc" id="L1166">                return true;</span>
+<span class="nc" id="L1180">                terminal.writer().println(&quot;Invalid flag, no attribute added&quot;);</span>
+<span class="nc" id="L1181">                return true;</span>
             }
         }
     }
@@ -1177,17 +1192,17 @@ public class CLIController {
      * @return returns true if the correct flag is returned, false otherwise
      */
     public boolean addRelFlag(ArrayList&lt;String&gt; userInputList, String operation) {
-<span class="nc" id="L1180">        terminal.writer().print(&quot;type \&quot;-a\&quot; for aggregation, \n\&quot;-c\&quot; for composition, \n&quot; +</span>
+<span class="nc" id="L1195">        terminal.writer().print(&quot;type \&quot;-a\&quot; for aggregation, \n\&quot;-c\&quot; for composition, \n&quot; +</span>
                 &quot;\&quot;-i\&quot; for inheritance, \nor \&quot;-r\&quot; for realization to &quot; + operation + &quot; that relationship type: &quot;);
-<span class="nc" id="L1182">        String relFlag = reader.readLine().trim();</span>
-<span class="nc bnc" id="L1183" title="All 2 branches missed.">        switch (relFlag) {</span>
+<span class="nc" id="L1197">        String relFlag = reader.readLine().trim();</span>
+<span class="nc bnc" id="L1198" title="All 2 branches missed.">        switch (relFlag) {</span>
             case &quot;-a&quot;, &quot;-c&quot;, &quot;-i&quot;, &quot;-r&quot; -&gt; {
-<span class="nc" id="L1185">                userInputList.add(relFlag);</span>
-<span class="nc" id="L1186">                return true;</span>
+<span class="nc" id="L1200">                userInputList.add(relFlag);</span>
+<span class="nc" id="L1201">                return true;</span>
             }
             default -&gt; {
-<span class="nc" id="L1189">                terminal.writer().println(&quot;Invalid flag, no relationship added&quot;);</span>
-<span class="nc" id="L1190">                return false;</span>
+<span class="nc" id="L1204">                terminal.writer().println(&quot;Invalid flag, no relationship added&quot;);</span>
+<span class="nc" id="L1205">                return false;</span>
             }
         }
     }
@@ -1199,15 +1214,15 @@ public class CLIController {
      * @param flag the flag of the command
      */
     public String flagToString(String flag) {
-<span class="nc bnc" id="L1202" title="All 8 branches missed.">        return switch (flag) {</span>
-<span class="nc" id="L1203">            case &quot;-f&quot; -&gt; &quot;field&quot;;</span>
-<span class="nc" id="L1204">            case &quot;-m&quot; -&gt; &quot;method&quot;;</span>
-<span class="nc" id="L1205">            case &quot;-p&quot; -&gt; &quot;parameter&quot;;</span>
-<span class="nc" id="L1206">            case &quot;-a&quot; -&gt; &quot;aggregation&quot;;</span>
-<span class="nc" id="L1207">            case &quot;-c&quot; -&gt; &quot;composition&quot;;</span>
-<span class="nc" id="L1208">            case &quot;-i&quot; -&gt; &quot;inheritance&quot;;</span>
-<span class="nc" id="L1209">            case &quot;-r&quot; -&gt; &quot;realization&quot;;</span>
-<span class="nc" id="L1210">            default -&gt; &quot;&quot;;</span>
+<span class="nc bnc" id="L1217" title="All 8 branches missed.">        return switch (flag) {</span>
+<span class="nc" id="L1218">            case &quot;-f&quot; -&gt; &quot;field&quot;;</span>
+<span class="nc" id="L1219">            case &quot;-m&quot; -&gt; &quot;method&quot;;</span>
+<span class="nc" id="L1220">            case &quot;-p&quot; -&gt; &quot;parameter&quot;;</span>
+<span class="nc" id="L1221">            case &quot;-a&quot; -&gt; &quot;aggregation&quot;;</span>
+<span class="nc" id="L1222">            case &quot;-c&quot; -&gt; &quot;composition&quot;;</span>
+<span class="nc" id="L1223">            case &quot;-i&quot; -&gt; &quot;inheritance&quot;;</span>
+<span class="nc" id="L1224">            case &quot;-r&quot; -&gt; &quot;realization&quot;;</span>
+<span class="nc" id="L1225">            default -&gt; &quot;&quot;;</span>
         };
     }
 
@@ -1219,21 +1234,21 @@ public class CLIController {
     private void clearScreen() {
         // Clears Screen
         try {
-<span class="nc bnc" id="L1222" title="All 2 branches missed.">            if (System.getProperty(&quot;os.name&quot;).contains(&quot;Windows&quot;))</span>
-<span class="nc" id="L1223">                new ProcessBuilder(&quot;cmd&quot;, &quot;/c&quot;, &quot;cls&quot;).inheritIO().start().waitFor();</span>
+<span class="nc bnc" id="L1237" title="All 2 branches missed.">            if (System.getProperty(&quot;os.name&quot;).contains(&quot;Windows&quot;))</span>
+<span class="nc" id="L1238">                new ProcessBuilder(&quot;cmd&quot;, &quot;/c&quot;, &quot;cls&quot;).inheritIO().start().waitFor();</span>
             else
-<span class="nc" id="L1225">                Runtime.getRuntime().exec(&quot;clear&quot;);</span>
-<span class="nc" id="L1226">        } catch (IOException | InterruptedException ex) {</span>
-<span class="nc" id="L1227">            terminal.writer().println(&quot;couldn't clear screen&quot;);</span>
-<span class="nc" id="L1228">        }</span>
-<span class="nc" id="L1229">    }</span>
+<span class="nc" id="L1240">                Runtime.getRuntime().exec(&quot;clear&quot;);</span>
+<span class="nc" id="L1241">        } catch (IOException | InterruptedException ex) {</span>
+<span class="nc" id="L1242">            terminal.writer().println(&quot;couldn't clear screen&quot;);</span>
+<span class="nc" id="L1243">        }</span>
+<span class="nc" id="L1244">    }</span>
 
     private ArrayList&lt;String&gt; convertStringList2ArrayList(String[] list) {
-<span class="nc" id="L1232">        ArrayList&lt;String&gt; listToReturn = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L1233" title="All 2 branches missed.">        for (int i = 0; i &gt;= list.length; i++) {</span>
-<span class="nc" id="L1234">            listToReturn.add(list[i]);</span>
+<span class="nc" id="L1247">        ArrayList&lt;String&gt; listToReturn = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L1248" title="All 2 branches missed.">        for (int i = 0; i &gt;= list.length; i++) {</span>
+<span class="nc" id="L1249">            listToReturn.add(list[i]);</span>
         }
-<span class="nc" id="L1236">        return listToReturn;</span>
+<span class="nc" id="L1251">        return listToReturn;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
