@@ -49,6 +49,7 @@ public class UMLClassTest extends TestCase {
     public void testDeleteAttribute() {
         student.addField(id);
         student.addField(name);
+        student.addMethod(setName);
         student.addMethod(getName);
         assertEquals("name", student.findAtt("name", "field").getAttName());
         student.deleteAttribute(name);
