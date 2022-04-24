@@ -14,28 +14,28 @@ public class Method extends Attribute {
      * @param returnType the return type of the method
      */
     public Method(String methodName, String returnType) {
-<span class="nc" id="L17">        super(methodName);</span>
-<span class="nc" id="L18">        this.returnType = returnType;</span>
-<span class="nc" id="L19">        paramList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L20">    }</span>
+<span class="fc" id="L17">        super(methodName);</span>
+<span class="fc" id="L18">        this.returnType = returnType;</span>
+<span class="fc" id="L19">        paramList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L20">    }</span>
 
     // getter for return type
     public String getReturnType(){
-<span class="nc" id="L24">        return this.returnType;</span>
+<span class="fc" id="L24">        return this.returnType;</span>
     }
 
     // getter for param list
     public ArrayList&lt;Parameter&gt; getParamList() {
-<span class="nc" id="L29">        return paramList;</span>
+<span class="fc" id="L29">        return paramList;</span>
     }
     // adds a parameter to the param list
     public void addParameter(Parameter param) {
-<span class="nc" id="L33">        paramList.add(param);</span>
-<span class="nc" id="L34">    }</span>
+<span class="fc" id="L33">        paramList.add(param);</span>
+<span class="fc" id="L34">    }</span>
     // removes a parameter from the param list
     public void deleteParameter(Parameter param) {
-<span class="nc" id="L37">        paramList.remove(param);</span>
-<span class="nc" id="L38">    }</span>
+<span class="fc" id="L37">        paramList.remove(param);</span>
+<span class="fc" id="L38">    }</span>
 
     /**
      * Iterates through paramList, returns with .get()
@@ -45,30 +45,32 @@ public class Method extends Attribute {
      */
     public Parameter findParameter(String paramToFind) {
         // iterates through the arraylist
-<span class="nc bnc" id="L48" title="All 2 branches missed.">        for (Parameter parameter : paramList) {</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        for (Parameter parameter : paramList) {</span>
             // if the name matches, return class
-<span class="nc bnc" id="L50" title="All 2 branches missed.">            if (paramToFind.equals(parameter.getAttName())) {</span>
-<span class="nc" id="L51">                return parameter;</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">            if (paramToFind.equals(parameter.getAttName())) {</span>
+<span class="fc" id="L51">                return parameter;</span>
             }
-<span class="nc" id="L53">        }</span>
-<span class="nc" id="L54">        return null;</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">        return null;</span>
     }
 
     /**
      * Iterates through paramList, returns with .get()
      *
      * @param paramToFind the name of the parameter
+     * @return param if found, null if not found
      */
-    public void changeParameter(String paramToFind, Parameter paramToChange) {
+    public Parameter changeParameter(String paramToFind, Parameter paramToChange) {
         // iterates through the arraylist
-<span class="nc bnc" id="L64" title="All 2 branches missed.">        for (int i = 0; i &lt; paramList.size(); ++i) {</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        for (int i = 0; i &lt; paramList.size(); ++i) {</span>
             // if the name matches, return class
-<span class="nc bnc" id="L66" title="All 2 branches missed.">            if (paramToFind.equals(paramList.get(i).getAttName())) {</span>
-<span class="nc" id="L67">                paramList.set(i, paramToChange);</span>
-<span class="nc" id="L68">                return;</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            if (paramToFind.equals(paramList.get(i).getAttName())) {</span>
+<span class="fc" id="L68">                paramList.set(i, paramToChange);</span>
+<span class="fc" id="L69">                return paramToChange;</span>
             }
         }
-<span class="nc" id="L71">    }</span>
+<span class="fc" id="L72">        return null;</span>
+    }
 }
 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
