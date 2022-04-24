@@ -49,6 +49,6 @@ public class MethodTest extends TestCase {
         setName.changeParameter("approval", denial);
         assertEquals(null, setName.findParameter("approval"));
         assertEquals("denial", setName.findParameter("denial").getAttName());
-        assertEquals(null, setName.findParameter("approval"));
+        assertEquals(null, setName.changeParameter("approval", denial));
     }
 }
