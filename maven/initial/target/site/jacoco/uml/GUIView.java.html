@@ -1,0 +1,1933 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GUIView.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">GUIView.java</span></div><h1>GUIView.java</h1><pre class="source lang-java linenums">package uml;
+
+import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.DoubleBinding;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
+import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="nc bnc" id="L32" title="All 2 branches missed.">@SuppressWarnings(&quot;DanglingJavadoc&quot;)</span>
+/**
+ * Creates the GUI environment for the user when using the GUI version of the diagram
+ *
+ * @author AlarmSquad
+ */
+public class GUIView extends Application {
+
+    // create the menu bar
+<span class="nc" id="L41">    private MenuBar menuBar = new MenuBar();</span>
+    // initialize the root
+<span class="nc" id="L43">    private Group superRoot = new Group();</span>
+    // diagram width and height for window
+<span class="nc" id="L45">    private double diagram_width = 950;</span>
+<span class="nc" id="L46">    private double diagram_height = 640;</span>
+    // coordinates for draging objects
+    private double startDragX;
+    private double startDragY;
+    // class box and relationship line lists
+<span class="nc" id="L51">    private ArrayList&lt;ClassBox&gt; classBoxList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L52">    private ArrayList&lt;RelLine&gt; lineList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L53">    private ArrayList&lt;ArrayList&lt;Line&gt;&gt; arrowList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L54">    private AffineTransform affineTransform = new AffineTransform();</span>
+<span class="nc" id="L55">    private FontRenderContext frc = new FontRenderContext(affineTransform, true, true);</span>
+<span class="nc" id="L56">    private Font font = new Font(&quot;Arial&quot;, Font.PLAIN, 12);</span>
+    private GUIController controller;
+    private UMLModel model;
+
+<span class="nc" id="L60">    public GUIView(UMLModel model) {</span>
+<span class="nc" id="L61">        this.controller = new GUIController(this, model);</span>
+<span class="nc" id="L62">        this.model = model;</span>
+<span class="nc" id="L63">    }</span>
+
+<span class="nc" id="L65">    public GUIView() {</span>
+<span class="nc" id="L66">        this.model = new UMLModel();</span>
+<span class="nc" id="L67">        controller = new GUIController(this, model);</span>
+<span class="nc" id="L68">    }</span>
+
+    /**
+     * Starts the initial window for the diagram
+     *
+     * @param stage the stage of the diagram
+     */
+    @Override
+    public void start(Stage stage) {
+        // add the menu to the root
+<span class="nc" id="L78">        superRoot.getChildren().add(createDiagramMenu());</span>
+        // initialize the window, and set the color
+<span class="nc" id="L80">        Scene window = new Scene(superRoot, Color.DIMGRAY);</span>
+        // set the title, height, and width of the window
+<span class="nc" id="L82">        stage.setTitle(&quot;UML Editor&quot;);</span>
+<span class="nc" id="L83">        stage.setWidth(diagram_width);</span>
+<span class="nc" id="L84">        stage.setHeight(diagram_height);</span>
+<span class="nc" id="L85">        stage.setResizable(true);</span>
+        // set the stage and show it
+<span class="nc" id="L87">        stage.setScene(window);</span>
+<span class="nc" id="L88">        stage.setAlwaysOnTop(false);</span>
+<span class="nc" id="L89">        this.menuBar.prefWidthProperty().bind(stage.widthProperty());</span>
+        // constantly updates the width of the stage whenever the window is resized
+<span class="nc" id="L91">        stage.widthProperty().addListener((observableValue, oldWidth, newWidth) -&gt; {</span>
+<span class="nc" id="L92">            stage.setWidth(newWidth.doubleValue());</span>
+<span class="nc" id="L93">            diagram_width = stage.getWidth();</span>
+<span class="nc" id="L94">        });</span>
+        // constantly updates the height of the stage whenever the window is resized
+<span class="nc" id="L96">        stage.heightProperty().addListener((observableValue, oldWidth, newHeight) -&gt; {</span>
+<span class="nc" id="L97">            stage.setHeight(newHeight.doubleValue());</span>
+<span class="nc" id="L98">            diagram_height = stage.getHeight();</span>
+<span class="nc" id="L99">        });</span>
+<span class="nc" id="L100">        stage.show();</span>
+<span class="nc" id="L101">    }</span>
+
+    public Group getSuperRoot() {
+<span class="nc" id="L104">        return superRoot;</span>
+    }
+
+    public ArrayList&lt;ArrayList&lt;Line&gt;&gt; getArrowList() {
+<span class="nc" id="L108">        return arrowList;</span>
+    }
+
+    public ArrayList&lt;RelLine&gt; getLineList() {
+<span class="nc" id="L112">        return lineList;</span>
+    }
+
+    public ArrayList&lt;ClassBox&gt; getClassBoxList() {
+<span class="nc" id="L116">        return classBoxList;</span>
+    }
+
+    /**
+     * Creates the menu bar at the top of the screen, and gives the menu options functionality
+     *
+     * @return a VBox which encapsulates the menu
+     */
+    private VBox createDiagramMenu() {
+        // create the file menu and its menu items
+<span class="nc" id="L126">        Menu file = new Menu(&quot;File&quot;);</span>
+<span class="nc" id="L127">        MenuItem saveAsFile = new MenuItem(&quot;Save as File&quot;);</span>
+        // if the save button is pressed, open a new window to save
+<span class="nc" id="L129">        saveAsFile.setOnAction(event -&gt; saveFileWindow());</span>
+<span class="nc" id="L130">        MenuItem saveAsImage = new MenuItem(&quot;Save as Image&quot;);</span>
+        // if the save as image button is pressed, save the diagram to an image
+<span class="nc" id="L132">        saveAsImage.setOnAction(event -&gt; {</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if (classBoxList.isEmpty()) {</span>
+<span class="nc" id="L134">                popUpWindow(&quot;Error&quot;, &quot;There is nothing to display in the image.&quot;);</span>
+            } else {
+<span class="nc" id="L136">                saveImageWindow();</span>
+            }
+<span class="nc" id="L138">        });</span>
+<span class="nc" id="L139">        MenuItem load = new MenuItem(&quot;Load&quot;);</span>
+        // if the load button is pressed, open a new window to load
+<span class="nc" id="L141">        load.setOnAction(event -&gt; loadWindow());</span>
+<span class="nc" id="L142">        file.getItems().addAll(saveAsFile, saveAsImage);</span>
+
+        //***************************************//
+        //********** Add Menu Items *************//
+        //***************************************//
+
+        // create the add menu and its menu items
+<span class="nc" id="L149">        Menu add = new Menu(&quot;Add&quot;);</span>
+<span class="nc" id="L150">        MenuItem addClass = new MenuItem(&quot;Add Class&quot;);</span>
+        // if the add class button is pressed, open a new window to add class
+<span class="nc" id="L152">        addClass.setOnAction(event -&gt; addClassWindow());</span>
+        // create the add attribute menu and its menu items
+<span class="nc" id="L154">        Menu addAttribute = new Menu(&quot;Add Attribute&quot;);</span>
+        // if the add field button is pressed, open a new window to add field
+<span class="nc" id="L156">        MenuItem addField = new MenuItem(&quot;Add Field&quot;);</span>
+<span class="nc" id="L157">        addField.setOnAction(event -&gt; addFieldWindow());</span>
+        // if the add method button is pressed, open a new window to add method
+<span class="nc" id="L159">        MenuItem addMethod = new MenuItem(&quot;Add Method&quot;);</span>
+<span class="nc" id="L160">        addMethod.setOnAction(event -&gt; addMethodWindow());</span>
+<span class="nc" id="L161">        addAttribute.getItems().addAll(addField, addMethod);</span>
+        // if the add relationship button is pressed, open a new window to add relationship
+<span class="nc" id="L163">        MenuItem addRel = new MenuItem(&quot;Add Relationship&quot;);</span>
+<span class="nc" id="L164">        addRel.setOnAction(event -&gt; addRelWindow());</span>
+        // if the add parameter button is pressed, open a new window to add parameter
+<span class="nc" id="L166">        MenuItem addParam = new MenuItem(&quot;Add Parameter(s)&quot;);</span>
+<span class="nc" id="L167">        addParam.setOnAction(event -&gt; addParameterWindow());</span>
+<span class="nc" id="L168">        add.getItems().addAll(addClass, addAttribute, addRel, addParam);</span>
+
+        //***************************************//
+        //********** Delete Menu Items **********//
+        //***************************************//
+
+        // create the delete menu and its menu items
+<span class="nc" id="L175">        Menu delete = new Menu(&quot;Delete&quot;);</span>
+        // Menu item for deleting a class, when clicked, launch delete class window
+<span class="nc" id="L177">        MenuItem deleteClass = new MenuItem(&quot;Delete Class&quot;);</span>
+<span class="nc" id="L178">        deleteClass.setOnAction(event -&gt; deleteClassWindow());</span>
+        // create the delete attribute menu and its menu items
+<span class="nc" id="L180">        Menu deleteAttribute = new Menu(&quot;Delete Attribute&quot;);</span>
+        // if the delete field button is pressed, open a new window to delete field
+<span class="nc" id="L182">        MenuItem deleteField = new MenuItem(&quot;Delete Field&quot;);</span>
+<span class="nc" id="L183">        deleteField.setOnAction(event -&gt; deleteFieldWindow());</span>
+        // if the delete method button is pressed, open a new window to delete method
+<span class="nc" id="L185">        MenuItem deleteMethod = new MenuItem(&quot;Delete Method&quot;);</span>
+<span class="nc" id="L186">        deleteMethod.setOnAction(event -&gt; deleteMethodWindow());</span>
+        // if the delete method button is pressed, open a new window to delete method
+<span class="nc" id="L188">        MenuItem deleteParam = new MenuItem(&quot;Delete Parameter(s)&quot;);</span>
+<span class="nc" id="L189">        deleteParam.setOnAction(event -&gt; deleteParameterWindow());</span>
+<span class="nc" id="L190">        deleteAttribute.getItems().addAll(deleteField, deleteMethod);</span>
+        // Menu item for deleting a relationship,
+        // when clicked, launch delete relationship window
+<span class="nc" id="L193">        MenuItem deleteRel = new MenuItem(&quot;Delete Relationship&quot;);</span>
+<span class="nc" id="L194">        deleteRel.setOnAction(event -&gt; deleteRelWindow());</span>
+<span class="nc" id="L195">        delete.getItems().addAll(deleteClass, deleteAttribute, deleteRel, deleteParam);</span>
+
+        //***************************************//
+        //******* Rename/Change Menu Items ******//
+        //***************************************//
+
+        // create the rename menu and its menu items
+<span class="nc" id="L202">        Menu rename = new Menu(&quot;Rename&quot;);</span>
+<span class="nc" id="L203">        MenuItem renameClass = new MenuItem(&quot;Rename Class&quot;);</span>
+        // if the rename class button is pressed, open a new window to rename class
+<span class="nc" id="L205">        renameClass.setOnAction(event -&gt; renameClassWindow());</span>
+        // create the rename attribute menu and its menu items
+<span class="nc" id="L207">        Menu renameAttribute = new Menu(&quot;Rename Attribute&quot;);</span>
+        // if the rename field button is pressed, open a new window to rename field
+<span class="nc" id="L209">        MenuItem renameField = new MenuItem(&quot;Rename Field&quot;);</span>
+<span class="nc" id="L210">        renameField.setOnAction(event -&gt; renameFieldWindow());</span>
+        // if the rename method button is pressed, open a new window to rename method
+<span class="nc" id="L212">        MenuItem renameMethod = new MenuItem(&quot;Rename Method&quot;);</span>
+<span class="nc" id="L213">        renameMethod.setOnAction(event -&gt; renameMethodWindow());</span>
+<span class="nc" id="L214">        renameAttribute.getItems().addAll(renameField, renameMethod);</span>
+        // adds all the rename menu items to rename option
+<span class="nc" id="L216">        rename.getItems().addAll(renameClass, renameAttribute);</span>
+<span class="nc" id="L217">        Menu change = new Menu(&quot;Change&quot;);</span>
+        // open new window for changing a parameter when the option is pressed
+<span class="nc" id="L219">        MenuItem changeParam = new MenuItem(&quot;Change Parameter(s)&quot;);</span>
+<span class="nc" id="L220">        changeParam.setOnAction(event -&gt; changeParamWindow());</span>
+        // open new window for changing the relType when the option is pressed
+<span class="nc" id="L222">        MenuItem changeRelType = new MenuItem(&quot;Change Relationship Type&quot;);</span>
+<span class="nc" id="L223">        changeRelType.setOnAction(event -&gt; changeRelTypeWindow());</span>
+        // all of the change options as part of the edit menu
+<span class="nc" id="L225">        change.getItems().addAll(changeParam, changeRelType);</span>
+
+        // undoes the most recent action
+<span class="nc" id="L228">        MenuItem undo = new MenuItem(&quot;Undo&quot;);</span>
+<span class="nc" id="L229">        undo.setOnAction(event -&gt; controller.undoAction());</span>
+        // redoes the most recent undo
+<span class="nc" id="L231">        MenuItem redo = new MenuItem(&quot;Redo&quot;);</span>
+<span class="nc" id="L232">        redo.setOnAction(event -&gt; controller.redoAction());</span>
+
+        // create the edit menu and add the 'add', 'delete', and 'rename' menus to it
+<span class="nc" id="L235">        Menu edit = new Menu(&quot;Edit&quot;);</span>
+        // all of the options that are part of the edit menu
+<span class="nc" id="L237">        edit.getItems().addAll(add, delete, rename, change, undo, redo);</span>
+        // create the help menu and its menu item
+<span class="nc" id="L239">        Menu help = new Menu(&quot;Help&quot;);</span>
+<span class="nc" id="L240">        MenuItem showCommands = new MenuItem(&quot;Show Commands&quot;);</span>
+<span class="nc" id="L241">        showCommands.setOnAction(event -&gt; showCommandsWindow());</span>
+<span class="nc" id="L242">        help.getItems().add(showCommands);</span>
+        // adds all menus to the menu bar
+<span class="nc" id="L244">        menuBar.getMenus().addAll(file, edit, help);</span>
+        // disable all menu items that cannot be used until updateMenu is called
+<span class="nc" id="L246">        addField.setDisable(true);</span>
+<span class="nc" id="L247">        addMethod.setDisable(true);</span>
+<span class="nc" id="L248">        addRel.setDisable(true);</span>
+<span class="nc" id="L249">        addParam.setDisable(true);</span>
+<span class="nc" id="L250">        deleteClass.setDisable(true);</span>
+<span class="nc" id="L251">        deleteField.setDisable(true);</span>
+<span class="nc" id="L252">        deleteMethod.setDisable(true);</span>
+<span class="nc" id="L253">        deleteRel.setDisable(true);</span>
+<span class="nc" id="L254">        deleteParam.setDisable(true);</span>
+<span class="nc" id="L255">        renameClass.setDisable(true);</span>
+<span class="nc" id="L256">        renameField.setDisable(true);</span>
+<span class="nc" id="L257">        renameMethod.setDisable(true);</span>
+<span class="nc" id="L258">        changeParam.setDisable(true);</span>
+<span class="nc" id="L259">        changeRelType.setDisable(true);</span>
+        // return the vbox using the menu bar
+<span class="nc" id="L261">        return new VBox(menuBar);</span>
+    }
+
+    /******************************************************************
+     *
+     * Start of window methods
+     *
+     ******************************************************************/
+
+    /**
+     * Creates a window for the save file method and its data
+     */
+    private void saveFileWindow() {
+<span class="nc" id="L274">        Stage stage = new Stage();</span>
+        // create a file chooser and set the text to represent the right file
+<span class="nc" id="L276">        FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L277">        fileChooser.setTitle(&quot;Save as File&quot;);</span>
+<span class="nc" id="L278">        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(&quot;JSON Files&quot;, &quot;*.json&quot;));</span>
+        // get the selected file
+<span class="nc" id="L280">        File file = fileChooser.showSaveDialog(stage);</span>
+        // if the file is not null, run the save action method
+<span class="nc bnc" id="L282" title="All 2 branches missed.">        if (file != null) {</span>
+<span class="nc" id="L283">            this.controller.saveFileAction(file, stage);</span>
+        }
+<span class="nc" id="L285">    }</span>
+
+    /**
+     * Creates a window for the save image method and its data
+     */
+    private void saveImageWindow() {
+<span class="nc" id="L291">        Stage stage = new Stage();</span>
+        // create a file chooser and set the text to represent the right file
+<span class="nc" id="L293">        FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L294">        fileChooser.setTitle(&quot;Save as Image&quot;);</span>
+<span class="nc" id="L295">        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(&quot;JPG Files&quot;, &quot;*.jpg&quot;));</span>
+        // get the selected file
+<span class="nc" id="L297">        File file = fileChooser.showSaveDialog(stage);</span>
+        // if the file is not null, run the save action method
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (file != null) {</span>
+<span class="nc" id="L300">            this.controller.saveImageAction(file, stage, superRoot, diagram_width, diagram_height);</span>
+        }
+
+<span class="nc" id="L303">    }</span>
+
+    /**
+     * Creates a window for the load method and its data
+     */
+    private void loadWindow() {
+<span class="nc" id="L309">        Stage stage = new Stage();</span>
+        // create a file chooser
+<span class="nc" id="L311">        FileChooser fileChooser = new FileChooser();</span>
+        // get the selected file
+<span class="nc" id="L313">        File file = fileChooser.showOpenDialog(stage);</span>
+        // if the file is not null, run the load action method and update the menus
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        if (file != null) {</span>
+<span class="nc" id="L316">            this.controller.loadAction(file, stage);</span>
+<span class="nc" id="L317">            updateMenus();</span>
+        }
+<span class="nc" id="L319">    }</span>
+
+    /**
+     * Creates a window for the add class method and its data
+     */
+    private void addClassWindow() {
+        // initialize the stage and root
+<span class="nc" id="L326">        Stage stage = new Stage();</span>
+<span class="nc" id="L327">        Group root = new Group();</span>
+<span class="nc" id="L328">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box
+<span class="nc" id="L330">        Label label = new Label(&quot;Class name: &quot;);</span>
+        // create the text box for user input
+<span class="nc" id="L332">        TextField text = new TextField();</span>
+<span class="nc" id="L333">        text.setPrefColumnCount(16);</span>
+        // create a button to add the class with the inputted name
+<span class="nc" id="L335">        Button add = new Button(&quot;Add&quot;);</span>
+<span class="nc" id="L336">        add.setOnAction(event -&gt; {</span>
+<span class="nc" id="L337">            this.controller.addClassAction(text.getText(), stage);</span>
+<span class="nc" id="L338">            updateMenus();</span>
+<span class="nc" id="L339">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L341">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L342">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L344">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L345">        pane.add(label, 0, 0);</span>
+<span class="nc" id="L346">        pane.add(text, 1, 0);</span>
+<span class="nc" id="L347">        pane.add(add, 0, 1);</span>
+<span class="nc" id="L348">        pane.add(cancel, 1, 1);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L350">        finalizeWindow(stage, root, pane, &quot;Add Class&quot;, 120, 300);</span>
+<span class="nc" id="L351">    }</span>
+
+    /**
+     * Creates a window for the add field method and its data
+     */
+    private void addFieldWindow() {
+        // initialize the stage and root
+<span class="nc" id="L358">        Stage stage = new Stage();</span>
+<span class="nc" id="L359">        Group root = new Group();</span>
+<span class="nc" id="L360">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L362">        Label classNameText = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the field name
+<span class="nc" id="L364">        Label fieldNameText = new Label(&quot;Field name: &quot;);</span>
+        // create a label for the text box for the field type
+<span class="nc" id="L366">        Label fieldTypeText = new Label(&quot;Field type: &quot;);</span>
+        // create the text box for the class name
+<span class="nc" id="L368">        TextField className = new TextField();</span>
+<span class="nc" id="L369">        className.setPrefColumnCount(16);</span>
+        // create the text box for the field name
+<span class="nc" id="L371">        TextField fieldName = new TextField();</span>
+<span class="nc" id="L372">        fieldName.setPrefColumnCount(16);</span>
+        // create the text box for the field type
+<span class="nc" id="L374">        TextField fieldType = new TextField();</span>
+<span class="nc" id="L375">        fieldType.setPrefColumnCount(16);</span>
+        // create a button to add the field with the inputted name
+<span class="nc" id="L377">        Button add = new Button(&quot;Add&quot;);</span>
+<span class="nc" id="L378">        add.setOnAction(event -&gt; {</span>
+<span class="nc" id="L379">            this.controller.addFieldAction(className.getText(), fieldName.getText(), fieldType.getText(), stage);</span>
+<span class="nc" id="L380">            updateMenus();</span>
+<span class="nc" id="L381">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L383">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L384">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L386">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L387">        pane.add(classNameText, 0, 0);</span>
+<span class="nc" id="L388">        pane.add(fieldNameText, 0, 1);</span>
+<span class="nc" id="L389">        pane.add(fieldTypeText, 0, 2);</span>
+<span class="nc" id="L390">        pane.add(className, 1, 0);</span>
+<span class="nc" id="L391">        pane.add(fieldName, 1, 1);</span>
+<span class="nc" id="L392">        pane.add(fieldType, 1, 2);</span>
+<span class="nc" id="L393">        pane.add(add, 0, 3);</span>
+<span class="nc" id="L394">        pane.add(cancel, 1, 3);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L396">        finalizeWindow(stage, root, pane, &quot;Add Field&quot;, 190, 300);</span>
+<span class="nc" id="L397">    }</span>
+
+    /**
+     * Creates a window for the add method method and its data
+     */
+    private void addMethodWindow() {
+        // initialize the stage and root
+<span class="nc" id="L404">        Stage stage = new Stage();</span>
+<span class="nc" id="L405">        Group root = new Group();</span>
+<span class="nc" id="L406">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L408">        Label classNameText = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the method name
+<span class="nc" id="L410">        Label methodNameText = new Label(&quot;Method name: &quot;);</span>
+        // create a label for the text box for the return type
+<span class="nc" id="L412">        Label returnTypeText = new Label(&quot;Return type: &quot;);</span>
+        // create the text box for the class name
+<span class="nc" id="L414">        TextField className = new TextField();</span>
+<span class="nc" id="L415">        className.setPrefColumnCount(14);</span>
+        // create the text box for the method name
+<span class="nc" id="L417">        TextField methodName = new TextField();</span>
+<span class="nc" id="L418">        methodName.setPrefColumnCount(14);</span>
+        // create the text box for the return type
+<span class="nc" id="L420">        TextField returnType = new TextField();</span>
+<span class="nc" id="L421">        returnType.setPrefColumnCount(14);</span>
+        // create a button to add the method with the inputted name
+<span class="nc" id="L423">        Button add = new Button(&quot;Add&quot;);</span>
+<span class="nc" id="L424">        add.setOnAction(event -&gt; {</span>
+<span class="nc" id="L425">            this.controller.addMethodAction(className.getText(), methodName.getText(), returnType.getText(), stage);</span>
+<span class="nc" id="L426">            updateMenus();</span>
+<span class="nc" id="L427">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L429">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L430">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L432">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L433">        pane.add(classNameText, 0, 0);</span>
+<span class="nc" id="L434">        pane.add(methodNameText, 0, 1);</span>
+<span class="nc" id="L435">        pane.add(returnTypeText, 0, 2);</span>
+<span class="nc" id="L436">        pane.add(className, 1, 0);</span>
+<span class="nc" id="L437">        pane.add(methodName, 1, 1);</span>
+<span class="nc" id="L438">        pane.add(returnType, 1, 2);</span>
+<span class="nc" id="L439">        pane.add(add, 0, 3);</span>
+<span class="nc" id="L440">        pane.add(cancel, 1, 3);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L442">        finalizeWindow(stage, root, pane, &quot;Add Method&quot;, 190, 300);</span>
+<span class="nc" id="L443">    }</span>
+
+    /**
+     * Creates a window for the add relationship method and its data
+     */
+    private void addRelWindow() {
+        // initialize the stage and root
+<span class="nc" id="L450">        Stage stage = new Stage();</span>
+<span class="nc" id="L451">        Group root = new Group();</span>
+<span class="nc" id="L452">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the source class name
+<span class="nc" id="L454">        Label srcNameText = new Label(&quot;Source: &quot;);</span>
+        // create a label for the text box for the destination class name
+<span class="nc" id="L456">        Label destNameText = new Label(&quot;Destination: &quot;);</span>
+        // create a label for the text box for the relationship type
+<span class="nc" id="L458">        Label relTypeText = new Label(&quot;Relationship type: &quot;);</span>
+        // create the text box for the source class name
+<span class="nc" id="L460">        TextField srcName = new TextField();</span>
+<span class="nc" id="L461">        srcName.setPrefColumnCount(13);</span>
+        // create the text box for the destination class name
+<span class="nc" id="L463">        TextField destName = new TextField();</span>
+<span class="nc" id="L464">        destName.setPrefColumnCount(13);</span>
+        // create the text box for the type of relationship
+<span class="nc" id="L466">        TextField relType = new TextField();</span>
+<span class="nc" id="L467">        relType.setPrefColumnCount(13);</span>
+        // create a button to add the relationship with the correct src and dest names
+<span class="nc" id="L469">        Button add = new Button(&quot;Add&quot;);</span>
+<span class="nc" id="L470">        add.setOnAction(event -&gt; {</span>
+<span class="nc" id="L471">            this.controller.addRelationshipAction(srcName.getText(),</span>
+<span class="nc" id="L472">                    destName.getText(), relType.getText(), stage);</span>
+<span class="nc" id="L473">            updateMenus();</span>
+<span class="nc" id="L474">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L476">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L477">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L479">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L480">        pane.add(srcNameText, 0, 0);</span>
+<span class="nc" id="L481">        pane.add(destNameText, 0, 1);</span>
+<span class="nc" id="L482">        pane.add(relTypeText, 0, 2);</span>
+<span class="nc" id="L483">        pane.add(srcName, 1, 0);</span>
+<span class="nc" id="L484">        pane.add(destName, 1, 1);</span>
+<span class="nc" id="L485">        pane.add(relType, 1, 2);</span>
+<span class="nc" id="L486">        pane.add(add, 0, 3);</span>
+<span class="nc" id="L487">        pane.add(cancel, 1, 3);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L489">        finalizeWindow(stage, root, pane, &quot;Add Relationship&quot;, 190, 300);</span>
+<span class="nc" id="L490">    }</span>
+
+    /**
+     * Creates a window for the add parameter method and its data
+     */
+    private void addParameterWindow() {
+        // initialize the stage and root
+<span class="nc" id="L497">        Stage stage = new Stage();</span>
+<span class="nc" id="L498">        Group root = new Group();</span>
+<span class="nc" id="L499">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L501">        Label classNameText = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the method name
+<span class="nc" id="L503">        Label methodNameText = new Label(&quot;Method name: &quot;);</span>
+        // create a label for the text box for the parameter name
+<span class="nc" id="L505">        Label paramText = new Label(&quot;Parameter name: &quot;);</span>
+        // create a label for the text box for the parameter type
+<span class="nc" id="L507">        Label paramTypeText = new Label(&quot;Parameter type: &quot;);</span>
+        // create the text box for the class name
+<span class="nc" id="L509">        TextField className = new TextField();</span>
+<span class="nc" id="L510">        className.setPrefColumnCount(14);</span>
+        // create the text box for the method name
+<span class="nc" id="L512">        TextField methodName = new TextField();</span>
+<span class="nc" id="L513">        methodName.setPrefColumnCount(14);</span>
+        // create the text box for the parameter name
+<span class="nc" id="L515">        TextField paramName = new TextField();</span>
+<span class="nc" id="L516">        paramName.setPrefColumnCount(14);</span>
+        // create the text box for the parameter type
+<span class="nc" id="L518">        TextField paramType = new TextField();</span>
+<span class="nc" id="L519">        paramType.setPrefColumnCount(14);</span>
+        // create a button to add the method with the inputted name
+<span class="nc" id="L521">        Button add = new Button(&quot;Add&quot;);</span>
+<span class="nc" id="L522">        add.setOnAction(event -&gt; {</span>
+<span class="nc bnc" id="L523" title="All 2 branches missed.">            if(this.controller.addParameterAction(className.getText(), methodName.getText(),</span>
+<span class="nc" id="L524">                    paramName.getText(), paramType.getText(), stage))</span>
+<span class="nc" id="L525">                addParameterWindowLoop ();</span>
+<span class="nc" id="L526">            updateMenus();</span>
+<span class="nc" id="L527">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L529">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L530">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L532">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L533">        pane.add(classNameText, 0, 0);</span>
+<span class="nc" id="L534">        pane.add(methodNameText, 0, 1);</span>
+<span class="nc" id="L535">        pane.add(paramText, 0, 2);</span>
+<span class="nc" id="L536">        pane.add(paramTypeText, 0, 3);</span>
+<span class="nc" id="L537">        pane.add(className, 1, 0);</span>
+<span class="nc" id="L538">        pane.add(methodName, 1, 1);</span>
+<span class="nc" id="L539">        pane.add(paramName, 1, 2);</span>
+<span class="nc" id="L540">        pane.add(paramType, 1, 3);</span>
+<span class="nc" id="L541">        pane.add(add, 0, 4);</span>
+<span class="nc" id="L542">        pane.add(cancel, 1, 4);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L544">        finalizeWindow(stage, root, pane, &quot;Add Parameter(s)&quot;, 225, 300);</span>
+<span class="nc" id="L545">    }</span>
+
+    private void addParameterWindowLoop () {
+        // initialize the stage and root
+<span class="nc" id="L549">        Stage stage = new Stage();</span>
+<span class="nc" id="L550">        Group root = new Group();</span>
+<span class="nc" id="L551">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L553">        Label continueText = new Label(&quot;Add Another Parameter?&quot;);</span>
+        // create a button to continue creating parameters
+<span class="nc" id="L555">        Button yes = new Button(&quot;Yes&quot;);</span>
+<span class="nc" id="L556">        yes.setOnAction(event -&gt; {</span>
+<span class="nc" id="L557">            stage.close();</span>
+<span class="nc" id="L558">            addParameterWindow();</span>
+<span class="nc" id="L559">        });</span>
+        // create a button to stop creating parameters
+<span class="nc" id="L561">        Button no = new Button(&quot;No&quot;);</span>
+<span class="nc" id="L562">        no.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L564">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L565">        pane.add(continueText, 0, 0);</span>
+<span class="nc" id="L566">        pane.add(yes, 0, 1);</span>
+<span class="nc" id="L567">        pane.add(no, 1, 1);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L569">        finalizeWindow(stage, root, pane, &quot;Continue?&quot;, 110, 220);</span>
+<span class="nc" id="L570">    }</span>
+
+    /**
+     * Creates a window for the delete class method and its data
+     */
+    private void deleteClassWindow() {
+        // initialize the stage and root
+<span class="nc" id="L577">        Stage stage = new Stage();</span>
+<span class="nc" id="L578">        Group root = new Group();</span>
+<span class="nc" id="L579">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box
+<span class="nc" id="L581">        Label label = new Label(&quot;Class name: &quot;);</span>
+        // create the text box for user input
+<span class="nc" id="L583">        TextField text = new TextField();</span>
+<span class="nc" id="L584">        text.setPrefColumnCount(16);</span>
+        // create a button to delete the class with the inputted name
+<span class="nc" id="L586">        Button delete = new Button(&quot;Delete&quot;);</span>
+<span class="nc" id="L587">        delete.setOnAction(event -&gt; {</span>
+<span class="nc" id="L588">            this.controller.deleteClassAction(text.getText(), stage);</span>
+<span class="nc" id="L589">            updateMenus();</span>
+<span class="nc" id="L590">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L592">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L593">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L595">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L596">        pane.add(label, 0, 0);</span>
+<span class="nc" id="L597">        pane.add(text, 1, 0);</span>
+<span class="nc" id="L598">        pane.add(delete, 0, 1);</span>
+<span class="nc" id="L599">        pane.add(cancel, 1, 1);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L601">        finalizeWindow(stage, root, pane, &quot;Delete Class&quot;, 120, 300);</span>
+<span class="nc" id="L602">    }</span>
+
+    /**
+     * Creates a window for the delete field method and its data
+     */
+    private void deleteFieldWindow() {
+        // initialize the stage and root
+<span class="nc" id="L609">        Stage stage = new Stage();</span>
+<span class="nc" id="L610">        Group root = new Group();</span>
+<span class="nc" id="L611">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L613">        Label classNameText = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the field name
+<span class="nc" id="L615">        Label fieldNameText = new Label(&quot;Field name: &quot;);</span>
+        // create the text box for the class name
+<span class="nc" id="L617">        TextField className = new TextField();</span>
+<span class="nc" id="L618">        className.setPrefColumnCount(16);</span>
+        // create the text box for the field name
+<span class="nc" id="L620">        TextField fieldName = new TextField();</span>
+<span class="nc" id="L621">        fieldName.setPrefColumnCount(16);</span>
+        // create a button to add the field with the inputted name
+<span class="nc" id="L623">        Button delete = new Button(&quot;Delete&quot;);</span>
+<span class="nc" id="L624">        delete.setOnAction(event -&gt; {</span>
+<span class="nc" id="L625">            this.controller.deleteFieldAction(className.getText(), fieldName.getText(), stage);</span>
+<span class="nc" id="L626">            updateMenus();</span>
+<span class="nc" id="L627">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L629">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L630">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L632">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L633">        pane.add(classNameText, 0, 0);</span>
+<span class="nc" id="L634">        pane.add(fieldNameText, 0, 1);</span>
+<span class="nc" id="L635">        pane.add(className, 1, 0);</span>
+<span class="nc" id="L636">        pane.add(fieldName, 1, 1);</span>
+<span class="nc" id="L637">        pane.add(delete, 0, 2);</span>
+<span class="nc" id="L638">        pane.add(cancel, 1, 2);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L640">        finalizeWindow(stage, root, pane, &quot;Delete Field&quot;, 155, 300);</span>
+<span class="nc" id="L641">    }</span>
+
+    /**
+     * Creates a window for the delete method method and its data
+     */
+    private void deleteMethodWindow() {
+    // initialize the stage and root
+<span class="nc" id="L648">        Stage stage = new Stage();</span>
+<span class="nc" id="L649">        Group root = new Group();</span>
+<span class="nc" id="L650">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L652">        Label classNameText = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the method name
+<span class="nc" id="L654">        Label fieldNameText = new Label(&quot;Method name: &quot;);</span>
+        // create the text box for the class name
+<span class="nc" id="L656">        TextField className = new TextField();</span>
+<span class="nc" id="L657">        className.setPrefColumnCount(15);</span>
+        // create the text box for the method name
+<span class="nc" id="L659">        TextField methodName = new TextField();</span>
+<span class="nc" id="L660">        methodName.setPrefColumnCount(15);</span>
+        // create a button to add the field with the inputted name
+<span class="nc" id="L662">        Button delete = new Button(&quot;Delete&quot;);</span>
+<span class="nc" id="L663">        delete.setOnAction(event -&gt; {</span>
+<span class="nc" id="L664">            this.controller.deleteMethodAction(className.getText(), methodName.getText(), stage);</span>
+<span class="nc" id="L665">            updateMenus();</span>
+<span class="nc" id="L666">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L668">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L669">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L671">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L672">        pane.add(classNameText, 0, 0);</span>
+<span class="nc" id="L673">        pane.add(fieldNameText, 0, 1);</span>
+<span class="nc" id="L674">        pane.add(className, 1, 0);</span>
+<span class="nc" id="L675">        pane.add(methodName, 1, 1);</span>
+<span class="nc" id="L676">        pane.add(delete, 0, 2);</span>
+<span class="nc" id="L677">        pane.add(cancel, 1, 2);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L679">        finalizeWindow(stage, root, pane, &quot;Delete Method&quot;, 155, 300);</span>
+<span class="nc" id="L680">    }</span>
+
+    /**
+     * Creates a window for the delete parameter method and its data
+     */
+    private void deleteParameterWindow() {
+        // initialize the stage and root
+<span class="nc" id="L687">        Stage stage = new Stage();</span>
+<span class="nc" id="L688">        Group root = new Group();</span>
+<span class="nc" id="L689">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L691">        Label classNameText = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the method name
+<span class="nc" id="L693">        Label methodNameText = new Label(&quot;Method name: &quot;);</span>
+        // create a label for the text box for the parameter name
+<span class="nc" id="L695">        Label paramText = new Label(&quot;Parameter name: &quot;);</span>
+        // create the text box for the class name
+<span class="nc" id="L697">        TextField className = new TextField();</span>
+<span class="nc" id="L698">        className.setPrefColumnCount(15);</span>
+        // create the text box for the method name
+<span class="nc" id="L700">        TextField methodName = new TextField();</span>
+<span class="nc" id="L701">        methodName.setPrefColumnCount(15);</span>
+        // create the text box for the class name
+<span class="nc" id="L703">        TextField paramName = new TextField();</span>
+<span class="nc" id="L704">        paramName.setPrefColumnCount(15);</span>
+        // create the text box for the class name
+<span class="nc" id="L706">        TextField paramType = new TextField();</span>
+<span class="nc" id="L707">        paramType.setPrefColumnCount(15);</span>
+        // create a button to add the field with the inputted name
+<span class="nc" id="L709">        Button delete = new Button(&quot;Delete&quot;);</span>
+<span class="nc" id="L710">        delete.setOnAction(event -&gt; {</span>
+<span class="nc bnc" id="L711" title="All 2 branches missed.">            if(this.controller.deleteParamAction(className.getText(), methodName.getText(), paramName.getText(),</span>
+                    stage))
+<span class="nc" id="L713">                deleteParameterWindowLoop();</span>
+<span class="nc" id="L714">            updateMenus();</span>
+<span class="nc" id="L715">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L717">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L718">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L720">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L721">        pane.add(classNameText, 0, 0);</span>
+<span class="nc" id="L722">        pane.add(methodNameText, 0, 1);</span>
+<span class="nc" id="L723">        pane.add(paramText, 0, 2);</span>
+<span class="nc" id="L724">        pane.add(className, 1, 0);</span>
+<span class="nc" id="L725">        pane.add(methodName, 1, 1);</span>
+<span class="nc" id="L726">        pane.add(paramName, 1, 2);</span>
+<span class="nc" id="L727">        pane.add(delete, 0, 3);</span>
+<span class="nc" id="L728">        pane.add(cancel, 1, 3);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L730">        finalizeWindow(stage, root, pane, &quot;Delete Parameter(s)&quot;, 185, 320);</span>
+<span class="nc" id="L731">    }</span>
+
+    private void deleteParameterWindowLoop () {
+        // initialize the stage and root
+<span class="nc" id="L735">        Stage stage = new Stage();</span>
+<span class="nc" id="L736">        Group root = new Group();</span>
+<span class="nc" id="L737">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L739">        Label continueText = new Label(&quot;Delete Another Parameter?&quot;);</span>
+        // create a button to continue creating parameters
+<span class="nc" id="L741">        Button yes = new Button(&quot;Yes&quot;);</span>
+<span class="nc" id="L742">        yes.setOnAction(event -&gt; {</span>
+<span class="nc" id="L743">            stage.close();</span>
+<span class="nc" id="L744">            deleteParameterWindow();</span>
+<span class="nc" id="L745">        });</span>
+        // create a button to stop creating parameters
+<span class="nc" id="L747">        Button no = new Button(&quot;No&quot;);</span>
+<span class="nc" id="L748">        no.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L750">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L751">        pane.add(continueText, 0, 0);</span>
+<span class="nc" id="L752">        pane.add(yes, 0, 1);</span>
+<span class="nc" id="L753">        pane.add(no, 1, 1);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L755">        finalizeWindow(stage, root, pane, &quot;Continue?&quot;, 110, 220);</span>
+<span class="nc" id="L756">    }</span>
+
+    /**
+     * Creates a window for the delete relationship method and its data
+     */
+    private void deleteRelWindow() {
+        // initialize the stage and root
+<span class="nc" id="L763">        Stage stage = new Stage();</span>
+<span class="nc" id="L764">        Group root = new Group();</span>
+<span class="nc" id="L765">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the source class name
+<span class="nc" id="L767">        Label srcNameText = new Label(&quot;Source: &quot;);</span>
+        // create a label for the text box for the destination class name
+<span class="nc" id="L769">        Label destNameText = new Label(&quot;Destination: &quot;);</span>
+        // create the text box for the source class name
+<span class="nc" id="L771">        TextField srcName = new TextField();</span>
+<span class="nc" id="L772">        srcName.setPrefColumnCount(13);</span>
+        // create the text box for the destination class name
+<span class="nc" id="L774">        TextField destName = new TextField();</span>
+<span class="nc" id="L775">        destName.setPrefColumnCount(13);</span>
+        // create a button to delete the relationship with the correct src and dest names
+<span class="nc" id="L777">        Button delete = new Button(&quot;Delete&quot;);</span>
+<span class="nc" id="L778">        delete.setOnAction(event -&gt; {</span>
+<span class="nc" id="L779">            this.controller.deleteRelAction(srcName.getText(),</span>
+<span class="nc" id="L780">                    destName.getText(), stage);</span>
+<span class="nc" id="L781">            updateMenus();</span>
+<span class="nc" id="L782">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L784">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L785">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L787">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L788">        pane.add(srcNameText, 0, 0);</span>
+<span class="nc" id="L789">        pane.add(destNameText, 0, 1);</span>
+<span class="nc" id="L790">        pane.add(srcName, 1, 0);</span>
+<span class="nc" id="L791">        pane.add(destName, 1, 1);</span>
+<span class="nc" id="L792">        pane.add(delete, 0, 3);</span>
+<span class="nc" id="L793">        pane.add(cancel, 1, 3);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L795">        finalizeWindow(stage, root, pane, &quot;Delete Relationship&quot;, 165, 300);</span>
+<span class="nc" id="L796">    }</span>
+
+    /**
+     * Creates a window for the rename class method and its data
+     */
+    private void renameClassWindow() {
+        // initialize the stage and root
+<span class="nc" id="L803">        Stage stage = new Stage();</span>
+<span class="nc" id="L804">        Group root = new Group();</span>
+<span class="nc" id="L805">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the old class name
+<span class="nc" id="L807">        Label classLabel = new Label(&quot;Old class name: &quot;);</span>
+        // create a label for the text box for the new class name
+<span class="nc" id="L809">        Label nameLabel = new Label(&quot;New class name: &quot;);</span>
+        // create the text box for the class to be renamed
+<span class="nc" id="L811">        TextField classToRename = new TextField();</span>
+<span class="nc" id="L812">        classToRename.setPrefColumnCount(14);</span>
+        // create the text box for the new class name
+<span class="nc" id="L814">        TextField newClassName = new TextField();</span>
+<span class="nc" id="L815">        newClassName.setPrefColumnCount(14);</span>
+        // create a button to add the class with the inputted name
+<span class="nc" id="L817">        Button rename = new Button(&quot;Rename&quot;);</span>
+<span class="nc" id="L818">        rename.setOnAction(event -&gt; {</span>
+<span class="nc" id="L819">            this.controller.renameClassAction(classToRename.getText(), newClassName.getText(), stage);</span>
+<span class="nc" id="L820">            updateMenus();</span>
+<span class="nc" id="L821">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L823">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L824">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L826">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L827">        pane.add(classLabel, 0, 0);</span>
+<span class="nc" id="L828">        pane.add(nameLabel, 0, 1);</span>
+<span class="nc" id="L829">        pane.add(classToRename, 1, 0);</span>
+<span class="nc" id="L830">        pane.add(newClassName, 1, 1);</span>
+<span class="nc" id="L831">        pane.add(rename, 0, 2);</span>
+<span class="nc" id="L832">        pane.add(cancel, 1, 2);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L834">        finalizeWindow(stage, root, pane, &quot;Rename Class&quot;, 155, 300);</span>
+<span class="nc" id="L835">    }</span>
+
+    /**
+     * Creates a window for the rename field method and its data
+     */
+    private void renameFieldWindow() {
+        // initialize the stage and root
+<span class="nc" id="L842">        Stage stage = new Stage();</span>
+<span class="nc" id="L843">        Group root = new Group();</span>
+<span class="nc" id="L844">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class with the field
+<span class="nc" id="L846">        Label givenClassLabel = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the old field name
+<span class="nc" id="L848">        Label fieldLabel = new Label(&quot;Old field name: &quot;);</span>
+        // create a label for the text box for the new field name
+<span class="nc" id="L850">        Label nameLabel = new Label(&quot;New field name: &quot;);</span>
+        // create a label for the text box for the field type
+<span class="nc" id="L852">        TextField givenClass = new TextField();</span>
+<span class="nc" id="L853">        givenClass.setPrefColumnCount(14);</span>
+        // create the text box for the field to be renamed
+<span class="nc" id="L855">        TextField fieldToRename = new TextField();</span>
+<span class="nc" id="L856">        fieldToRename.setPrefColumnCount(14);</span>
+        // create the text box for the field type
+<span class="nc" id="L858">        TextField fieldType = new TextField();</span>
+<span class="nc" id="L859">        fieldType.setPrefColumnCount(14);</span>
+        // create the text box for the new field name
+<span class="nc" id="L861">        TextField newFieldName = new TextField();</span>
+<span class="nc" id="L862">        newFieldName.setPrefColumnCount(14);</span>
+        // create a button to add the field with the inputted name
+<span class="nc" id="L864">        Button rename = new Button(&quot;Rename&quot;);</span>
+<span class="nc" id="L865">        rename.setOnAction(event -&gt; {</span>
+<span class="nc" id="L866">            this.controller.renameFieldAction(givenClass.getText(),</span>
+<span class="nc" id="L867">                    fieldToRename.getText(),</span>
+<span class="nc" id="L868">                    newFieldName.getText(), stage);</span>
+<span class="nc" id="L869">            updateMenus();</span>
+<span class="nc" id="L870">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L872">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L873">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L875">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L876">        pane.add(givenClassLabel, 0, 0);</span>
+<span class="nc" id="L877">        pane.add(fieldLabel, 0, 1);</span>
+        //pane.add(fieldTypeText, 0, 2);
+<span class="nc" id="L879">        pane.add(nameLabel, 0, 2);</span>
+<span class="nc" id="L880">        pane.add(givenClass, 1, 0);</span>
+<span class="nc" id="L881">        pane.add(fieldToRename, 1, 1);</span>
+        //pane.add(fieldType, 1, 2);
+<span class="nc" id="L883">        pane.add(newFieldName, 1, 2);</span>
+<span class="nc" id="L884">        pane.add(rename, 0, 3);</span>
+<span class="nc" id="L885">        pane.add(cancel, 1, 3);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L887">        finalizeWindow(stage, root, pane, &quot;Rename Field&quot;, 190, 300);</span>
+<span class="nc" id="L888">    }</span>
+
+    /**
+     * Creates a window for the rename method method and its data
+     */
+    private void renameMethodWindow() {
+        // initialize the stage and root
+<span class="nc" id="L895">        Stage stage = new Stage();</span>
+<span class="nc" id="L896">        Group root = new Group();</span>
+<span class="nc" id="L897">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class with the method
+<span class="nc" id="L899">        Label givenClassLabel = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the old method name
+<span class="nc" id="L901">        Label methodLabel = new Label(&quot;Old method name: &quot;);</span>
+        // create a label for the text box for the new method name
+<span class="nc" id="L903">        Label nameLabel = new Label(&quot;New method name: &quot;);</span>
+        // create the text box for the class with the method
+<span class="nc" id="L905">        TextField givenClass = new TextField();</span>
+<span class="nc" id="L906">        givenClass.setPrefColumnCount(12);</span>
+        // create the text box for the method to be renamed
+<span class="nc" id="L908">        TextField methodToRename = new TextField();</span>
+<span class="nc" id="L909">        methodToRename.setPrefColumnCount(12);</span>
+        // create the text box for the new method name
+<span class="nc" id="L911">        TextField newMethodName = new TextField();</span>
+<span class="nc" id="L912">        newMethodName.setPrefColumnCount(12);</span>
+        // create a button to add the method with the inputted name
+<span class="nc" id="L914">        Button rename = new Button(&quot;Rename&quot;);</span>
+<span class="nc" id="L915">        rename.setOnAction(event -&gt; {</span>
+<span class="nc" id="L916">            this.controller.renameMethodAction(givenClass.getText(),</span>
+<span class="nc" id="L917">                    methodToRename.getText(), newMethodName.getText(), stage);</span>
+<span class="nc" id="L918">            updateMenus();</span>
+<span class="nc" id="L919">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L921">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L922">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L924">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L925">        pane.add(givenClassLabel, 0, 0);</span>
+<span class="nc" id="L926">        pane.add(methodLabel, 0, 1);</span>
+<span class="nc" id="L927">        pane.add(nameLabel, 0, 2);</span>
+<span class="nc" id="L928">        pane.add(givenClass, 1, 0);</span>
+<span class="nc" id="L929">        pane.add(methodToRename, 1, 1);</span>
+<span class="nc" id="L930">        pane.add(newMethodName, 1, 2);</span>
+<span class="nc" id="L931">        pane.add(rename, 0, 3);</span>
+<span class="nc" id="L932">        pane.add(cancel, 1, 3);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L934">        finalizeWindow(stage, root, pane, &quot;Rename Method&quot;, 190, 300);</span>
+<span class="nc" id="L935">    }</span>
+
+    /**
+     * Creates a window for the change parameter method and its data
+     */
+    private void changeParamWindow() {
+        // initialize the stage and root
+<span class="nc" id="L942">        Stage stage = new Stage();</span>
+<span class="nc" id="L943">        Group root = new Group();</span>
+<span class="nc" id="L944">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class with the method
+<span class="nc" id="L946">        Label givenClassLabel = new Label(&quot;Class name: &quot;);</span>
+        // create a label for the text box for the method with the parameter
+<span class="nc" id="L948">        Label givenMethodLabel = new Label(&quot;Method name: &quot;);</span>
+        // create a label for the text box for the old parameter name
+<span class="nc" id="L950">        Label paramLabel = new Label(&quot;Old parameter name: &quot;);</span>
+        // create a label for the text box for the new parameter name
+<span class="nc" id="L952">        Label nameLabel = new Label(&quot;New parameter name: &quot;);</span>
+        // create a label for the text box for the new parameter type
+<span class="nc" id="L954">        Label typeLabel = new Label(&quot;New parameter type: &quot;);</span>
+        // create the text box for the class with the method
+<span class="nc" id="L956">        TextField givenClass = new TextField();</span>
+<span class="nc" id="L957">        givenClass.setPrefColumnCount(11);</span>
+        // create the text box for the method with the parameter
+<span class="nc" id="L959">        TextField givenMethod = new TextField();</span>
+<span class="nc" id="L960">        givenMethod.setPrefColumnCount(11);</span>
+        // create the text box for the parameter to change
+<span class="nc" id="L962">        TextField paramToChange = new TextField();</span>
+<span class="nc" id="L963">        paramToChange.setPrefColumnCount(11);</span>
+        // create the text box for the new parameter name
+<span class="nc" id="L965">        TextField newParamName = new TextField();</span>
+<span class="nc" id="L966">        newParamName.setPrefColumnCount(11);</span>
+        // create the text box for the new parameter type
+<span class="nc" id="L968">        TextField newParamType = new TextField();</span>
+<span class="nc" id="L969">        newParamType.setPrefColumnCount(11);</span>
+        // create a button to add the method with the inputted name
+<span class="nc" id="L971">        Button change = new Button(&quot;Change&quot;);</span>
+<span class="nc" id="L972">        change.setOnAction(event -&gt; {</span>
+<span class="nc bnc" id="L973" title="All 2 branches missed.">            if(this.controller.changeParameterAction(givenClass.getText(), givenMethod.getText(),</span>
+<span class="nc" id="L974">                    paramToChange.getText(), newParamName.getText(), newParamType.getText(), stage))</span>
+<span class="nc" id="L975">                changeParameterWindowLoop();</span>
+<span class="nc" id="L976">            updateMenus();</span>
+<span class="nc" id="L977">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L979">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L980">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L982">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L983">        pane.add(givenClassLabel, 0, 0);</span>
+<span class="nc" id="L984">        pane.add(givenMethodLabel, 0, 1);</span>
+<span class="nc" id="L985">        pane.add(paramLabel, 0, 2);</span>
+<span class="nc" id="L986">        pane.add(nameLabel, 0, 3);</span>
+<span class="nc" id="L987">        pane.add(typeLabel, 0, 4);</span>
+<span class="nc" id="L988">        pane.add(givenClass, 1, 0);</span>
+<span class="nc" id="L989">        pane.add(givenMethod, 1, 1);</span>
+<span class="nc" id="L990">        pane.add(paramToChange, 1, 2);</span>
+<span class="nc" id="L991">        pane.add(newParamName, 1, 3);</span>
+<span class="nc" id="L992">        pane.add(newParamType, 1, 4);</span>
+<span class="nc" id="L993">        pane.add(change, 0, 5);</span>
+<span class="nc" id="L994">        pane.add(cancel, 1, 5);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L996">        finalizeWindow(stage, root, pane, &quot;Change Parameter(s)&quot;, 260, 300);</span>
+<span class="nc" id="L997">    }</span>
+
+    private void changeParameterWindowLoop () {
+        // initialize the stage and root
+<span class="nc" id="L1001">        Stage stage = new Stage();</span>
+<span class="nc" id="L1002">        Group root = new Group();</span>
+<span class="nc" id="L1003">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the text box for the class
+<span class="nc" id="L1005">        Label continueText = new Label(&quot;Change Another Parameter?&quot;);</span>
+        // create a button to continue creating parameters
+<span class="nc" id="L1007">        Button yes = new Button(&quot;Yes&quot;);</span>
+<span class="nc" id="L1008">        yes.setOnAction(event -&gt; {</span>
+<span class="nc" id="L1009">            stage.close();</span>
+<span class="nc" id="L1010">            changeParamWindow();</span>
+<span class="nc" id="L1011">        });</span>
+        // create a button to stop creating parameters
+<span class="nc" id="L1013">        Button no = new Button(&quot;No&quot;);</span>
+<span class="nc" id="L1014">        no.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L1016">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L1017">        pane.add(continueText, 0, 0);</span>
+<span class="nc" id="L1018">        pane.add(yes, 0, 1);</span>
+<span class="nc" id="L1019">        pane.add(no, 1, 1);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L1021">        finalizeWindow(stage, root, pane, &quot;Continue?&quot;, 110, 220);</span>
+<span class="nc" id="L1022">    }</span>
+
+    /**
+     * Creates a window for the change relationship method and its data
+     */
+    private void changeRelTypeWindow(){
+        // initialize the stage and root
+<span class="nc" id="L1029">        Stage stage = new Stage();</span>
+<span class="nc" id="L1030">        Group root = new Group();</span>
+<span class="nc" id="L1031">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the next text box for the source class
+<span class="nc" id="L1033">        Label srcLabel = new Label(&quot;Source: &quot;);</span>
+        // create a label for the next text box for the source class
+<span class="nc" id="L1035">        Label destLabel = new Label(&quot;Destination: &quot;);</span>
+        // create a label for the text box for the old type name
+<span class="nc" id="L1037">        Label relTypeLabel = new Label(&quot;Old type: &quot;);</span>
+        // create a label for the text box for the new type name
+<span class="nc" id="L1039">        Label newRelTypeLabel = new Label(&quot;New type: &quot;);</span>
+        // create the text box for the type to be renamed
+<span class="nc" id="L1041">        TextField srcName = new TextField();</span>
+<span class="nc" id="L1042">        srcName.setPrefColumnCount(16);</span>
+        // create the text box for the new type name
+<span class="nc" id="L1044">        TextField destName = new TextField();</span>
+<span class="nc" id="L1045">        destName.setPrefColumnCount(16);</span>
+        // create the text box for the type to be renamed
+<span class="nc" id="L1047">        TextField oldRelTypeName = new TextField();</span>
+<span class="nc" id="L1048">        oldRelTypeName.setPrefColumnCount(16);</span>
+        // create the text box for the new type name
+<span class="nc" id="L1050">        TextField newRelTypeName = new TextField();</span>
+<span class="nc" id="L1051">        newRelTypeName.setPrefColumnCount(16);</span>
+        // create a button to add the class with the inputted name
+<span class="nc" id="L1053">        Button rename = new Button(&quot;Change&quot;);</span>
+<span class="nc" id="L1054">        rename.setOnAction(event -&gt; {</span>
+<span class="nc" id="L1055">            this.controller.changeRelTypeAction(srcName.getText(),</span>
+<span class="nc" id="L1056">                    destName.getText(), oldRelTypeName.getText(), newRelTypeName.getText(), stage);</span>
+<span class="nc" id="L1057">            updateMenus();</span>
+<span class="nc" id="L1058">        });</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L1060">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L1061">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L1063">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L1064">        pane.add(srcLabel, 0, 0);</span>
+<span class="nc" id="L1065">        pane.add(destLabel, 0, 1);</span>
+<span class="nc" id="L1066">        pane.add(relTypeLabel, 0, 2);</span>
+<span class="nc" id="L1067">        pane.add(newRelTypeLabel, 0, 3);</span>
+<span class="nc" id="L1068">        pane.add(srcName, 1, 0);</span>
+<span class="nc" id="L1069">        pane.add(destName, 1, 1);</span>
+<span class="nc" id="L1070">        pane.add(oldRelTypeName, 1, 2);</span>
+<span class="nc" id="L1071">        pane.add(newRelTypeName, 1, 3);</span>
+<span class="nc" id="L1072">        pane.add(rename, 0, 4);</span>
+<span class="nc" id="L1073">        pane.add(cancel, 1, 4);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L1075">        finalizeWindow(stage, root, pane, &quot;Change Relationship Type&quot;, 225, 300);</span>
+<span class="nc" id="L1076">    }</span>
+
+    /**
+     * Creates a window for the help method and its data
+     */
+    private void showCommandsWindow() {
+        // initialize the stage and root
+<span class="nc" id="L1083">        Stage stage = new Stage();</span>
+<span class="nc" id="L1084">        Group root = new Group();</span>
+<span class="nc" id="L1085">        stage.setAlwaysOnTop(true);</span>
+        // create a label for the command list
+<span class="nc" id="L1087">        Text commandList = new Text(this.model.getGUIHelpMenu());</span>
+        // create a button to cancel out of the window and enable menu again
+<span class="nc" id="L1089">        Button cancel = new Button(&quot;Cancel&quot;);</span>
+<span class="nc" id="L1090">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the object and adds it
+<span class="nc" id="L1092">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L1093">        pane.add(commandList, 0, 0);</span>
+<span class="nc" id="L1094">        pane.add(cancel, 1, 1);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L1096">        finalizeWindow(stage, root, pane, &quot;Show Commands&quot;, 460, 615);</span>
+<span class="nc" id="L1097">    }</span>
+
+    /**
+     * Creates a standard popup window for telling the user something
+     *
+     * @param title the title of the popup window
+     * @param text  the text to be displayed in the popup
+     */
+    public void popUpWindow(String title, String text) {
+        // initialize the stage and root
+<span class="nc" id="L1107">        Stage stage = new Stage();</span>
+<span class="nc" id="L1108">        Group root = new Group();</span>
+<span class="nc" id="L1109">        stage.setAlwaysOnTop(true);</span>
+        // create a message for the user
+<span class="nc" id="L1111">        Label message = new Label(text);</span>
+        // create a button to cancel out of the window
+<span class="nc" id="L1113">        Button cancel = new Button(&quot;Okay&quot;);</span>
+<span class="nc" id="L1114">        cancel.setOnAction(event -&gt; this.controller.exitAction(stage));</span>
+        // create the pane for the objects and add them all
+<span class="nc" id="L1116">        GridPane pane = new GridPane();</span>
+<span class="nc" id="L1117">        pane.add(message, 0, 0);</span>
+<span class="nc" id="L1118">        pane.add(cancel, 1, 0);</span>
+        // finalize the window with standard formatting
+<span class="nc" id="L1120">        finalizeWindow(stage, root, pane, title, 100, 300);</span>
+<span class="nc" id="L1121">    }</span>
+
+    /******************************************************************
+     *
+     * End of window methods &amp; Start of helper methods
+     *
+     ******************************************************************/
+
+    //***************************************//
+    //*********** Drawing Objects ***********//
+    //***************************************//
+
+    /**
+     * Takes in a class name and draws a new class box object
+     *
+     * @param className the name of the class
+     */
+    public void drawClassBox(String className, int xOffset, int yOffset)  {
+        // create a class box object, add it to the class box list and the super root
+<span class="nc" id="L1140">        ClassBox classBox = new ClassBox(className);</span>
+<span class="nc" id="L1141">        superRoot.getChildren().add(classBox.getClassPane());</span>
+<span class="nc" id="L1142">        classBoxList.add(classBox);</span>
+        // place class box in correct area
+<span class="nc" id="L1144">        classBox.getClassPane().setTranslateX(classBox.getBoxWidth() + xOffset);</span>
+<span class="nc" id="L1145">        classBox.getClassPane().setTranslateY(classBox.getBoxHeight() + yOffset);</span>
+        // set the x and y to the right coordinates
+<span class="nc" id="L1147">        classBox.setX(classBox.getClassPane().getTranslateX());</span>
+<span class="nc" id="L1148">        classBox.setY(classBox.getClassPane().getTranslateY());</span>
+        // when the box is clicked on begin drag with mouse
+<span class="nc" id="L1150">        classBox.getClassPane().setOnMouseDragEntered(event -&gt; {</span>
+<span class="nc" id="L1151">            startDragX = event.getSceneX();</span>
+<span class="nc" id="L1152">            startDragY = event.getSceneY();</span>
+<span class="nc" id="L1153">        });</span>
+        // keep box under mouse as the mouse continues to drag
+<span class="nc" id="L1155">        classBox.getClassPane().setOnMouseDragged(event -&gt; {</span>
+<span class="nc" id="L1156">            classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);</span>
+<span class="nc" id="L1157">            classBox.getClassPane().setTranslateY(event.getSceneY() - startDragY);</span>
+            // set the x and y to the right coordinates
+<span class="nc" id="L1159">            classBox.setX(classBox.getClassPane().getTranslateX());</span>
+<span class="nc" id="L1160">            classBox.setY(classBox.getClassPane().getTranslateY());</span>
+<span class="nc" id="L1161">            addToCoordinateMap(className, classBox.getX(), classBox.getY());</span>
+<span class="nc" id="L1162">        });</span>
+        // Increases box width if className is too big for the default
+<span class="nc bnc" id="L1164" title="All 2 branches missed.">        if((int)(font.getStringBounds(className, frc)).getWidth() + 30 &gt; classBox.getBoxWidth())</span>
+        {
+<span class="nc" id="L1166">            classBox.setBoxWidth((int)(font.getStringBounds(className, frc)).getWidth() + 30);</span>
+        }
+<span class="nc" id="L1168">    }</span>
+
+    /**
+     * Moves all the classes in the diagram to their saved x and y fields
+     */
+    public void moveClassBoxes() {
+        // iterate through the class box list and set the translate x and y to the right value
+<span class="nc bnc" id="L1175" title="All 2 branches missed.">        for (ClassBox cbObj : classBoxList) {</span>
+<span class="nc" id="L1176">            double X = this.model.getCoordinateMap().get(cbObj.getClassBoxName()).get(0);</span>
+<span class="nc" id="L1177">            double Y = this.model.getCoordinateMap().get(cbObj.getClassBoxName()).get(1);</span>
+<span class="nc" id="L1178">            cbObj.setX(X);</span>
+<span class="nc" id="L1179">            cbObj.setY(Y);</span>
+<span class="nc" id="L1180">            cbObj.getClassPane().setTranslateX(cbObj.getX());</span>
+<span class="nc" id="L1181">            cbObj.getClassPane().setTranslateY(cbObj.getY());</span>
+<span class="nc" id="L1182">        }</span>
+<span class="nc" id="L1183">    }</span>
+
+    public void drawFieldBox(int fieldListSize, int methListSize, Field field, String className) {
+<span class="nc" id="L1186">        ClassBox box = findClassBox(className);</span>
+<span class="nc" id="L1187">        box.setBoxHeight(box.getBoxHeight() + 15);</span>
+<span class="nc" id="L1188">        box.addText(field, fieldListSize, methListSize, false);</span>
+
+        // Increases box size if the field will extend past it
+<span class="nc" id="L1191">        if((int)(font.getStringBounds(field.getAttName() + &quot; : &quot; + field.getFieldType(), frc)).getWidth() + 30</span>
+<span class="nc bnc" id="L1192" title="All 2 branches missed.">                &gt; box.getBoxWidth())</span>
+        {
+<span class="nc" id="L1194">            box.setBoxWidth((int)(font.getStringBounds(field.getAttName() + &quot; : &quot; + field.getFieldType(), frc))</span>
+<span class="nc" id="L1195">                    .getWidth() + 30);</span>
+        }
+<span class="nc" id="L1197">    }</span>
+
+    public void drawMethodBox(int fieldListSize, int methListSize, Method meth, String className) {
+<span class="nc" id="L1200">        ClassBox box = findClassBox(className);</span>
+<span class="nc" id="L1201">        box.setBoxHeight(box.getBoxHeight() + 15);</span>
+<span class="nc" id="L1202">        box.addText(meth, fieldListSize, methListSize, false);</span>
+
+        // Calculates pixel width of type
+<span class="nc" id="L1205">        String methType = &quot;&quot;;</span>
+<span class="nc bnc" id="L1206" title="All 2 branches missed.">        if (!meth.getReturnType().equals(&quot;void&quot;))</span>
+        {
+<span class="nc" id="L1208">            methType = meth.getReturnType();</span>
+        }
+
+        // Increases box size if the method will extend past it
+<span class="nc" id="L1212">        if((int)(font.getStringBounds(meth.getAttName() + &quot; : &quot; + meth.getReturnType(), frc))</span>
+<span class="nc bnc" id="L1213" title="All 2 branches missed.">                .getWidth() + 30 &gt; box.getBoxWidth())</span>
+        {
+<span class="nc" id="L1215">            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + &quot; : &quot; +</span>
+<span class="nc" id="L1216">                    meth.getReturnType(), frc)).getWidth() + 30);</span>
+        }
+<span class="nc" id="L1218">    }</span>
+
+    public void resizeMethod(Method meth, String className) {
+<span class="nc" id="L1221">        ClassBox box = findClassBox(className);</span>
+
+        // Calculates pixel width of type
+<span class="nc" id="L1224">        String methType = &quot;&quot;;</span>
+<span class="nc bnc" id="L1225" title="All 2 branches missed.">        if (!meth.getReturnType().equals(&quot;void&quot;))</span>
+        {
+<span class="nc" id="L1227">            methType = meth.getReturnType();</span>
+        }
+
+        // Caculate pixel length of all parameters in the current method
+<span class="nc" id="L1231">        String param = &quot;&quot;;</span>
+<span class="nc bnc" id="L1232" title="All 2 branches missed.">        for (Parameter tempParam : meth.getParamList())</span>
+        {
+<span class="nc" id="L1234">            param += &quot;, &quot; + tempParam.getAttName() + &quot; : &quot; + tempParam.getFieldType();</span>
+<span class="nc" id="L1235">        }</span>
+
+        // Increases box size if the method will extend past it
+<span class="nc" id="L1238">        if((int)(font.getStringBounds(meth.getAttName() + &quot;(&quot; + param + &quot;) &quot; + meth.getReturnType(), frc))</span>
+<span class="nc bnc" id="L1239" title="All 2 branches missed.">                .getWidth() &gt; box.getBoxWidth())</span>
+        {
+<span class="nc" id="L1241">            box.setBoxWidth((int)(font.getStringBounds(meth.getAttName() + &quot;(&quot; + param + &quot;) &quot; +</span>
+<span class="nc" id="L1242">                    meth.getReturnType(), frc)).getWidth());</span>
+        }
+<span class="nc" id="L1244">    }</span>
+
+    /**
+     * Takes in the source and destination class names and a type
+     * Draws a line with a style depending on the type of relationship
+     *  @param src the source class name
+     * @param dest the destination class name
+     * @param relType the relationship type
+     */
+    public void drawLine(String src, String dest, String relType){
+<span class="nc" id="L1254">        ClassBox source = null;</span>
+<span class="nc" id="L1255">        ClassBox destination = null;</span>
+        // search through the class box list for the source and destination classes
+<span class="nc bnc" id="L1257" title="All 2 branches missed.">        for(ClassBox box : classBoxList){</span>
+<span class="nc bnc" id="L1258" title="All 2 branches missed.">            if(box.getClassBoxName().equals(src)){</span>
+<span class="nc" id="L1259">                source = box;</span>
+            }
+<span class="nc bnc" id="L1261" title="All 2 branches missed.">            if(box.getClassBoxName().equals(dest)){</span>
+<span class="nc" id="L1262">                destination = box;</span>
+            }
+<span class="nc" id="L1264">        }</span>
+<span class="nc bnc" id="L1265" title="All 4 branches missed.">        assert source != null;</span>
+<span class="nc bnc" id="L1266" title="All 4 branches missed.">        assert destination != null;</span>
+        // draw a new line that connects to the source and destination class boxes
+<span class="nc" id="L1268">        RelLine newRelLine = new RelLine(source, destination, relType);</span>
+        // create dashed line with empty arrowhead
+<span class="nc bnc" id="L1270" title="All 5 branches missed.">        switch (relLineStyle(newRelLine.getRelType())) {</span>
+            case &quot;EA&quot; -&gt; {
+<span class="nc" id="L1272">                newRelLine.getLine().setStrokeWidth(0);</span>
+<span class="nc" id="L1273">                arrowList.add(emptyArrow(newRelLine));</span>
+<span class="nc" id="L1274">            }</span>
+            // create line with filled in arrowhead
+<span class="nc" id="L1276">            case &quot;FA&quot; -&gt; arrowList.add(filledArrow(newRelLine));</span>
+
+            // create line with filled in diamond
+<span class="nc" id="L1279">            case &quot;FD&quot; -&gt; arrowList.add(filledDiamond(newRelLine));</span>
+
+            // create line with empty diamond
+            case &quot;ED&quot; -&gt; {
+<span class="nc" id="L1283">                newRelLine.getLine().setStrokeWidth(0);</span>
+<span class="nc" id="L1284">                arrowList.add(emptyDiamond(newRelLine));</span>
+            }
+        }
+        // add the new line to the line list and the super root
+<span class="nc" id="L1288">        lineList.add(newRelLine);</span>
+<span class="nc" id="L1289">        superRoot.getChildren().add(0, newRelLine.getLine());</span>
+<span class="nc" id="L1290">    }</span>
+
+    //***************************************//
+    //******* Manipulation of Objects *******//
+    //***************************************//
+
+    /**
+     * Takes in a relationship line
+     * Draws an empty arrowhead shape
+     * (Realization)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList&lt;Line&gt; emptyArrow(RelLine line){
+        // top(right) and bottom(left) arrows
+<span class="nc" id="L1305">        Line topArrow = new Line();</span>
+<span class="nc" id="L1306">        topArrow.setStrokeWidth(5);</span>
+<span class="nc" id="L1307">        topArrow.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1308">        Line bottomArrow = new Line();</span>
+<span class="nc" id="L1309">        bottomArrow.setStrokeWidth(5);</span>
+<span class="nc" id="L1310">        bottomArrow.setStroke(Color.BLACK);</span>
+        // completes the arrow and fills in diamond
+<span class="nc" id="L1312">        Line middleArrow = new Line();</span>
+<span class="nc" id="L1313">        middleArrow.setStrokeWidth(5);</span>
+<span class="nc" id="L1314">        middleArrow.setStroke(Color.BLACK);</span>
+        // for replacement line bindings setup
+<span class="nc" id="L1316">        Line tBackArrow = new Line();</span>
+<span class="nc" id="L1317">        tBackArrow.setStrokeWidth(0);</span>
+        // Set up arrow's shape
+<span class="nc" id="L1319">        InvalidationListener update = observable -&gt; {</span>
+<span class="nc" id="L1320">            double endX = line.getLine().getEndX();</span>
+<span class="nc" id="L1321">            double endY = line.getLine().getEndY();</span>
+<span class="nc" id="L1322">            double startX = line.getLine().getStartX();</span>
+<span class="nc" id="L1323">            double startY = line.getLine().getStartY();</span>
+            // end of arrow head is the end of the line
+<span class="nc" id="L1325">            topArrow.setEndX(endX);</span>
+<span class="nc" id="L1326">            topArrow.setEndY(endY);</span>
+<span class="nc" id="L1327">            bottomArrow.setEndX(endX);</span>
+<span class="nc" id="L1328">            bottomArrow.setEndY(endY);</span>
+            // get arrowhead angle
+<span class="nc" id="L1330">            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);</span>
+<span class="nc" id="L1331">            double widthM = 9 / Math.hypot(startX - endX, startY - endY);</span>
+            // arrow shape regarding direction of main line
+<span class="nc" id="L1333">            double dirX = (startX - endX) * lengthM;</span>
+<span class="nc" id="L1334">            double dirY = (startY - endY) * lengthM;</span>
+            // arrow shape regarding orthogonal of main line
+<span class="nc" id="L1336">            double orthX = (startX - endX) * widthM;</span>
+<span class="nc" id="L1337">            double orthY = (startY - endY) * widthM;</span>
+            //replacement variables to get dashed line closer to arrow
+<span class="nc" id="L1339">            double rLength = 7 / Math.hypot(startX - endX, startY - endY);</span>
+<span class="nc" id="L1340">            double rDirX = (startX - endX) * rLength;</span>
+<span class="nc" id="L1341">            double rDirY = (startY - endY) * rLength;</span>
+            // set proper arrow shape
+<span class="nc" id="L1343">            topArrow.setStartX(endX + dirX - orthY);</span>
+<span class="nc" id="L1344">            topArrow.setStartY(endY + dirY + orthX);</span>
+<span class="nc" id="L1345">            bottomArrow.setStartX(endX + dirX + orthY);</span>
+<span class="nc" id="L1346">            bottomArrow.setStartY(endY + dirY - orthX);</span>
+<span class="nc" id="L1347">            tBackArrow.setStartX(topArrow.getStartX());</span>
+<span class="nc" id="L1348">            tBackArrow.setStartY(topArrow.getStartY());</span>
+<span class="nc" id="L1349">            tBackArrow.setEndX(topArrow.getStartX() + rDirX + orthY);</span>
+<span class="nc" id="L1350">            tBackArrow.setEndY(topArrow.getStartY() + rDirY - orthX);</span>
+<span class="nc" id="L1351">            middleArrow.setStartX(bottomArrow.getStartX() - .5);</span>
+<span class="nc" id="L1352">            middleArrow.setStartY(bottomArrow.getStartY() - .5);</span>
+<span class="nc" id="L1353">            middleArrow.setEndX(topArrow.getStartX() - .5);</span>
+<span class="nc" id="L1354">            middleArrow.setEndY(topArrow.getStartY() - .5);</span>
+<span class="nc" id="L1355">        };</span>
+        // bindings for replacement line to invisible original line
+<span class="nc" id="L1357">        DoubleBinding startXBind = line.getCBSrc().getClassPane().translateXProperty().add(line.getCBSrc()</span>
+<span class="nc" id="L1358">                .getClassPane().widthProperty().divide(2));</span>
+<span class="nc" id="L1359">        DoubleBinding startYBind = line.getCBSrc().getClassPane().translateYProperty().add(line.getCBSrc()</span>
+<span class="nc" id="L1360">                .getClassPane().heightProperty().divide(2));</span>
+<span class="nc" id="L1361">        DoubleBinding endXBind = tBackArrow.translateXProperty().add(tBackArrow.endXProperty());</span>
+<span class="nc" id="L1362">        DoubleBinding endYBind = tBackArrow.translateYProperty().add(tBackArrow.endYProperty());</span>
+        // replacement line for real line, set bindings
+<span class="nc" id="L1364">        Line rLine = new Line();</span>
+<span class="nc" id="L1365">        rLine.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1366">        rLine.setStrokeWidth(9.5);</span>
+<span class="nc" id="L1367">        rLine.setStrokeLineCap(StrokeLineCap.BUTT);</span>
+<span class="nc" id="L1368">        rLine.getStrokeDashArray().addAll(15d);</span>
+<span class="nc" id="L1369">        rLine.setStrokeDashOffset(10);</span>
+<span class="nc" id="L1370">        rLine.startXProperty().bind(startXBind);</span>
+<span class="nc" id="L1371">        rLine.startYProperty().bind(startYBind);</span>
+<span class="nc" id="L1372">        rLine.endXProperty().bind(endXBind);</span>
+<span class="nc" id="L1373">        rLine.endYProperty().bind(endYBind);</span>
+        // update to arrow shape when moving line
+<span class="nc" id="L1375">        line.getLine().startXProperty().addListener(update);</span>
+<span class="nc" id="L1376">        line.getLine().startYProperty().addListener(update);</span>
+<span class="nc" id="L1377">        line.getLine().endXProperty().addListener(update);</span>
+<span class="nc" id="L1378">        line.getLine().endYProperty().addListener(update);</span>
+        //same update listener for replacement lines
+<span class="nc" id="L1380">        rLine.startXProperty().addListener(update);</span>
+<span class="nc" id="L1381">        rLine.startYProperty().addListener(update);</span>
+<span class="nc" id="L1382">        rLine.endXProperty().addListener(update);</span>
+<span class="nc" id="L1383">        rLine.endYProperty().addListener(update);</span>
+<span class="nc" id="L1384">        update.invalidated(null);</span>
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+<span class="nc" id="L1387">        superRoot.getChildren().add(1, topArrow);</span>
+<span class="nc" id="L1388">        superRoot.getChildren().add(2, bottomArrow);</span>
+<span class="nc" id="L1389">        superRoot.getChildren().add(3, middleArrow);</span>
+<span class="nc" id="L1390">        superRoot.getChildren().add(4, tBackArrow);</span>
+<span class="nc" id="L1391">        superRoot.getChildren().add(5, rLine);</span>
+        // add lines to array list to be manipulated(accessed or deleted)
+<span class="nc" id="L1393">        ArrayList&lt;Line&gt; arrowShape = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L1394">        arrowShape.add(topArrow);</span>
+<span class="nc" id="L1395">        arrowShape.add(bottomArrow);</span>
+<span class="nc" id="L1396">        arrowShape.add(middleArrow);</span>
+<span class="nc" id="L1397">        arrowShape.add(tBackArrow);</span>
+<span class="nc" id="L1398">        arrowShape.add(rLine);</span>
+<span class="nc" id="L1399">        return arrowShape;</span>
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in arrowhead shape
+     * (Inheritance)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList&lt;Line&gt; filledArrow(RelLine line){
+        // top(right) and bottom(left) arrows
+<span class="nc" id="L1411">        Line topArrow = new Line();</span>
+<span class="nc" id="L1412">        topArrow.setStrokeWidth(6);</span>
+<span class="nc" id="L1413">        topArrow.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1414">        Line bottomArrow = new Line();</span>
+<span class="nc" id="L1415">        bottomArrow.setStrokeWidth(6);</span>
+<span class="nc" id="L1416">        bottomArrow.setStroke(Color.BLACK);</span>
+        // completes the arrow and fills in diamond
+<span class="nc" id="L1418">        Line middleArrow = new Line();</span>
+<span class="nc" id="L1419">        middleArrow.setStrokeWidth(6);</span>
+<span class="nc" id="L1420">        middleArrow.setStroke(Color.BLACK);</span>
+        // for filled in arrow or diamond
+<span class="nc" id="L1422">        Line fillArrow = new Line();</span>
+<span class="nc" id="L1423">        fillArrow.setStrokeWidth(7);</span>
+<span class="nc" id="L1424">        fillArrow.setStroke(Color.BLACK);</span>
+        // Set up arrow's shape
+<span class="nc" id="L1426">        InvalidationListener update1 = observable -&gt; {</span>
+<span class="nc" id="L1427">            double endX = line.getLine().getEndX();</span>
+<span class="nc" id="L1428">            double endY = line.getLine().getEndY();</span>
+<span class="nc" id="L1429">            double startX = line.getLine().getStartX();</span>
+<span class="nc" id="L1430">            double startY = line.getLine().getStartY();</span>
+            // end of arrow head is the end of the line
+<span class="nc" id="L1432">            topArrow.setEndX(endX);</span>
+<span class="nc" id="L1433">            topArrow.setEndY(endY);</span>
+<span class="nc" id="L1434">            bottomArrow.setEndX(endX);</span>
+<span class="nc" id="L1435">            bottomArrow.setEndY(endY);</span>
+            // get arrowhead angle
+<span class="nc" id="L1437">            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);</span>
+<span class="nc" id="L1438">            double widthM = 9 / Math.hypot(startX - endX, startY - endY);</span>
+            // arrow shape regarding direction of main line
+<span class="nc" id="L1440">            double dirX = (startX - endX) * lengthM;</span>
+<span class="nc" id="L1441">            double dirY = (startY - endY) * lengthM;</span>
+            // arrow shape regarding orthogonal of main line
+<span class="nc" id="L1443">            double orthX = (startX - endX) * widthM;</span>
+<span class="nc" id="L1444">            double orthY = (startY - endY) * widthM;</span>
+            // set proper arrow shape
+<span class="nc" id="L1446">            topArrow.setStartX(endX + dirX - orthY);</span>
+<span class="nc" id="L1447">            topArrow.setStartY(endY + dirY + orthX);</span>
+<span class="nc" id="L1448">            bottomArrow.setStartX(endX + dirX + orthY);</span>
+<span class="nc" id="L1449">            bottomArrow.setStartY(endY + dirY - orthX);</span>
+<span class="nc" id="L1450">            middleArrow.setStartX(bottomArrow.getStartX() - .5);</span>
+<span class="nc" id="L1451">            middleArrow.setStartY(bottomArrow.getStartY() - .5);</span>
+<span class="nc" id="L1452">            middleArrow.setEndX(topArrow.getStartX() - .5);</span>
+<span class="nc" id="L1453">            middleArrow.setEndY(topArrow.getStartY() - .5);</span>
+<span class="nc" id="L1454">            fillArrow.setStartX(((middleArrow.getStartX() + middleArrow.getEndX()) / 2));</span>
+<span class="nc" id="L1455">            fillArrow.setStartY(((middleArrow.getStartY() + middleArrow.getEndY()) / 2));</span>
+<span class="nc" id="L1456">            fillArrow.setEndX(topArrow.getEndX());</span>
+<span class="nc" id="L1457">            fillArrow.setEndY(topArrow.getEndY());</span>
+<span class="nc" id="L1458">        };</span>
+        // update to arrow shape when moving line
+<span class="nc" id="L1460">        line.getLine().startXProperty().addListener(update1);</span>
+<span class="nc" id="L1461">        line.getLine().startYProperty().addListener(update1);</span>
+<span class="nc" id="L1462">        line.getLine().endXProperty().addListener(update1);</span>
+<span class="nc" id="L1463">        line.getLine().endYProperty().addListener(update1);</span>
+<span class="nc" id="L1464">        update1.invalidated(null);</span>
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+<span class="nc" id="L1467">        superRoot.getChildren().add(1, topArrow);</span>
+<span class="nc" id="L1468">        superRoot.getChildren().add(2, bottomArrow);</span>
+<span class="nc" id="L1469">        superRoot.getChildren().add(3, middleArrow);</span>
+<span class="nc" id="L1470">        superRoot.getChildren().add(4, fillArrow);</span>
+        // add lines to array list to be manipulated(accessed or deleted)
+<span class="nc" id="L1472">        ArrayList&lt;Line&gt; arrowShape = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L1473">        arrowShape.add(topArrow);</span>
+<span class="nc" id="L1474">        arrowShape.add(bottomArrow);</span>
+<span class="nc" id="L1475">        arrowShape.add(middleArrow);</span>
+<span class="nc" id="L1476">        arrowShape.add(fillArrow);</span>
+<span class="nc" id="L1477">        return arrowShape;</span>
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in diamond shape
+     * (Composition)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList&lt;Line&gt; filledDiamond(RelLine line){
+        // top(right) and bottom(left) arrows
+<span class="nc" id="L1489">        Line topArrow = new Line();</span>
+<span class="nc" id="L1490">        topArrow.setStrokeWidth(8);</span>
+<span class="nc" id="L1491">        topArrow.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1492">        Line bottomArrow = new Line();</span>
+<span class="nc" id="L1493">        bottomArrow.setStrokeWidth(8);</span>
+<span class="nc" id="L1494">        bottomArrow.setStroke(Color.BLACK);</span>
+        // for filled in arrow or diamond
+<span class="nc" id="L1496">        Line fillArrow = new Line();</span>
+<span class="nc" id="L1497">        fillArrow.setStrokeWidth(7);</span>
+<span class="nc" id="L1498">        fillArrow.setStroke(Color.BLACK);</span>
+        // for diamond Shape
+<span class="nc" id="L1500">        Line tBackArrow = new Line();</span>
+<span class="nc" id="L1501">        tBackArrow.setStrokeWidth(8);</span>
+<span class="nc" id="L1502">        tBackArrow.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1503">        Line bBackArrow = new Line();</span>
+<span class="nc" id="L1504">        bBackArrow.setStrokeWidth(8);</span>
+<span class="nc" id="L1505">        bBackArrow.setStroke(Color.BLACK);</span>
+        // Set up arrow's shape
+<span class="nc" id="L1507">        InvalidationListener update2 = observable -&gt; {</span>
+<span class="nc" id="L1508">            double startX = line.getLine().getStartX();</span>
+<span class="nc" id="L1509">            double startY = line.getLine().getStartY();</span>
+<span class="nc" id="L1510">            double endX = line.getLine().getEndX();</span>
+<span class="nc" id="L1511">            double endY = line.getLine().getEndY();</span>
+            // end of arrow head is the end of the line
+<span class="nc" id="L1513">            topArrow.setEndX(endX);</span>
+<span class="nc" id="L1514">            topArrow.setEndY(endY);</span>
+<span class="nc" id="L1515">            bottomArrow.setEndX(endX);</span>
+<span class="nc" id="L1516">            bottomArrow.setEndY(endY);</span>
+            // get arrowhead angle
+<span class="nc" id="L1518">            double lengthM = 20 / Math.hypot(startX - endX, startY - endY);</span>
+<span class="nc" id="L1519">            double widthM = 9 / Math.hypot(startX - endX, startY - endY);</span>
+            // arrow shape regarding direction of main line
+<span class="nc" id="L1521">            double dirX = (startX - endX) * lengthM;</span>
+<span class="nc" id="L1522">            double dirY = (startY - endY) * lengthM;</span>
+            // arrow shape regarding orthogonal of main line
+<span class="nc" id="L1524">            double orthX = (startX - endX) * widthM;</span>
+<span class="nc" id="L1525">            double orthY = (startY - endY) * widthM;</span>
+            // set proper arrow shape
+<span class="nc" id="L1527">            topArrow.setStartX(endX + dirX - orthY);</span>
+<span class="nc" id="L1528">            topArrow.setStartY(endY + dirY + orthX);</span>
+<span class="nc" id="L1529">            bottomArrow.setStartX(endX + dirX + orthY);</span>
+<span class="nc" id="L1530">            bottomArrow.setStartY(endY + dirY - orthX);</span>
+<span class="nc" id="L1531">            tBackArrow.setStartX(topArrow.getStartX());</span>
+<span class="nc" id="L1532">            tBackArrow.setStartY(topArrow.getStartY());</span>
+<span class="nc" id="L1533">            tBackArrow.setEndX(topArrow.getStartX() + dirX + orthY);</span>
+<span class="nc" id="L1534">            tBackArrow.setEndY(topArrow.getStartY() + dirY - orthX);</span>
+<span class="nc" id="L1535">            bBackArrow.setStartX(bottomArrow.getStartX());</span>
+<span class="nc" id="L1536">            bBackArrow.setStartY(bottomArrow.getStartY());</span>
+<span class="nc" id="L1537">            bBackArrow.setEndX(bottomArrow.getStartX() + dirX - orthY);</span>
+<span class="nc" id="L1538">            bBackArrow.setEndY(bottomArrow.getStartY() + dirY + orthX);</span>
+<span class="nc" id="L1539">            fillArrow.setStartX(tBackArrow.getEndX());</span>
+<span class="nc" id="L1540">            fillArrow.setStartY(tBackArrow.getEndY());</span>
+<span class="nc" id="L1541">            fillArrow.setEndX(topArrow.getEndX());</span>
+<span class="nc" id="L1542">            fillArrow.setEndY(topArrow.getEndY());</span>
+
+<span class="nc" id="L1544">        };</span>
+        // update to arrow shape when moving line
+<span class="nc" id="L1546">        line.getLine().startXProperty().addListener(update2);</span>
+<span class="nc" id="L1547">        line.getLine().startYProperty().addListener(update2);</span>
+<span class="nc" id="L1548">        line.getLine().endXProperty().addListener(update2);</span>
+<span class="nc" id="L1549">        line.getLine().endYProperty().addListener(update2);</span>
+<span class="nc" id="L1550">        update2.invalidated(null);</span>
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+<span class="nc" id="L1553">        superRoot.getChildren().add(1, topArrow);</span>
+<span class="nc" id="L1554">        superRoot.getChildren().add(2, bottomArrow);</span>
+<span class="nc" id="L1555">        superRoot.getChildren().add(3, fillArrow);</span>
+<span class="nc" id="L1556">        superRoot.getChildren().add(4, tBackArrow);</span>
+<span class="nc" id="L1557">        superRoot.getChildren().add(5, bBackArrow);</span>
+        // add lines to array list to be manipulated(accessed or deleted)
+<span class="nc" id="L1559">        ArrayList&lt;Line&gt; arrowShape = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L1560">        arrowShape.add(topArrow);</span>
+<span class="nc" id="L1561">        arrowShape.add(bottomArrow);</span>
+<span class="nc" id="L1562">        arrowShape.add(fillArrow);</span>
+<span class="nc" id="L1563">        arrowShape.add(tBackArrow);</span>
+<span class="nc" id="L1564">        arrowShape.add(bBackArrow);</span>
+<span class="nc" id="L1565">        return arrowShape;</span>
+    }
+
+    /**
+     * Takes in a relationship line
+     * Draws a filled in diamond shape
+     * (Aggregation)
+     *
+     * @param line the relationship line
+     */
+    public ArrayList&lt;Line&gt; emptyDiamond(RelLine line){
+        // top(right) and bottom(left) arrows
+<span class="nc" id="L1577">        Line topArrow = new Line();</span>
+<span class="nc" id="L1578">        topArrow.setStrokeWidth(6);</span>
+<span class="nc" id="L1579">        topArrow.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1580">        Line bottomArrow = new Line();</span>
+<span class="nc" id="L1581">        bottomArrow.setStrokeWidth(6);</span>
+<span class="nc" id="L1582">        bottomArrow.setStroke(Color.BLACK);</span>
+        // for diamond Shape
+<span class="nc" id="L1584">        Line tBackArrow = new Line();</span>
+<span class="nc" id="L1585">        tBackArrow.setStrokeWidth(6);</span>
+<span class="nc" id="L1586">        tBackArrow.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1587">        Line bBackArrow = new Line();</span>
+<span class="nc" id="L1588">        bBackArrow.setStrokeWidth(6);</span>
+<span class="nc" id="L1589">        bBackArrow.setStroke(Color.BLACK);</span>
+        // Set up arrow's shape
+<span class="nc" id="L1591">        InvalidationListener update3 = observable -&gt; {</span>
+<span class="nc" id="L1592">            double endX = line.getLine().getEndX();</span>
+<span class="nc" id="L1593">            double endY = line.getLine().getEndY();</span>
+<span class="nc" id="L1594">            double startX = line.getLine().getStartX();</span>
+<span class="nc" id="L1595">            double startY = line.getLine().getStartY();</span>
+            // end of arrow head is the end of the line
+<span class="nc" id="L1597">            topArrow.setEndX(endX);</span>
+<span class="nc" id="L1598">            topArrow.setEndY(endY);</span>
+<span class="nc" id="L1599">            bottomArrow.setEndX(endX);</span>
+<span class="nc" id="L1600">            bottomArrow.setEndY(endY);</span>
+            // get arrowhead angle
+<span class="nc" id="L1602">            double lengthM = 25 / Math.hypot(startX - endX, startY - endY);</span>
+<span class="nc" id="L1603">            double widthM = 11 / Math.hypot(startX - endX, startY - endY);</span>
+            // arrow shape regarding direction of main line
+<span class="nc" id="L1605">            double dirX = (startX - endX) * lengthM;</span>
+<span class="nc" id="L1606">            double dirY = (startY - endY) * lengthM;</span>
+            // arrow shape regarding orthogonal of main line
+<span class="nc" id="L1608">            double orthX = (startX - endX) * widthM;</span>
+<span class="nc" id="L1609">            double orthY = (startY - endY) * widthM;</span>
+            // set proper arrow shape
+<span class="nc" id="L1611">            topArrow.setStartX(endX + dirX - orthY);</span>
+<span class="nc" id="L1612">            topArrow.setStartY(endY + dirY + orthX);</span>
+<span class="nc" id="L1613">            bottomArrow.setStartX(endX + dirX + orthY);</span>
+<span class="nc" id="L1614">            bottomArrow.setStartY(endY + dirY - orthX);</span>
+<span class="nc" id="L1615">            tBackArrow.setStartX(topArrow.getStartX());</span>
+<span class="nc" id="L1616">            tBackArrow.setStartY(topArrow.getStartY());</span>
+<span class="nc" id="L1617">            tBackArrow.setEndX(topArrow.getStartX() + dirX + orthY);</span>
+<span class="nc" id="L1618">            tBackArrow.setEndY(topArrow.getStartY() + dirY - orthX);</span>
+<span class="nc" id="L1619">            bBackArrow.setStartX(bottomArrow.getStartX());</span>
+<span class="nc" id="L1620">            bBackArrow.setStartY(bottomArrow.getStartY());</span>
+<span class="nc" id="L1621">            bBackArrow.setEndX(bottomArrow.getStartX() + dirX - orthY);</span>
+<span class="nc" id="L1622">            bBackArrow.setEndY(bottomArrow.getStartY() + dirY + orthX);</span>
+<span class="nc" id="L1623">        };</span>
+        // bindings for replacement line to invisible original line
+<span class="nc" id="L1625">        DoubleBinding startXBind = line.getCBSrc().getClassPane().translateXProperty().add(line.getCBSrc()</span>
+<span class="nc" id="L1626">                .getClassPane().widthProperty().divide(2));</span>
+<span class="nc" id="L1627">        DoubleBinding startYBind = line.getCBSrc().getClassPane().translateYProperty().add(line.getCBSrc()</span>
+<span class="nc" id="L1628">                .getClassPane().heightProperty().divide(2));</span>
+<span class="nc" id="L1629">        DoubleBinding endXBind = tBackArrow.translateXProperty().add(tBackArrow.endXProperty());</span>
+<span class="nc" id="L1630">        DoubleBinding endYBind = tBackArrow.translateYProperty().add(tBackArrow.endYProperty());</span>
+        // replacement line for real line, set bindings
+<span class="nc" id="L1632">        Line rLine = new Line();</span>
+<span class="nc" id="L1633">        rLine.setStroke(Color.BLACK);</span>
+<span class="nc" id="L1634">        rLine.setStrokeWidth(9.5);</span>
+<span class="nc" id="L1635">        rLine.startXProperty().bind(startXBind);</span>
+<span class="nc" id="L1636">        rLine.startYProperty().bind(startYBind);</span>
+<span class="nc" id="L1637">        rLine.endXProperty().bind(endXBind);</span>
+<span class="nc" id="L1638">        rLine.endYProperty().bind(endYBind);</span>
+        // update to arrow shape when moving line
+<span class="nc" id="L1640">        line.getLine().startXProperty().addListener(update3);</span>
+<span class="nc" id="L1641">        line.getLine().startYProperty().addListener(update3);</span>
+<span class="nc" id="L1642">        line.getLine().endXProperty().addListener(update3);</span>
+<span class="nc" id="L1643">        line.getLine().endYProperty().addListener(update3);</span>
+        //same update listener for replacement lines
+<span class="nc" id="L1645">        rLine.startXProperty().addListener(update3);</span>
+<span class="nc" id="L1646">        rLine.startYProperty().addListener(update3);</span>
+<span class="nc" id="L1647">        rLine.endXProperty().addListener(update3);</span>
+<span class="nc" id="L1648">        rLine.endYProperty().addListener(update3);</span>
+<span class="nc" id="L1649">        update3.invalidated(null);</span>
+        // add lines to the super root to show up in gui
+        // (DO NOT change these line below to an addAll call for superRoot.getChildren, the order matters)
+<span class="nc" id="L1652">        superRoot.getChildren().add(1, topArrow);</span>
+<span class="nc" id="L1653">        superRoot.getChildren().add(2, bottomArrow);</span>
+<span class="nc" id="L1654">        superRoot.getChildren().add(3, tBackArrow);</span>
+<span class="nc" id="L1655">        superRoot.getChildren().add(4, bBackArrow);</span>
+<span class="nc" id="L1656">        superRoot.getChildren().add(5, rLine);</span>
+        // add lines to array list to be manipulated(accessed or deleted)
+<span class="nc" id="L1658">        ArrayList&lt;Line&gt; arrowShape = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L1659">        arrowShape.add(topArrow);</span>
+<span class="nc" id="L1660">        arrowShape.add(bottomArrow);</span>
+<span class="nc" id="L1661">        arrowShape.add(tBackArrow);</span>
+<span class="nc" id="L1662">        arrowShape.add(bBackArrow);</span>
+<span class="nc" id="L1663">        arrowShape.add(rLine);</span>
+<span class="nc" id="L1664">        return arrowShape;</span>
+    }
+
+    /**
+     * Takes in the source and destination class box objects
+     * finds and returns the relationship line corresponding to
+     * the src and dest
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     * @return the relationship line
+     */
+    public RelLine findRelLine(ClassBox src, ClassBox dest){
+<span class="nc bnc" id="L1677" title="All 2 branches missed.">        for(RelLine line : lineList){</span>
+<span class="nc bnc" id="L1678" title="All 2 branches missed.">            if(line.getCBSrc().equals(src)) {</span>
+<span class="nc bnc" id="L1679" title="All 2 branches missed.">                if (line.getCBDest().equals(dest)) {</span>
+<span class="nc" id="L1680">                    return line;</span>
+                }
+            }
+<span class="nc" id="L1683">        }</span>
+<span class="nc" id="L1684">        return null;</span>
+    }
+
+    /**
+     * Takes in a relationship line
+     * returns the arrow shape (list of lines)
+     *
+     * @param line the relationship line
+     * @return the arrow shape
+     */
+    public ArrayList&lt;Line&gt; findArrow(RelLine line){
+<span class="nc bnc" id="L1695" title="All 2 branches missed.">        for(ArrayList&lt;Line&gt; arrows : arrowList){</span>
+<span class="nc bnc" id="L1696" title="All 2 branches missed.">            for(Line arrow : arrows){</span>
+<span class="nc bnc" id="L1697" title="All 2 branches missed.">                if(arrow.getEndX() == line.getLine().getEndX()){</span>
+<span class="nc" id="L1698">                    return arrows;</span>
+                }
+<span class="nc" id="L1700">            }</span>
+<span class="nc" id="L1701">        }</span>
+<span class="nc" id="L1702">        return null;</span>
+    }
+
+    /**
+     * Takes in a class name from the classlist, searches through the
+     * class box list for a class box object with the same name as className
+     *
+     * @param className the name of the class
+     * @return the classbox object with the same class name
+     */
+    public ClassBox findClassBox(String className){
+<span class="nc" id="L1713">        ClassBox classbox = null;</span>
+<span class="nc bnc" id="L1714" title="All 2 branches missed.">        for(ClassBox box : classBoxList) {</span>
+<span class="nc bnc" id="L1715" title="All 2 branches missed.">            if (box.getClassBoxName().equals(className)) {</span>
+<span class="nc" id="L1716">                classbox = box;</span>
+            }
+<span class="nc" id="L1718">        }</span>
+<span class="nc" id="L1719">        return classbox;</span>
+    }
+
+    /**
+     * Takes in a class box name(class name) and removes it from the super root
+     * and class box list(removes the class from the view)
+     *
+     * @param classBoxName the name of the class box(name of class)
+     */
+    public void deleteClassBox (String classBoxName){
+<span class="nc bnc" id="L1729" title="All 2 branches missed.">        for (ClassBox cbObj : classBoxList) {</span>
+<span class="nc bnc" id="L1730" title="All 2 branches missed.">            if(cbObj.getClassBoxName().equals(classBoxName)) {</span>
+<span class="nc" id="L1731">                superRoot.getChildren().remove(cbObj.getClassPane());</span>
+            }
+<span class="nc" id="L1733">        }</span>
+<span class="nc" id="L1734">        classBoxList.remove(findClassBox(classBoxName));</span>
+<span class="nc" id="L1735">    }</span>
+
+    /**
+     * Takes in a source class box object and a destination class
+     * box object, searches through the list of relationship lines
+     * and deletes the line that matches the source and destination
+     *
+     * @param src the source class box object
+     * @param dest the destination class box object
+     */
+    public void deleteRelLine (ClassBox src, ClassBox dest){
+<span class="nc bnc" id="L1746" title="All 2 branches missed.">        for(ArrayList&lt;Line&gt; arrows : arrowList){</span>
+<span class="nc bnc" id="L1747" title="All 2 branches missed.">            if(arrows.equals(findArrow(findRelLine(src, dest)))) {</span>
+<span class="nc bnc" id="L1748" title="All 2 branches missed.">                for (Line arrow : arrows) {</span>
+<span class="nc" id="L1749">                    superRoot.getChildren().remove(arrow);</span>
+<span class="nc" id="L1750">                }</span>
+<span class="nc" id="L1751">                superRoot.getChildren().remove(arrows);</span>
+<span class="nc" id="L1752">                arrowList.remove(arrows);</span>
+<span class="nc" id="L1753">                break;</span>
+            }
+<span class="nc" id="L1755">        }</span>
+<span class="nc" id="L1756">        superRoot.getChildren().remove(findRelLine(src, dest).getLine());</span>
+<span class="nc" id="L1757">        lineList.remove(findRelLine(src, dest).getLine());</span>
+<span class="nc" id="L1758">        lineList.remove(findRelLine(src, dest));</span>
+<span class="nc" id="L1759">    }</span>
+
+    /**
+     * Takes in a relLine and a relType
+     * Styles the relationship line depending on the relationship type
+     *
+     * @param relType the relationship type
+     * @return the type of arrowhead shape (arrow or diamond, filled or empty)
+     */
+    public String relLineStyle(String relType){
+<span class="nc bnc" id="L1769" title="All 5 branches missed.">        switch (relType) {</span>
+            case &quot;aggregation&quot; -&gt; {
+<span class="nc" id="L1771">                return &quot;ED&quot;; // empty diamond</span>
+            }
+            case &quot;composition&quot; -&gt; {
+<span class="nc" id="L1774">                return &quot;FD&quot;; // filled in diamond</span>
+            }
+            case &quot;inheritance&quot; -&gt; {
+<span class="nc" id="L1777">                return &quot;FA&quot;; // filled in arrow</span>
+            }
+            case &quot;realization&quot; -&gt; {
+<span class="nc" id="L1780">                return &quot;EA&quot;; // empty arrow</span>
+            }
+        }
+<span class="nc" id="L1783">        return null;</span>
+    }
+
+    private void updateMenus() {
+        // get the list of items in the edit menu object
+<span class="nc" id="L1788">        ObservableList&lt;MenuItem&gt; editList = menuBar.getMenus().get(1).getItems();</span>
+        // get the add menu object
+<span class="nc" id="L1790">        Menu add = (Menu) editList.get(0);</span>
+        // get the add attribute menu object
+<span class="nc" id="L1792">        Menu addAttribute = (Menu) add.getItems().get(1);</span>
+        // get the delete menu object
+<span class="nc" id="L1794">        Menu delete = (Menu) editList.get(1);</span>
+        // get the delete attribute menu object
+<span class="nc" id="L1796">        Menu deleteAttribute = (Menu) delete.getItems().get(1);</span>
+        // get the rename menu object
+<span class="nc" id="L1798">        Menu rename = (Menu) editList.get(2);</span>
+        // get the rename attribute menu object
+<span class="nc" id="L1800">        Menu renameAttribute = (Menu) rename.getItems().get(1);</span>
+        // get the change menu object
+<span class="nc" id="L1802">        Menu change = (Menu) editList.get(3);</span>
+
+        // enable/disable
+<span class="nc bnc" id="L1805" title="All 2 branches missed.">        if (!this.controller.getClassList().isEmpty()) {</span>
+            // enable the add field menu item
+<span class="nc" id="L1807">            addAttribute.getItems().get(0).setDisable(false);</span>
+            // enable the add method menu item
+<span class="nc" id="L1809">            addAttribute.getItems().get(1).setDisable(false);</span>
+            // enable add relationship
+<span class="nc" id="L1811">            add.getItems().get(2).setDisable(false);</span>
+            // enable the delete class menu item
+<span class="nc" id="L1813">            delete.getItems().get(0).setDisable(false);</span>
+            // enable the rename class menu item
+<span class="nc" id="L1815">            rename.getItems().get(0).setDisable(false);</span>
+
+<span class="nc" id="L1817">            boolean fieldExists = false;</span>
+<span class="nc" id="L1818">            boolean methodExists = false;</span>
+<span class="nc" id="L1819">            boolean paramExists = false;</span>
+            // check every object and see if at least one of them has either a field or method
+<span class="nc bnc" id="L1821" title="All 2 branches missed.">            for (UMLClass classObj : this.controller.getClassList()) {</span>
+<span class="nc bnc" id="L1822" title="All 2 branches missed.">                if (!classObj.getFieldList().isEmpty()) {</span>
+<span class="nc" id="L1823">                    fieldExists = true;</span>
+                }
+<span class="nc bnc" id="L1825" title="All 2 branches missed.">                if (!classObj.getMethodList().isEmpty()) {</span>
+<span class="nc" id="L1826">                    methodExists = true;</span>
+<span class="nc bnc" id="L1827" title="All 2 branches missed.">                    for (Method methObj : classObj.getMethodList()) {</span>
+<span class="nc bnc" id="L1828" title="All 2 branches missed.">                        if (!methObj.getParamList().isEmpty()) {</span>
+<span class="nc" id="L1829">                            paramExists = true;</span>
+                        }
+<span class="nc" id="L1831">                    }</span>
+                }
+<span class="nc" id="L1833">            }</span>
+            // if there is at least one field in the list, enable the menu items
+            // otherwise, disable them
+<span class="nc bnc" id="L1836" title="All 2 branches missed.">            if (fieldExists) {</span>
+<span class="nc" id="L1837">                deleteAttribute.getItems().get(0).setDisable(false);</span>
+<span class="nc" id="L1838">                renameAttribute.getItems().get(0).setDisable(false);</span>
+            } else {
+<span class="nc" id="L1840">                deleteAttribute.getItems().get(0).setDisable(true);</span>
+<span class="nc" id="L1841">                renameAttribute.getItems().get(0).setDisable(true);</span>
+            }
+            // if there is at least one method in the list, enable the menu items
+            // otherwise, disable them
+<span class="nc bnc" id="L1845" title="All 2 branches missed.">            if (methodExists) {</span>
+<span class="nc" id="L1846">                deleteAttribute.getItems().get(1).setDisable(false);</span>
+<span class="nc" id="L1847">                deleteAttribute.getItems().get(1).setDisable(false);</span>
+<span class="nc" id="L1848">                renameAttribute.getItems().get(1).setDisable(false);</span>
+<span class="nc" id="L1849">                add.getItems().get(3).setDisable(false);</span>
+            } else {
+<span class="nc" id="L1851">                deleteAttribute.getItems().get(1).setDisable(true);</span>
+<span class="nc" id="L1852">                renameAttribute.getItems().get(1).setDisable(true);</span>
+<span class="nc" id="L1853">                add.getItems().get(3).setDisable(true);</span>
+            }
+            // if there is at least one parameter in the list, enable the menu items
+            // otherwise, disable them
+<span class="nc bnc" id="L1857" title="All 2 branches missed.">            if (paramExists) {</span>
+<span class="nc" id="L1858">                delete.getItems().get(3).setDisable(false);</span>
+<span class="nc" id="L1859">                change.getItems().get(0).setDisable(false);</span>
+            } else {
+<span class="nc" id="L1861">                delete.getItems().get(3).setDisable(true);</span>
+<span class="nc" id="L1862">                change.getItems().get(0).setDisable(true);</span>
+            }
+            // if there are at least one relationship in the relationship list, enable the menu items
+            // otherwise, disable them
+<span class="nc bnc" id="L1866" title="All 2 branches missed.">            if (!this.controller.getRelationshipList().isEmpty()) {</span>
+<span class="nc" id="L1867">                delete.getItems().get(2).setDisable(false);</span>
+<span class="nc" id="L1868">                change.getItems().get(1).setDisable(false);</span>
+            } else {
+<span class="nc" id="L1870">                delete.getItems().get(2).setDisable(true);</span>
+<span class="nc" id="L1871">                change.getItems().get(1).setDisable(true);</span>
+            }
+<span class="nc" id="L1873">        } else {</span>
+            // disable all the menu items
+<span class="nc" id="L1875">            addAttribute.getItems().get(0).setDisable(true);</span>
+<span class="nc" id="L1876">            addAttribute.getItems().get(1).setDisable(true);</span>
+<span class="nc" id="L1877">            add.getItems().get(2).setDisable(true);</span>
+<span class="nc" id="L1878">            delete.getItems().get(0).setDisable(true);</span>
+<span class="nc" id="L1879">            rename.getItems().get(0).setDisable(true);</span>
+<span class="nc" id="L1880">            deleteAttribute.getItems().get(0).setDisable(true);</span>
+<span class="nc" id="L1881">            renameAttribute.getItems().get(0).setDisable(true);</span>
+<span class="nc" id="L1882">            deleteAttribute.getItems().get(1).setDisable(true);</span>
+<span class="nc" id="L1883">            renameAttribute.getItems().get(1).setDisable(true);</span>
+<span class="nc" id="L1884">            add.getItems().get(3).setDisable(true);</span>
+<span class="nc" id="L1885">            change.getItems().get(0).setDisable(true);</span>
+        }
+<span class="nc" id="L1887">    }</span>
+
+    /**
+     * Takes in many parameters from the window and gives it standardized formatting,
+     * then finalizes and shows it
+     *
+     * @param stage the stage of the window
+     * @param root the group of objects in the window
+     * @param pane the pane of objects
+     * @param title the title of the window
+     * @param height the height of the window
+     * @param width the width of the window
+     */
+    private void finalizeWindow(Stage stage, Group root, GridPane pane, String title, int height, int width) {
+<span class="nc" id="L1901">        stage.initModality(Modality.APPLICATION_MODAL);</span>
+<span class="nc" id="L1902">        pane.setHgap(5);</span>
+<span class="nc" id="L1903">        pane.setVgap(10);</span>
+<span class="nc" id="L1904">        pane.setPadding(new Insets(10, 10, 10, 10));</span>
+<span class="nc" id="L1905">        stage.setTitle(title);</span>
+<span class="nc" id="L1906">        stage.setWidth(width);</span>
+<span class="nc" id="L1907">        stage.setHeight(height);</span>
+<span class="nc" id="L1908">        stage.setResizable(false);</span>
+<span class="nc" id="L1909">        root.getChildren().add(pane);</span>
+<span class="nc" id="L1910">        Scene window = new Scene(root);</span>
+<span class="nc" id="L1911">        stage.setScene(window);</span>
+<span class="nc" id="L1912">        stage.show();</span>
+<span class="nc" id="L1913">    }</span>
+
+    /**
+     * Adds a key value pair to the coordinate map, where the value is a list of the x and y
+     *
+     * @param className the key, the name of the class
+     * @param X the x value for the class box
+     * @param Y the y value for the class box
+     */
+    public void addToCoordinateMap(String className, Double X, Double Y) {
+<span class="nc" id="L1923">        List&lt;Double&gt; coordinateList = new ArrayList&lt;Double&gt;();</span>
+<span class="nc" id="L1924">        coordinateList.add(X);</span>
+<span class="nc" id="L1925">        coordinateList.add(Y);</span>
+<span class="nc" id="L1926">        this.model.getCoordinateMap().put(className, coordinateList);</span>
+<span class="nc" id="L1927">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L1930">        launch(args);</span>
+<span class="nc" id="L1931">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

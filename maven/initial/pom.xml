@@ -14,6 +14,12 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>19-ea+5</version>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
@@ -47,11 +53,55 @@
         <plugins>
 
             <plugin>
+                <groupId>com.github.veithen.maven</groupId>
+                <artifactId>jacoco-report-maven-plugin</artifactId>
+                <version>0.3.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>uml.GUIController</exclude>
+                        <exclude>uml.GUIView</exclude>
+                        <exclude>uml.ClassBox</exclude>
+                        <exclude>uml.JSON</exclude>
+                        <exclude>uml.RelLine</exclude>
+                        <exclude>uml.Memento</exclude>
+                        <exclude>uml.Caretaker</exclude>
+                    </excludes>
+                </configuration>
+                <version>0.8.7</version>
+                <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>generate-report</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            
+            <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.1</version>
                 <configuration>
-                    <mainClass>uml.GUIController</mainClass>
+                    <mainClass>uml.Driver</mainClass>
                 </configuration>
             </plugin>
 

@@ -86,8 +86,8 @@ public class UMLClass {
     public void deleteAttribute(Attribute attToDel) {
         if (attToDel instanceof Field fieldToDel) {
             deleteField(fieldToDel);
-        } else if (attToDel instanceof Method methToDel) {
-            deleteMethod(methToDel);
+        } else {
+            deleteMethod((Method) attToDel);
         }
     }
 

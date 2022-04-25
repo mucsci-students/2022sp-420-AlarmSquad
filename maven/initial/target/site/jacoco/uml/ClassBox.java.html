@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassBox.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">ClassBox.java</span></div><h1>ClassBox.java</h1><pre class="source lang-java linenums">package uml;
+
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.*;
+
+import java.util.ArrayList;
+
+public class ClassBox {
+
+    private final Rectangle titleBox;
+    private String classBoxName;
+<span class="nc" id="L15">    private double boxWidth = 100;</span>
+<span class="nc" id="L16">    private double boxHeight = 20;</span>
+    private StackPane classPane;
+    private TextFlow flow;
+    private TextFlow fieldFlow;
+    private TextFlow methFlow;
+    private Text classTitle;
+    private ArrayList&lt;Text&gt; fieldTextList;
+    private ArrayList&lt;Text&gt; methTextList;
+    private double X;
+    private double Y;
+
+<span class="nc" id="L27">    public ClassBox(String className) {</span>
+<span class="nc" id="L28">        classBoxName = className;</span>
+<span class="nc" id="L29">        classPane = new StackPane();</span>
+<span class="nc" id="L30">        titleBox = new Rectangle((boxWidth), (boxHeight));</span>
+<span class="nc" id="L31">        titleBox.setFill(Color.WHITESMOKE);</span>
+<span class="nc" id="L32">        titleBox.setStroke(Color.BLACK);</span>
+<span class="nc" id="L33">        classTitle = new Text(className);</span>
+<span class="nc" id="L34">        classTitle.setFont(Font.font(classTitle.getFont().getName(), FontWeight.BOLD, 12));</span>
+<span class="nc" id="L35">        flow = new TextFlow();</span>
+<span class="nc" id="L36">        flow.setTextAlignment(TextAlignment.CENTER);</span>
+<span class="nc" id="L37">        flow.getChildren().add(classTitle);</span>
+<span class="nc" id="L38">        classPane.getChildren().add(0, titleBox);</span>
+<span class="nc" id="L39">        classPane.getChildren().add(1, flow);</span>
+<span class="nc" id="L40">    }</span>
+
+    // Getters and Setters
+<span class="nc" id="L43">    public double getX() {return X;}</span>
+
+<span class="nc" id="L45">    public void setX(double X) {this.X = X;}</span>
+
+<span class="nc" id="L47">    public double getY() {return Y;}</span>
+
+<span class="nc" id="L49">    public void setY(double Y) {this.Y = Y;}</span>
+
+    public StackPane getClassPane() {
+<span class="nc" id="L52">        return this.classPane;</span>
+    }
+
+    public void setClassPane(StackPane classPane) {
+<span class="nc" id="L56">        this.classPane = classPane;</span>
+<span class="nc" id="L57">    }</span>
+
+    public TextFlow getFlow(){
+<span class="nc" id="L60">        return this.flow;</span>
+    }
+
+    public void setFlow(TextFlow flow) {
+<span class="nc" id="L64">        this.flow = flow;</span>
+<span class="nc" id="L65">    }</span>
+
+    public String getClassBoxName() {
+<span class="nc" id="L68">        return this.classBoxName;</span>
+    }
+
+    public void setClassBoxName(String classBoxName) {
+<span class="nc" id="L72">        this.classBoxName = classBoxName;</span>
+<span class="nc" id="L73">    }</span>
+
+    public Text getClassTitle() {
+<span class="nc" id="L76">        return classTitle;</span>
+    }
+
+    public void setClassTitle(Text classTitle) {
+<span class="nc" id="L80">        this.classTitle = classTitle;</span>
+<span class="nc" id="L81">    }</span>
+
+    public double getBoxWidth() {
+<span class="nc" id="L84">        return this.boxWidth;</span>
+    }
+
+    public void setBoxWidth(double boxWidth) {
+<span class="nc" id="L88">        this.titleBox.setWidth(boxWidth);</span>
+<span class="nc" id="L89">        this.boxWidth = boxWidth;</span>
+<span class="nc" id="L90">    }</span>
+
+    public double getBoxHeight() {
+<span class="nc" id="L93">        return this.boxHeight;</span>
+    }
+
+    public void setBoxHeight(double boxHeight) {
+<span class="nc" id="L97">        this.titleBox.setHeight(boxHeight);</span>
+<span class="nc" id="L98">        this.boxHeight = boxHeight;</span>
+<span class="nc" id="L99">    }</span>
+
+    public ArrayList&lt;Text&gt; getFieldTextList() {
+<span class="nc" id="L102">        return fieldTextList;</span>
+    }
+
+    public void setFieldTextList(ArrayList&lt;Text&gt; fieldTextList) {
+<span class="nc" id="L106">        this.fieldTextList = fieldTextList;</span>
+<span class="nc" id="L107">    }</span>
+
+    public ArrayList&lt;Text&gt; getMethTextList() {
+<span class="nc" id="L110">        return methTextList;</span>
+    }
+
+    public void setMethTextList(ArrayList&lt;Text&gt; methTextList) {
+<span class="nc" id="L114">        this.methTextList = methTextList;</span>
+<span class="nc" id="L115">    }</span>
+
+    /**
+     * Takes in a generic object, 'E att', with the number of fields and methods
+     * currently in the class. Iterates through the fieldTextList and methTextList
+     * in the classBox object, and outputs the fields and methods accordingly
+     *
+     * @param att generic attribute to be added, either of type method or field
+     * @param numOfFields number of fields currently in the class
+     * @param numOfMeths number of methods currently in the class
+     */
+    public &lt;E&gt; void addText(E att, int numOfFields, int numOfMeths, boolean dontAddPadding) {
+        // Clear the flow each time a method or field is added,
+        // thus clearing the classbox of all objects.
+<span class="nc" id="L129">        flow.getChildren().clear();</span>
+        // Remake the flow with just the name of the class added
+<span class="nc" id="L131">        flow.getChildren().add(classTitle);</span>
+        // Must initialize attName outside if/else statement or intellij cries
+<span class="nc" id="L133">        String attName = &quot;&quot;;</span>
+        // To format output correctly, determine if att belongs to
+        // the class Field or Method
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (att instanceof Field) {</span>
+            // If att is a Field, add a newline to the front of it's name to put it
+            // on a new line in the classbox, and add &quot;- &quot; to the front of the name for formatting
+<span class="nc" id="L139">            attName = (&quot;\n- &quot; + ((Field) att).getAttName() + &quot; : &quot; + ((Field) att).getFieldType());</span>
+            // If this is the first field ever being added to the class associated with this
+            // classbox, then initialize the fieldTextList, and increase the size of the
+            // classbox for formatting. Attributes are added to their classes BEFORE the drawing of the box,
+            // so the number of fields in a class will only == 1 inside this method when this is the first
+            // field being added to a class.
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (numOfFields == 1) {</span>
+<span class="nc" id="L146">                fieldTextList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">                if (!dontAddPadding) {</span>
+<span class="nc" id="L148">                    setBoxHeight(boxHeight + 15);</span>
+                }
+                // If methods will also need to be placed in the classbox, extra padding
+                // is needed to accommodate the additional separator line between the field list and
+                // the method list.
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                if (numOfMeths != 0)</span>
+<span class="nc" id="L154">                    setBoxHeight(boxHeight + 10);</span>
+            }
+            // Add the field to the fieldTextList
+<span class="nc" id="L157">            Text text = new Text(attName);</span>
+<span class="nc" id="L158">            fieldTextList.add(text);</span>
+<span class="nc" id="L159">        }</span>
+
+        // If the object to be added is a method, add a newline to the front of it's name to put it
+        // on a new line in the classbox, and add &quot;+ &quot; to front of the name, and &quot;()&quot; to the back
+        // for formatting
+        else {
+<span class="nc" id="L165">            attName = (&quot;\n+ &quot; + ((Method) att).getAttName() + &quot;(&quot;);</span>
+<span class="nc" id="L166">            String paramText = &quot;&quot;;</span>
+<span class="nc" id="L167">            ArrayList&lt;Parameter&gt; paramList = ((Method) att).getParamList();</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            if (paramList.size() &gt;= 1) {</span>
+<span class="nc" id="L169">                paramText += paramList.get(0).getAttName() + &quot; : &quot; + paramList.get(0).getFieldType();</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                for (int i = 1; i &lt; paramList.size(); ++i) {</span>
+<span class="nc" id="L171">                    paramText += &quot;, &quot; + paramList.get(i).getAttName() + &quot; : &quot; + paramList.get(i).getFieldType();</span>
+                }
+            }
+<span class="nc" id="L174">            attName += paramText + &quot;)&quot;;</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">            if(!((Method) att).getReturnType().equals(&quot;void&quot;)){</span>
+<span class="nc" id="L176">                 attName += &quot; : &quot; + ((Method) att).getReturnType();</span>
+            }
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (dontAddPadding) {</span>
+<span class="nc" id="L179">                String name = ((Method) att).getAttName();</span>
+<span class="nc" id="L180">                methTextList.removeIf(textObj -&gt; textObj.getText().startsWith(&quot;\n+ &quot; + name));</span>
+            }
+                // If this is the first method ever being added to the class associated with this
+                // classbox, then initialize the methTextList, and increase the size of the
+                // classbox for formatting. Attributes are added to their classes BEFORE the drawing of the box,
+                // so the number of methods in a class will only == 1 inside this method when this is the first
+                // method being added to a class.
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                if (numOfMeths == 1) {</span>
+<span class="nc" id="L188">                    methTextList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">                    if (!dontAddPadding) {</span>
+<span class="nc" id="L190">                        setBoxHeight(boxHeight + 15);</span>
+                    }
+                    // If fields will also need to be placed in the classbox, extra padding
+                    // is needed to accommodate the additional separator line between the field list and
+                    // the method list.
+<span class="nc bnc" id="L195" title="All 4 branches missed.">                    if (!dontAddPadding &amp;&amp; numOfFields != 0)</span>
+<span class="nc" id="L196">                        setBoxHeight(boxHeight + 10);</span>
+                }
+                // Add the method to the methTextList
+<span class="nc" id="L199">                Text text = new Text(attName);</span>
+<span class="nc" id="L200">                methTextList.add(text);</span>
+            }
+        // Draw a separating line between the title of the class, and the attribute list(s)
+        // that are about to be added
+<span class="nc" id="L204">        drawSeparator();</span>
+        // If fields need to be added...
+<span class="nc bnc" id="L206" title="All 2 branches missed.">        if (numOfFields != 0) {</span>
+            // Iterate through the fieldTextList, and add each Text object to the flow, which in turn
+            // displays the fields on the box
+<span class="nc bnc" id="L209" title="All 2 branches missed.">            for (Text fieldText : fieldTextList) {</span>
+<span class="nc" id="L210">                flow.getChildren().add(fieldText);</span>
+<span class="nc" id="L211">            }</span>
+            // If methods also need to be added, draw another separator line
+<span class="nc bnc" id="L213" title="All 2 branches missed.">            if (numOfMeths != 0) {</span>
+<span class="nc" id="L214">                drawSeparator();</span>
+            }
+        }
+        // If methods need to be added...
+<span class="nc bnc" id="L218" title="All 2 branches missed.">        if (numOfMeths != 0) {</span>
+            // Iterate through the methTextList, and add each Text object to the flow, which in turn
+            // displays the methods on the box
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            for (Text methText : methTextList) {</span>
+<span class="nc" id="L222">                flow.getChildren().add(methText);</span>
+<span class="nc" id="L223">            }</span>
+        }
+<span class="nc" id="L225">    }</span>
+
+    /**
+     * draw a horizontal line across the classbox
+     */
+    public void drawSeparator () {
+<span class="nc" id="L231">        flow.getChildren().add(new Text(System.lineSeparator()));</span>
+<span class="nc" id="L232">        Line line = new Line(0, 0, titleBox.getWidth(), 0);</span>
+<span class="nc" id="L233">        flow.getChildren().add(line);</span>
+<span class="nc" id="L234">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

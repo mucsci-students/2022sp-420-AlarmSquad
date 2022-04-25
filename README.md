@@ -6,7 +6,7 @@
 
 ## Setup:
 
-1. Open Terminal for Linux and macOS, Command Prompt for Windows
+1. Open Terminal for Linux and MacOS, Command Prompt for Windows
 
 2. Clone the repository
 
@@ -17,8 +17,8 @@ git clone https://github.com/mucsci-students/2022sp-420-AlarmSquad
 3. Navigate to the app directory inside the project folder
 
 ```
-# Linux and macOS
-cd 2022sp-420-AlarmSquad\maven\initial
+# Linux and MacOS
+cd 2022sp-420-AlarmSquad/maven/initial
 
 # Windows
 cd 2022sp-420-AlarmSquad\maven\initial
@@ -27,7 +27,7 @@ cd 2022sp-420-AlarmSquad\maven\initial
 4. Invoke `mvnw` for your OS.
 
 ```
-# Linux and macOS
+# Linux and MacOS
 ./mvnw package
 
 # Windows
@@ -37,6 +37,14 @@ cd 2022sp-420-AlarmSquad\maven\initial
 5. To run the application, invoke the generated jar file
 
 ```
+# Linux and MacOS:
+# To run in GUI (default)
+java -jar target/2022sp-420-AlarmSquad-1.0.jar
+
+# To run in CLI
+java -jar target/2022sp-420-AlarmSquad-1.0.jar --cli
+
+# Windows:
 # To run in GUI (default)
 java -jar target\2022sp-420-AlarmSquad-1.0.jar
 
@@ -71,5 +79,7 @@ java -jar target\2022sp-420-AlarmSquad-1.0.jar --cli
     - A stack of saved states is how our Undo/Redo feature works. Each time an action is made, a state is created and put on the stack. Undo will go backwards to the previous state of the Editor. Redo will move forward to the next state after using Undo.
   - Observer
     - This is the View of our project. Are project design is Based on MVC(Model, View, Controller). The View, registered with the controllers, will show the user the data they are using. The controller will wait for an event to occur and act upon it to update the Model and the View.
-
+  - Object Pool
+    - Our object pool consists of the model object, the view object and the caretaker. These global objects are never destroyed and are reusable whenever the user requests to do something to that object like create a class, display that class and undo/redo their actions made to those objects.
+    
 ###### Authors: Aaron Katz, Logan Santee, Andrew Foster, Ryan Ganzke, Max Moyer  

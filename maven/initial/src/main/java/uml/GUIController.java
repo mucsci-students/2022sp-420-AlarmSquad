@@ -1,12 +1,21 @@
 package uml;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.WritableImage;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.*;
 import java.util.ArrayList;
 
 @SuppressWarnings("DanglingJavadoc")
@@ -34,9 +43,28 @@ public class GUIController {
      * @param file the given file to be saved
      * @param stage the working stage
      */
-    public void saveAction(File file, Stage stage) {
+    public void saveFileAction(File file, Stage stage) {
         JSON json = new JSON(this.model, this.view);
         json.saveGUI(file);
+        stage.close();
+    }
+
+    /**
+     *
+     * Saves an image to the given file
+     *
+     * @param file the given file to be saved
+     * @param root the super root
+     */
+    public void saveImageAction(File file, Stage stage, Group root, double width, double height) {
+        try {
+            WritableImage writableImage = new WritableImage((int) width, (int) height);
+            root.snapshot(null, writableImage);
+            RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+            ImageIO.write(renderedImage, "png", file);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         stage.close();
     }
 

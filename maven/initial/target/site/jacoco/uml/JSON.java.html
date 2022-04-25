@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSON.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">2022sp-420-AlarmSquad</a> &gt; <a href="index.source.html" class="el_package">uml</a> &gt; <span class="el_source">JSON.java</span></div><h1>JSON.java</h1><pre class="source lang-java linenums">package uml;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Objects;
+
+public class JSON {
+
+    // the default directory to save new files to
+<span class="nc" id="L18">    private final String DEFAULT_DIR = System.getProperty(&quot;user.dir&quot;);</span>
+    // the model to use in the save
+    private UMLModel model;
+    // the view of the gui
+    private GUIView view;
+    // a copy of the classList from Driver
+    private ArrayList&lt;UMLClass&gt; classList;
+    // a copy of the relationshipList from Driver
+    private ArrayList&lt;Relationship&gt; relationshipList;
+    // the JSON object to be saved
+<span class="nc" id="L28">    private JSONObject saveFile = new JSONObject();</span>
+
+<span class="nc" id="L30">    public JSON(UMLModel model) {</span>
+<span class="nc" id="L31">        this.model = model;</span>
+<span class="nc" id="L32">        this.classList = model.getClassList();</span>
+<span class="nc" id="L33">        this.relationshipList = model.getRelationshipList();</span>
+<span class="nc" id="L34">    }</span>
+
+<span class="nc" id="L36">    public JSON(UMLModel model, GUIView view) {</span>
+<span class="nc" id="L37">        this.view = view;</span>
+<span class="nc" id="L38">        this.model = model;</span>
+<span class="nc" id="L39">        this.classList = model.getClassList();</span>
+<span class="nc" id="L40">        this.relationshipList = model.getRelationshipList();</span>
+<span class="nc" id="L41">    }</span>
+
+    /**
+     * Saves the current UML diagram to a file with a given name in the default directory
+     * Overrides a file if it has the same name
+     *
+     * @param fileName the name of the file to be saved to
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public void saveCLI(String fileName) {
+        // if the file name doesn't already end in .json, append it
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (!fileName.endsWith(&quot;.json&quot;)) {</span>
+<span class="nc" id="L53">            fileName += &quot;.json&quot;;</span>
+        }
+        // perform the save and give the data to the saveFile object
+<span class="nc" id="L56">        saveFile = executeSave(true);</span>
+        // create a file with the default directory and given file name
+<span class="nc" id="L58">        File fileToBeSaved = new File(DEFAULT_DIR, fileName);</span>
+        // save the file
+<span class="nc" id="L60">        try (FileWriter file = new FileWriter(fileToBeSaved)) {</span>
+<span class="nc" id="L61">            file.write(saveFile.toString());</span>
+<span class="nc" id="L62">            file.flush();</span>
+<span class="nc" id="L63">        } catch (IOException exception) {</span>
+<span class="nc" id="L64">            exception.printStackTrace();</span>
+<span class="nc" id="L65">        }</span>
+        // inform the user that the save worked
+<span class="nc" id="L67">        System.out.println(&quot;Diagram has been saved to \&quot;&quot; + fileName + &quot;\&quot;&quot;);</span>
+<span class="nc" id="L68">    }</span>
+
+    /**
+     * Saves the current UML diagram to a given file
+     * Overrides a file if it is the same file
+     *
+     * @param file the file to be saved to
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public void saveGUI(File file) {
+        // perform the save and give the data to the saveFile object
+<span class="nc" id="L79">        saveFile = executeSave(false);</span>
+        // save the file to the given file
+<span class="nc" id="L81">        try (FileWriter fileWriter = new FileWriter(file)) {</span>
+<span class="nc" id="L82">            fileWriter.write(saveFile.toString());</span>
+<span class="nc" id="L83">            fileWriter.flush();</span>
+<span class="nc" id="L84">        } catch (IOException exception) {</span>
+<span class="nc" id="L85">            exception.printStackTrace();</span>
+<span class="nc" id="L86">        }</span>
+<span class="nc" id="L87">    }</span>
+
+    /**
+     * The functionality of the save
+     * Creates a JSONObject which holds all the model data
+     *
+     * @return a JSONObject to be used by other save methods
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private JSONObject executeSave(boolean isInCLI) {
+        // a JSON array that contains a list of all the classes
+<span class="nc" id="L98">        JSONArray saveClasses = new JSONArray();</span>
+        // a JSON array that contains a list of all the relationships
+<span class="nc" id="L100">        JSONArray saveRelationships = new JSONArray();</span>
+
+<span class="nc" id="L102">        int numClasses = 0;</span>
+        // iterate through the classList
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        for (UMLClass UMLClassObj : classList) {</span>
+<span class="nc" id="L105">            numClasses++;</span>
+<span class="nc" id="L106">            JSONObject classToBeSaved = new JSONObject();</span>
+            // add name to JSON
+<span class="nc" id="L108">            classToBeSaved.put(&quot;className&quot;, UMLClassObj.getClassName());</span>
+
+            // make new JSONArray
+<span class="nc" id="L111">            JSONArray fieldList = new JSONArray();</span>
+<span class="nc" id="L112">            JSONArray methList = new JSONArray();</span>
+
+            // iterate through the Class object's field and method lists
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            for (Field fieldObj : UMLClassObj.getFieldList()) {</span>
+<span class="nc" id="L116">                JSONObject fieldToBeSaved = new JSONObject();</span>
+<span class="nc" id="L117">                fieldToBeSaved.put(&quot;name&quot;, fieldObj.getAttName());</span>
+<span class="nc" id="L118">                fieldToBeSaved.put(&quot;type&quot;, fieldObj.getFieldType());</span>
+                // put each field in the JSONArray
+<span class="nc" id="L120">                fieldList.add(fieldToBeSaved);</span>
+<span class="nc" id="L121">            }</span>
+
+<span class="nc bnc" id="L123" title="All 2 branches missed.">            for (Method methObj : UMLClassObj.getMethodList()) {</span>
+<span class="nc" id="L124">                JSONObject methToBeSaved = new JSONObject();</span>
+<span class="nc" id="L125">                methToBeSaved.put(&quot;name&quot;, methObj.getAttName());</span>
+<span class="nc" id="L126">                methToBeSaved.put(&quot;returnType&quot;, methObj.getReturnType());</span>
+
+                // iterate through the method object's parameters
+<span class="nc" id="L129">                JSONArray paramList = new JSONArray();</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">                for (Parameter paramObj : methObj.getParamList()) {</span>
+<span class="nc" id="L131">                    JSONObject paramToBeSaved = new JSONObject();</span>
+<span class="nc" id="L132">                    paramToBeSaved.put(&quot;name&quot;, paramObj.getAttName());</span>
+<span class="nc" id="L133">                    paramToBeSaved.put(&quot;type&quot;, paramObj.getFieldType());</span>
+                    // put each parameter in the JSONArray
+<span class="nc" id="L135">                    paramList.add(paramToBeSaved);</span>
+<span class="nc" id="L136">                }</span>
+<span class="nc" id="L137">                methToBeSaved.put(&quot;parameters&quot;, paramList);</span>
+                // put each method in the JSONArray
+<span class="nc" id="L139">                methList.add(methToBeSaved);</span>
+<span class="nc" id="L140">            }</span>
+
+            // put the field and method JSONArray into the JSON Class object
+<span class="nc" id="L143">            classToBeSaved.put(&quot;fieldList&quot;, fieldList);</span>
+<span class="nc" id="L144">            classToBeSaved.put(&quot;methodList&quot;, methList);</span>
+
+            // create a location object to store the x and y of the class box
+<span class="nc" id="L147">            JSONObject location = new JSONObject();</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">            if (isInCLI) {</span>
+<span class="nc" id="L149">                int multiplier = ((numClasses - 1) / 8);</span>
+<span class="nc" id="L150">                int yOffset = 20 + (multiplier * 200) + 20;</span>
+<span class="nc" id="L151">                int xOffset = (-85) + (((numClasses - 1) % 8) * 115) + 100;</span>
+<span class="nc" id="L152">                location.put(&quot;x&quot;, (double) xOffset);</span>
+<span class="nc" id="L153">                location.put(&quot;y&quot;, (double) yOffset);</span>
+<span class="nc" id="L154">            } else {</span>
+<span class="nc" id="L155">                location.put(&quot;x&quot;, this.view.findClassBox(UMLClassObj.getClassName()).getX());</span>
+<span class="nc" id="L156">                location.put(&quot;y&quot;, this.view.findClassBox(UMLClassObj.getClassName()).getY());</span>
+            }
+
+            // put the location object in the JSON Class object
+<span class="nc" id="L160">            classToBeSaved.put(&quot;location&quot;, location);</span>
+            // put the JSONArray into the JSON object
+<span class="nc" id="L162">            saveClasses.add(classToBeSaved);</span>
+<span class="nc" id="L163">        }</span>
+        // add the classList to the JSONObject
+<span class="nc" id="L165">        saveFile.put(&quot;classList&quot;, saveClasses);</span>
+
+        // iterate through the relationship list
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        for (Relationship relObj : relationshipList) {</span>
+<span class="nc" id="L169">            JSONObject relToBeSaved = new JSONObject();</span>
+            // add source to JSON object
+<span class="nc" id="L171">            relToBeSaved.put(&quot;source&quot;, relObj.getSource().getClassName());</span>
+            // add destination to JSON object
+<span class="nc" id="L173">            relToBeSaved.put(&quot;destination&quot;, relObj.getDestination().getClassName());</span>
+            // add relType to JSON object
+<span class="nc" id="L175">            relToBeSaved.put(&quot;relType&quot;, relObj.getRelType());</span>
+            // put the JSON object in the JSONArray
+<span class="nc" id="L177">            saveRelationships.add(relToBeSaved);</span>
+<span class="nc" id="L178">        }</span>
+        // add the relationshipList to the JSONObject
+<span class="nc" id="L180">        saveFile.put(&quot;relationshipList&quot;, saveRelationships);</span>
+<span class="nc" id="L181">        return saveFile;</span>
+    }
+
+    /**
+     * Loads the current UML diagram from a file with a given name
+     * DOES NOT CHECK IF THE DIRECTORY IS EMPTY
+     *
+     * @param fileName the name of the file to be loaded from
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public UMLModel loadCLI(String fileName) {
+        // if the file name doesn't already end in .json, append it
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        if (!fileName.endsWith(&quot;.json&quot;)) {</span>
+<span class="nc" id="L194">            fileName += &quot;.json&quot;;</span>
+        }
+        // checks to see if the file exists in the directory
+<span class="nc bnc" id="L197" title="All 2 branches missed.">        if (!doesFileExist(fileName)) {</span>
+<span class="nc" id="L198">            return null;</span>
+        }
+        // gets the file in the correct directory
+<span class="nc" id="L201">        File fileToBeLoaded = new File(DEFAULT_DIR + &quot;/&quot; + fileName);</span>
+        // perform the load with the new file and return the model
+<span class="nc" id="L203">        return executeLoad(fileToBeLoaded, true);</span>
+    }
+
+    /**
+     * Loads the current UML diagram from a given file
+     * DOES NOT CHECK IF THE DIRECTORY IS EMPTY
+     *
+     * @param file the file to be loaded from
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public UMLModel loadGUI(File file) {
+        // perform the load with the given file
+<span class="nc" id="L215">        return executeLoad(file, false);</span>
+    }
+
+    /**
+     * The functionality of the load
+     * Accesses a file which holds all the model data, the adds that data to the model
+     *
+     * @param file the file to be loaded from
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private UMLModel executeLoad(File file, boolean isInCLI) {
+        try {
+            // wipe both lists
+<span class="nc" id="L228">            this.model.clearClassList();</span>
+<span class="nc" id="L229">            this.model.clearRelationshipList();</span>
+            // makes the JSONParser
+<span class="nc" id="L231">            Object obj = new JSONParser().parse(new FileReader(file));</span>
+            // casting obj to JSONObject
+<span class="nc" id="L233">            JSONObject jo = (JSONObject) obj;</span>
+
+            // JSONArray for getting the saved classList
+<span class="nc" id="L236">            JSONArray classArray = (JSONArray) jo.get(&quot;classList&quot;);</span>
+
+            // loops through the classes and attributes of the classes
+<span class="nc bnc" id="L239" title="All 2 branches missed.">            for (JSONObject current : (Iterable&lt;JSONObject&gt;) classArray) {</span>
+                // finds the class' name at the key &quot;className&quot;
+<span class="nc" id="L241">                String className = (String) current.get(&quot;className&quot;);</span>
+
+<span class="nc" id="L243">                JSONArray fieldArray = (JSONArray) current.get(&quot;fieldList&quot;);</span>
+<span class="nc" id="L244">                JSONArray methArray = (JSONArray) current.get(&quot;methodList&quot;);</span>
+                // iterator for iterating fieldList
+<span class="nc" id="L246">                Iterator&lt;JSONObject&gt; fieldIter = fieldArray.iterator();</span>
+                // iterator for iterating fieldList
+<span class="nc" id="L248">                Iterator&lt;JSONObject&gt; methIter = methArray.iterator();</span>
+
+                // make the new class
+<span class="nc" id="L251">                UMLClass newUMLClass = new UMLClass(className);</span>
+                // loop through the fieldList
+<span class="nc bnc" id="L253" title="All 2 branches missed.">                while (fieldIter.hasNext()) {</span>
+<span class="nc" id="L254">                    JSONObject currentField = fieldIter.next();</span>
+<span class="nc" id="L255">                    String fieldName = (String) currentField.get(&quot;name&quot;);</span>
+<span class="nc" id="L256">                    String fieldType = (String) currentField.get(&quot;type&quot;);</span>
+                    // make new field
+<span class="nc" id="L258">                    Field newField = new Field(fieldName, fieldType);</span>
+                    // add field to class
+<span class="nc" id="L260">                    newUMLClass.addField(newField);</span>
+<span class="nc" id="L261">                }</span>
+                // loop through the methodList
+<span class="nc bnc" id="L263" title="All 2 branches missed.">                while (methIter.hasNext()) {</span>
+<span class="nc" id="L264">                    JSONObject currentMeth = methIter.next();</span>
+<span class="nc" id="L265">                    String methName = (String) currentMeth.get(&quot;name&quot;);</span>
+<span class="nc" id="L266">                    String methType = (String) currentMeth.get(&quot;returnType&quot;);</span>
+                    // make new method
+<span class="nc" id="L268">                    Method newMeth = new Method(methName, methType);</span>
+                    // array of parameters in the method
+<span class="nc" id="L270">                    JSONArray paramArray = (JSONArray) currentMeth.get(&quot;parameters&quot;);</span>
+                    // iterator for iterating parameters
+<span class="nc" id="L272">                    Iterator&lt;JSONObject&gt; paramIter = paramArray.iterator();</span>
+                    // loop through the paramList
+<span class="nc bnc" id="L274" title="All 2 branches missed.">                    while (paramIter.hasNext()) {</span>
+<span class="nc" id="L275">                        JSONObject currentParam = paramIter.next();</span>
+<span class="nc" id="L276">                        String paramName = (String) currentParam.get(&quot;name&quot;);</span>
+<span class="nc" id="L277">                        String paramType = (String) currentParam.get(&quot;type&quot;);</span>
+                        // make new parameter
+<span class="nc" id="L279">                        Parameter newParam = new Parameter(paramName, paramType);</span>
+<span class="nc" id="L280">                        newMeth.addParameter(newParam);</span>
+<span class="nc" id="L281">                    }</span>
+                    // add method to class
+<span class="nc" id="L283">                    newUMLClass.addMethod(newMeth);</span>
+<span class="nc" id="L284">                }</span>
+
+                // get the JSON object containing the x and y values for the class box to be created
+<span class="nc" id="L287">                JSONObject location = (JSONObject) current.get(&quot;location&quot;);</span>
+                // puts the x and y values for the class box in the coordinate map
+<span class="nc" id="L289">                this.view.addToCoordinateMap((String) current.get(&quot;className&quot;), (Double) location.get(&quot;x&quot;), (Double) location.get(&quot;y&quot;));</span>
+
+                // add the filled class to the classList
+<span class="nc" id="L292">                this.model.addClass(newUMLClass);</span>
+<span class="nc" id="L293">            }</span>
+
+            // JSONArray for getting the saved relationshipList
+<span class="nc" id="L296">            JSONArray relArray = (JSONArray) jo.get(&quot;relationshipList&quot;);</span>
+            // iterator for iterating for source
+<span class="nc" id="L298">            Iterator&lt;JSONObject&gt; srcIter = relArray.iterator();</span>
+            // iterator for iterating for destination
+<span class="nc" id="L300">            Iterator&lt;JSONObject&gt; destIter = relArray.iterator();</span>
+            // iterator for iterating for relType
+<span class="nc" id="L302">            Iterator&lt;JSONObject&gt; typeIter = relArray.iterator();</span>
+
+            // iterate through the relationships
+<span class="nc bnc" id="L305" title="All 2 branches missed.">            while (srcIter.hasNext()) {</span>
+                // get the source name of the relationship
+<span class="nc" id="L307">                String sourceName = (String) srcIter.next().get(&quot;source&quot;);</span>
+                // get the type name of the relationship (possible problem with multiple relationships)
+<span class="nc" id="L309">                String relTypeName = (String) typeIter.next().get(&quot;relType&quot;);</span>
+                // get the destination name of the relationship
+<span class="nc" id="L311">                String destinationName = (String) destIter.next().get(&quot;destination&quot;);</span>
+                // make a new relationship with the correct parameters
+<span class="nc" id="L313">                Relationship newRelationship = new Relationship(Objects.requireNonNull(this.model.findClass(sourceName)),</span>
+<span class="nc" id="L314">                        Objects.requireNonNull(this.model.findClass(destinationName)), relTypeName);</span>
+                // add the relationship to the relationship list
+<span class="nc" id="L316">                this.model.addRel(newRelationship);</span>
+<span class="nc" id="L317">            }</span>
+<span class="nc" id="L318">        } catch (Exception exception) {</span>
+            // if the program catches an error related to an invalid file, inform the user
+<span class="nc bnc" id="L320" title="All 2 branches missed.">            if (isInCLI) {</span>
+<span class="nc" id="L321">                System.out.println(&quot;Invalid file&quot;);</span>
+            } else {
+<span class="nc" id="L323">                this.view.popUpWindow(&quot;Error&quot;, &quot;Invalid file&quot;);</span>
+            }
+<span class="nc" id="L325">        }</span>
+<span class="nc" id="L326">        return this.model;</span>
+    }
+
+    /**
+     * Checks to see if the provided file is in the directory
+     *
+     * @param fileName the provided file name
+     * @return true if found, false otherwise
+     */
+    public boolean doesFileExist(String fileName) {
+<span class="nc bnc" id="L336" title="All 2 branches missed.">        if (!fileName.endsWith(&quot;.json&quot;)) {</span>
+<span class="nc" id="L337">            fileName += &quot;.json&quot;;</span>
+        }
+        // a file which acts as the save file directory
+<span class="nc" id="L340">        File dir = new File(DEFAULT_DIR);</span>
+<span class="nc bnc" id="L341" title="All 2 branches missed.">        for (String file : Objects.requireNonNull(dir.list())) {</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">            if (file.equals((fileName))) {</span>
+<span class="nc" id="L343">                return true;</span>
+            }
+        }
+<span class="nc" id="L346">        return false;</span>
+    }
+
+    /**
+     * Checks to see if the save file directory is empty
+     *
+     * @return true if empty, false otherwise
+     */
+    public boolean ifDirIsEmpty() {
+<span class="nc" id="L355">        File dir = new File(DEFAULT_DIR);</span>
+<span class="nc" id="L356">        String[] fileList = dir.list();</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">        return Objects.requireNonNull(fileList).length == 1;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
