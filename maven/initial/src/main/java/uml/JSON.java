@@ -105,7 +105,7 @@ public class JSON {
             numClasses++;
             JSONObject classToBeSaved = new JSONObject();
             // add name to JSON
-            classToBeSaved.put("className", UMLClassObj.getClassName());
+            classToBeSaved.put("name", UMLClassObj.getClassName());
 
             // make new JSONArray
             JSONArray fieldList = new JSONArray();
@@ -123,7 +123,7 @@ public class JSON {
             for (Method methObj : UMLClassObj.getMethodList()) {
                 JSONObject methToBeSaved = new JSONObject();
                 methToBeSaved.put("name", methObj.getAttName());
-                methToBeSaved.put("returnType", methObj.getReturnType());
+                methToBeSaved.put("return_type", methObj.getReturnType());
 
                 // iterate through the method object's parameters
                 JSONArray paramList = new JSONArray();
@@ -134,14 +134,14 @@ public class JSON {
                     // put each parameter in the JSONArray
                     paramList.add(paramToBeSaved);
                 }
-                methToBeSaved.put("parameters", paramList);
+                methToBeSaved.put("params", paramList);
                 // put each method in the JSONArray
                 methList.add(methToBeSaved);
             }
 
             // put the field and method JSONArray into the JSON Class object
-            classToBeSaved.put("fieldList", fieldList);
-            classToBeSaved.put("methodList", methList);
+            classToBeSaved.put("fields", fieldList);
+            classToBeSaved.put("methods", methList);
 
             // create a location object to store the x and y of the class box
             JSONObject location = new JSONObject();
@@ -162,7 +162,7 @@ public class JSON {
             saveClasses.add(classToBeSaved);
         }
         // add the classList to the JSONObject
-        saveFile.put("classList", saveClasses);
+        saveFile.put("classes", saveClasses);
 
         // iterate through the relationship list
         for (Relationship relObj : relationshipList) {
@@ -172,12 +172,12 @@ public class JSON {
             // add destination to JSON object
             relToBeSaved.put("destination", relObj.getDestination().getClassName());
             // add relType to JSON object
-            relToBeSaved.put("relType", relObj.getRelType());
+            relToBeSaved.put("type", relObj.getRelType());
             // put the JSON object in the JSONArray
             saveRelationships.add(relToBeSaved);
         }
         // add the relationshipList to the JSONObject
-        saveFile.put("relationshipList", saveRelationships);
+        saveFile.put("relationships", saveRelationships);
         return saveFile;
     }
 
@@ -233,15 +233,15 @@ public class JSON {
             JSONObject jo = (JSONObject) obj;
 
             // JSONArray for getting the saved classList
-            JSONArray classArray = (JSONArray) jo.get("classList");
+            JSONArray classArray = (JSONArray) jo.get("classes");
 
             // loops through the classes and attributes of the classes
             for (JSONObject current : (Iterable<JSONObject>) classArray) {
                 // finds the class' name at the key "className"
-                String className = (String) current.get("className");
+                String className = (String) current.get("name");
 
-                JSONArray fieldArray = (JSONArray) current.get("fieldList");
-                JSONArray methArray = (JSONArray) current.get("methodList");
+                JSONArray fieldArray = (JSONArray) current.get("fields");
+                JSONArray methArray = (JSONArray) current.get("methods");
                 // iterator for iterating fieldList
                 Iterator<JSONObject> fieldIter = fieldArray.iterator();
                 // iterator for iterating fieldList
@@ -263,11 +263,11 @@ public class JSON {
                 while (methIter.hasNext()) {
                     JSONObject currentMeth = methIter.next();
                     String methName = (String) currentMeth.get("name");
-                    String methType = (String) currentMeth.get("returnType");
+                    String methType = (String) currentMeth.get("return_type");
                     // make new method
                     Method newMeth = new Method(methName, methType);
                     // array of parameters in the method
-                    JSONArray paramArray = (JSONArray) currentMeth.get("parameters");
+                    JSONArray paramArray = (JSONArray) currentMeth.get("params");
                     // iterator for iterating parameters
                     Iterator<JSONObject> paramIter = paramArray.iterator();
                     // loop through the paramList
@@ -286,14 +286,14 @@ public class JSON {
                 // get the JSON object containing the x and y values for the class box to be created
                 JSONObject location = (JSONObject) current.get("location");
                 // puts the x and y values for the class box in the coordinate map
-                this.view.addToCoordinateMap((String) current.get("className"), (Double) location.get("x"), (Double) location.get("y"));
+                this.view.addToCoordinateMap((String) current.get("name"), (Double) location.get("x"), (Double) location.get("y"));
 
                 // add the filled class to the classList
                 this.model.addClass(newUMLClass);
             }
 
             // JSONArray for getting the saved relationshipList
-            JSONArray relArray = (JSONArray) jo.get("relationshipList");
+            JSONArray relArray = (JSONArray) jo.get("relationships");
             // iterator for iterating for source
             Iterator<JSONObject> srcIter = relArray.iterator();
             // iterator for iterating for destination
@@ -306,7 +306,7 @@ public class JSON {
                 // get the source name of the relationship
                 String sourceName = (String) srcIter.next().get("source");
                 // get the type name of the relationship (possible problem with multiple relationships)
-                String relTypeName = (String) typeIter.next().get("relType");
+                String relTypeName = (String) typeIter.next().get("type");
                 // get the destination name of the relationship
                 String destinationName = (String) destIter.next().get("destination");
                 // make a new relationship with the correct parameters

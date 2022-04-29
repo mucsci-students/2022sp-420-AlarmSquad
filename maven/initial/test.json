@@ -1,0 +1,1 @@
+{"relationshipList":[{"destination":"b","relType":"aggregation","source":"a"}],"classList":[{"X":278.6666666666667,"Y":271.3333333333333,"className":"a","methodList":[],"fieldList":[{"name":"f","type":"int"}]},{"X":671.3333333333334,"Y":440.6666666666667,"className":"b","methodList":[{"name":"m","parameters":[],"returnType":"void"}],"fieldList":[]}]}

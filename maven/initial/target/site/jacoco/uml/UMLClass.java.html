@@ -86,8 +86,8 @@ public class UMLClass {
     public void deleteAttribute(Attribute attToDel) {
 <span class="fc bfc" id="L87" title="All 2 branches covered.">        if (attToDel instanceof Field fieldToDel) {</span>
 <span class="fc" id="L88">            deleteField(fieldToDel);</span>
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        } else if (attToDel instanceof Method methToDel) {</span>
-<span class="fc" id="L90">            deleteMethod(methToDel);</span>
+        } else {
+<span class="fc" id="L90">            deleteMethod((Method) attToDel);</span>
         }
 <span class="fc" id="L92">    }</span>
 

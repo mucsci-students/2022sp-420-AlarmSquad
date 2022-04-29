@@ -145,13 +145,13 @@ public class ClassBox {
 <span class="nc bnc" id="L145" title="All 2 branches missed.">            if (numOfFields == 1) {</span>
 <span class="nc" id="L146">                fieldTextList = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L147" title="All 2 branches missed.">                if (!dontAddPadding) {</span>
-<span class="nc" id="L148">                    setBoxHeight(boxHeight + 15);</span>
+<span class="nc" id="L148">                    setBoxHeight(boxHeight + 16);</span>
                 }
                 // If methods will also need to be placed in the classbox, extra padding
                 // is needed to accommodate the additional separator line between the field list and
                 // the method list.
 <span class="nc bnc" id="L153" title="All 2 branches missed.">                if (numOfMeths != 0)</span>
-<span class="nc" id="L154">                    setBoxHeight(boxHeight + 10);</span>
+<span class="nc" id="L154">                    setBoxHeight(boxHeight + 11);</span>
             }
             // Add the field to the fieldTextList
 <span class="nc" id="L157">            Text text = new Text(attName);</span>
@@ -187,13 +187,13 @@ public class ClassBox {
 <span class="nc bnc" id="L187" title="All 2 branches missed.">                if (numOfMeths == 1) {</span>
 <span class="nc" id="L188">                    methTextList = new ArrayList&lt;&gt;();</span>
 <span class="nc bnc" id="L189" title="All 2 branches missed.">                    if (!dontAddPadding) {</span>
-<span class="nc" id="L190">                        setBoxHeight(boxHeight + 15);</span>
+<span class="nc" id="L190">                        setBoxHeight(boxHeight + 16);</span>
                     }
                     // If fields will also need to be placed in the classbox, extra padding
                     // is needed to accommodate the additional separator line between the field list and
                     // the method list.
 <span class="nc bnc" id="L195" title="All 4 branches missed.">                    if (!dontAddPadding &amp;&amp; numOfFields != 0)</span>
-<span class="nc" id="L196">                        setBoxHeight(boxHeight + 10);</span>
+<span class="nc" id="L196">                        setBoxHeight(boxHeight + 11);</span>
                 }
                 // Add the method to the methTextList
 <span class="nc" id="L199">                Text text = new Text(attName);</span>
