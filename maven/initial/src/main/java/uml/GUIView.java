@@ -3,9 +3,11 @@ package uml;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.value.ObservableNumberValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,11 +15,13 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -25,6 +29,7 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
+import java.beans.EventHandler;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +103,21 @@ public class GUIView extends Application {
             diagram_height = stage.getHeight();
         });
         stage.show();
+
+        superRoot.setOnScroll(event -> {
+            if(event.getDeltaY() < 0) {
+                Scale scale1 = new Scale(.99,.99);
+                for(ClassBox box : classBoxList){
+                    box.getClassPane().getTransforms().add(scale1);
+                }
+            }
+            else{
+                Scale scale2 = new Scale(1.01,1.01);
+                for(ClassBox box : classBoxList){
+                    box.getClassPane().getTransforms().add(scale2);
+                }
+            }
+        });
     }
 
     public Group getSuperRoot() {
@@ -1151,6 +1171,7 @@ public class GUIView extends Application {
             startDragX = event.getSceneX();
             startDragY = event.getSceneY();
         });
+
         // keep box under mouse as the mouse continues to drag
         classBox.getClassPane().setOnMouseDragged(event -> {
             classBox.getClassPane().setTranslateX(event.getSceneX() - startDragX);

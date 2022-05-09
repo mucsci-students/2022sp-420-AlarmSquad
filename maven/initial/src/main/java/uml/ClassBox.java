@@ -145,13 +145,13 @@ public class ClassBox {
             if (numOfFields == 1) {
                 fieldTextList = new ArrayList<>();
                 if (!dontAddPadding) {
-                    setBoxHeight(boxHeight + 15);
+                    setBoxHeight(boxHeight + 16);
                 }
                 // If methods will also need to be placed in the classbox, extra padding
                 // is needed to accommodate the additional separator line between the field list and
                 // the method list.
                 if (numOfMeths != 0)
-                    setBoxHeight(boxHeight + 10);
+                    setBoxHeight(boxHeight + 11);
             }
             // Add the field to the fieldTextList
             Text text = new Text(attName);
@@ -187,13 +187,13 @@ public class ClassBox {
                 if (numOfMeths == 1) {
                     methTextList = new ArrayList<>();
                     if (!dontAddPadding) {
-                        setBoxHeight(boxHeight + 15);
+                        setBoxHeight(boxHeight + 16);
                     }
                     // If fields will also need to be placed in the classbox, extra padding
                     // is needed to accommodate the additional separator line between the field list and
                     // the method list.
                     if (!dontAddPadding && numOfFields != 0)
-                        setBoxHeight(boxHeight + 10);
+                        setBoxHeight(boxHeight + 11);
                 }
                 // Add the method to the methTextList
                 Text text = new Text(attName);
